@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?xml-stylesheet title="XSL_formatting" type="text/xsl" href="feed.xsl"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Uttarakhand: CAP Disaster Alert Feeds</title>
+    <description>CAP Integrated Alert System Warning Updates</description>
+    <language>en</language>
+    <link>https://sachet.ndma.gov.in/cap_public_website/rss/rss_uttarakhand.xml</link>
+    <atom:link href="https://sachet.ndma.gov.in/cap_public_website/rss/rss_uttarakhand.xml" rel="self" type="application/rss+xml"/>
+    <copyright>public domain</copyright>
+    <pubDate>Fri, 16 Oct 2026 09:04:34 GMT</pubDate>
+    <item>
+      <title>Thunderstorm accompanied with lightning and gusty wind (30-40 kmph) likely to occur is likely to occur at isolated places over Almora, Bageshwar, Chamoli, Champawat, Dehradun, Nainital, Pauri Garhwal, Pithoragarh, Rudraprayag, Tehri Garhwal, Uttarkashi in next 24 hours.</title>
+      <description/>
+      <category>Met</category>
+      <link>https://sachet.ndma.gov.in/cap_public_website/FetchXMLFile?identifier=1793430002314009</link>
+      <author>controlroom@ndma.gov.in (IMD Dehradun)</author>
+      <guid isPermaLink="false">1793430002314009</guid>
+      <pubDate>Sat, 31 Oct 2026 07:02:37 GMT</pubDate>
+    </item>
+    <item>
+      <title>उक्त जनपदों में कहीं-कहीं गर्जन के साथ आकाशीय बिजली चमकने / झोंकेदार हवाएं (30-40 कि.मी प्रति घंटा) चलने की संभावना है |(Dated 30.10.2026 Time: 2100-2400 IST)</title>
+      <description/>
+      <category>Met</category>
+      <link>https://sachet.ndma.gov.in/cap_public_website/FetchXMLFile?identifier=1793373709267009</link>
+      <author>controlroom@ndma.gov.in (IMD Dehradun)</author>
+      <guid isPermaLink="false">1793373709267009</guid>
+      <pubDate>Fri, 30 Oct 2026 15:24:29 GMT</pubDate>
+    </item>
+    <item>
+      <title>2026/10/30 17:45IST- अगले 3 घंटो में आपके क्षेत्र में कहीं-कहीं हल्की से मध्यम वर्षा / गर्जन के साथ आकाशीय बिजली चमकने / झोंकेदार हवाएं (40-50 kmph) चलने की संभावना है |</title>
+      <description/>
+      <category>Met</category>
+      <link>https://sachet.ndma.gov.in/cap_public_website/FetchXMLFile?identifier=1793363204398009</link>
+      <author>controlroom@ndma.gov.in (IMD Dehradun)</author>
+      <guid isPermaLink="false">1793363204398009</guid>
+      <pubDate>Fri, 30 Oct 2026 12:26:50 GMT</pubDate>
+    </item>
+    <item>
+      <title>कहीं-कहीं  हल्की वर्षा गर्जन के साथ आकाशीय बिजली चमकने/ झोंकेदार हवाएं (३०-४० kmph) होने की संभावना है |</title>
+      <description/>
+      <category>Met</category>
+      <link>https://sachet.ndma.gov.in/cap_public_website/FetchXMLFile?identifier=1793363093639009</link>
+      <author>controlroom@ndma.gov.in (IMD Dehradun)</author>
+      <guid isPermaLink="false">1793363093639009</guid>
+      <pubDate>Fri, 30 Oct 2026 12:30:21 GMT</pubDate>
+    </item>
+    <item>
+      <title>2026/10/30 17:45IST- अगले 3 घंटो में आपके क्षेत्र में कहीं-कहीं हल्की से मध्यम वर्षा / गर्जन के साथ आकाशीय बिजली चमकने / झोंकेदार हवाएं (३०-४० kmph) चलने की संभावना है |</title>
+      <description/>
+      <category>Met</category>
+      <link>https://sachet.ndma.gov.in/cap_public_website/FetchXMLFile?identifier=1793363092001009</link>
+      <author>controlroom@ndma.gov.in (IMD Dehradun)</author>
+      <guid isPermaLink="false">1793363092001009</guid>
+      <pubDate>Fri, 30 Oct 2026 12:25:00 GMT</pubDate>
+    </item>
+    <item>
+      <title>कहीं-कहीं हल्की वर्षा/ गर्जन के साथ वर्षा /आकाशीय बिजली चमकने/झोंकेदार हवाएं (३०-४० kmph) होने की संभावना है |</title>
+      <description/>
+      <category>Met</category>
+      <link>https://sachet.ndma.gov.in/cap_public_website/FetchXMLFile?identifier=1793354268008009</link>
+      <author>controlroom@ndma.gov.in (IMD Dehradun)</author>
+      <guid isPermaLink="false">1793354268008009</guid>
+      <pubDate>Fri, 30 Oct 2026 09:59:26 GMT</pubDate>
+    </item>
+    <item>
+      <title>(2026/10/30) अगले 24 घंटो में आपके क्षेत्र में कहीं-कहीं गर्जन के साथ आकाशीय बिजली चमकने / झोंकेदार हवाएं  (30-40 कि.मी./घंटा से बढ़कर 50 कि.मी./घंटा तक) चलने की संभावना है |</title>
+      <description/>
+      <category>Met</category>
+      <link>https://sachet.ndma.gov.in/cap_public_website/FetchXMLFile?identifier=1793350732688009</link>
+      <author>controlroom@ndma.gov.in (IMD Dehradun)</author>
+      <guid isPermaLink="false">1793350732688009</guid>
+      <pubDate>Fri, 30 Oct 2026 09:01:34 GMT</pubDate>
+    </item>
+    <item>
+      <title>(30-10-2026) अगले 24 घंटों में आपके क्षेत्र में कहीं-कहीं भारी वर्षा / गर्जन के साथ आकाशीय बिजली / झोंकेदार हवाएं (30-40 कि.मी./घंटा से बढ़कर 50 कि.मी./घंटा तक) चलने की संभावना है |</title>
+      <description/>
+      <category>Met</category>
+      <link>https://sachet.ndma.gov.in/cap_public_website/FetchXMLFile?identifier=1793350732141009</link>
+      <author>controlroom@ndma.gov.in (IMD Dehradun)</author>
+      <guid isPermaLink="false">1793350732141009</guid>
+      <pubDate>Fri, 30 Oct 2026 09:00:14 GMT</pubDate>
+    </item>
+    <item>
+      <title>अगले 3 घंटों में आपके क्षेत्र में गर्जन के साथ हल्की से मध्यम वर्षा / झोंकेदार हवाएं (30-40 kmph) चलने की संभावना है |</title>
+      <description/>
+      <category>Met</category>
+      <link>https://sachet.ndma.gov.in/cap_public_website/FetchXMLFile?identifier=1793322290455009</link>
+      <author>controlroom@ndma.gov.in (IMD Dehradun)</author>
+      <guid isPermaLink="false">1793322290455009</guid>
+      <pubDate>Fri, 30 Oct 2026 01:06:56 GMT</pubDate>
+    </item>
+    <item>
+      <title>अगले 3 घंटों में आपके क्षेत्र में गर्जन के साथ हल्की से मध्यम वर्षा / झोंकेदार हवाएं (30-40 kmph) चलने की संभावना है |</title>
+      <description/>
+      <category>Met</category>
+      <link>https://sachet.ndma.gov.in/cap_public_website/FetchXMLFile?identifier=1793311313221009</link>
+      <author>controlroom@ndma.gov.in (IMD Dehradun)</author>
+      <guid isPermaLink="false">1793311313221009</guid>
+      <pubDate>Thu, 29 Oct 2026 22:04:48 GMT</pubDate>
+    </item>
+  </channel>
+</rss>

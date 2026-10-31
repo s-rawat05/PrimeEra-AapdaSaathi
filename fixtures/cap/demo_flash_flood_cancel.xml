@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- FICTIONAL DEMO FIXTURE: Cancel of demo_flash_flood_update.xml -->
+<alert xmlns="urn:oasis:names:tc:emergency:cap:1.2">
+  <identifier>AAPDASAATHI-DEMO-FLOOD-0003</identifier>
+  <sender>demo-control-room@aapdasaathi.invalid</sender>
+  <sent>2026-07-14T18:00:00+05:30</sent>
+  <status>Exercise</status>
+  <msgType>Cancel</msgType>
+  <scope>Public</scope>
+  <references>demo-control-room@aapdasaathi.invalid,AAPDASAATHI-DEMO-FLOOD-0002,2026-07-14T16:10:00+05:30</references>
+  <info>
+    <language>en-IN</language>
+    <category>Met</category>
+    <event>Flash Flood</event>
+    <urgency>Past</urgency>
+    <severity>Minor</severity>
+    <certainty>Observed</certainty>
+    <headline>DEMO EXERCISE: Flash flood warning for Demo Ward DW-01 withdrawn.</headline>
+    <area>
+      <areaDesc>Demo Ward DW-01 Sarovar Nagar (fictional)</areaDesc>
+    </area>
+  </info>
+</alert>

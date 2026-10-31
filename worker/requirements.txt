@@ -1,0 +1,14 @@
+fastapi==0.115.12
+uvicorn[standard]==0.34.2
+httpx==0.28.1
+feedparser==6.0.11
+defusedxml==0.7.1
+pydantic==2.11.4
+pydantic-settings==2.9.1
+sqlalchemy[asyncio]==2.0.41
+aiosqlite==0.21.0
+asyncpg==0.30.0
+shapely==2.1.1
+PyJWT==2.10.1
+firebase-admin==6.8.0
+python-multipart==0.0.20

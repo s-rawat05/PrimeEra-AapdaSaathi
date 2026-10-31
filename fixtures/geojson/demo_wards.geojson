@@ -1,0 +1,37 @@
+{
+  "type": "FeatureCollection",
+  "name": "AapdaSaathi fictional demo wards",
+  "note": "FICTIONAL. Ward names, codes and boundaries are invented for drills and do not represent real administrative units.",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "code": "DW-01",
+        "name": "Sarovar Nagar (DEMO ward DW-01)",
+        "district": "Demo District",
+        "state": "Uttarakhand (demo)",
+        "lgd_district_code": null,
+        "is_demo": true
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[79.552, 29.346], [79.566, 29.346], [79.566, 29.356], [79.552, 29.356], [79.552, 29.346]]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "code": "DW-02",
+        "name": "Pahadi Tola (DEMO ward DW-02)",
+        "district": "Demo District",
+        "state": "Uttarakhand (demo)",
+        "lgd_district_code": null,
+        "is_demo": true
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[79.566, 29.346], [79.578, 29.346], [79.578, 29.356], [79.566, 29.356], [79.566, 29.346]]]
+      }
+    }
+  ]
+}

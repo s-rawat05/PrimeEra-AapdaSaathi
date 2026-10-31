@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- FICTIONAL DEMO FIXTURE: official-style Update to demo_flash_flood_alert.xml -->
+<alert xmlns="urn:oasis:names:tc:emergency:cap:1.2">
+  <identifier>AAPDASAATHI-DEMO-FLOOD-0002</identifier>
+  <sender>demo-control-room@aapdasaathi.invalid</sender>
+  <sent>2026-07-14T16:10:00+05:30</sent>
+  <status>Exercise</status>
+  <msgType>Update</msgType>
+  <scope>Public</scope>
+  <references>demo-control-room@aapdasaathi.invalid,AAPDASAATHI-DEMO-FLOOD-0001,2026-07-14T16:00:00+05:30</references>
+  <info>
+    <language>en-IN</language>
+    <category>Met</category>
+    <event>Flash Flood</event>
+    <urgency>Immediate</urgency>
+    <severity>Extreme</severity>
+    <certainty>Observed</certainty>
+    <onset>2026-07-14T16:15:00+05:30</onset>
+    <expires>2026-07-14T23:00:00+05:30</expires>
+    <headline>DEMO EXERCISE UPDATE: Water level rising fast in Demo Ward DW-01. Severity raised to Extreme.</headline>
+    <instruction>DEMO EXERCISE: Evacuate low-lying lanes now to Demo Relief Post A.</instruction>
+    <area>
+      <areaDesc>Demo Ward DW-01 Sarovar Nagar (fictional)</areaDesc>
+      <polygon>29.345,79.551 29.357,79.551 29.357,79.567 29.345,79.567 29.345,79.551</polygon>
+    </area>
+  </info>
+</alert>

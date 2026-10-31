@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- FICTIONAL DEMO FIXTURE for AapdaSaathi drills. Not an official alert. -->
+<alert xmlns="urn:oasis:names:tc:emergency:cap:1.2">
+  <identifier>AAPDASAATHI-DEMO-FLOOD-0001</identifier>
+  <sender>demo-control-room@aapdasaathi.invalid</sender>
+  <sent>2026-07-14T16:00:00+05:30</sent>
+  <status>Exercise</status>
+  <msgType>Alert</msgType>
+  <scope>Public</scope>
+  <note>Fictional exercise message for the AapdaSaathi demo ward. Not issued by any authority.</note>
+  <info>
+    <language>en-IN</language>
+    <category>Met</category>
+    <event>Flash Flood</event>
+    <urgency>Immediate</urgency>
+    <severity>Severe</severity>
+    <certainty>Likely</certainty>
+    <onset>2026-07-14T16:20:00+05:30</onset>
+    <expires>2026-07-14T22:00:00+05:30</expires>
+    <senderName>AapdaSaathi Demo Control Room (fictional)</senderName>
+    <headline>DEMO EXERCISE: Flash flood likely along the stream in Demo Ward DW-01 within 20 minutes.</headline>
+    <description>DEMO EXERCISE ONLY. Heavy rainfall upstream may cause a sudden rise in water level along the stream bed in the fictional demo ward.</description>
+    <instruction>DEMO EXERCISE: Move away from the stream bed to Demo Relief Post A. Help elderly and disabled neighbours. Do not cross flowing water.</instruction>
+    <area>
+      <areaDesc>Demo Ward DW-01 Sarovar Nagar (fictional)</areaDesc>
+      <polygon>29.345,79.551 29.357,79.551 29.357,79.567 29.345,79.567 29.345,79.551</polygon>
+    </area>
+  </info>
+  <info>
+    <language>hi-IN</language>
+    <category>Met</category>
+    <event>Flash Flood</event>
+    <urgency>Immediate</urgency>
+    <severity>Severe</severity>
+    <certainty>Likely</certainty>
+    <onset>2026-07-14T16:20:00+05:30</onset>
+    <expires>2026-07-14T22:00:00+05:30</expires>
+    <headline>डेमो अभ्यास: डेमो वार्ड DW-01 में 20 मिनट में अचानक बाढ़ की संभावना।</headline>
+    <instruction>डेमो अभ्यास: नदी तल से दूर डेमो राहत केंद्र A पर जाएँ। बुज़ुर्ग और दिव्यांग पड़ोसियों की मदद करें।</instruction>
+    <area>
+      <areaDesc>डेमो वार्ड DW-01 सरोवर नगर (काल्पनिक)</areaDesc>
+      <polygon>29.345,79.551 29.357,79.551 29.357,79.567 29.345,79.567 29.345,79.551</polygon>
+    </area>
+  </info>
+</alert>
