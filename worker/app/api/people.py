@@ -206,9 +206,8 @@ async def respond(
     d = await session.get(Delivery, delivery_id)
     if d is None:
         raise NotFound("Alert")
-    before = d.status
-    d = await responses.respond_as_resident(session, ctx, delivery_id, body.status, actor_of(user))
-    out = S.RespondOut(delivery_id=d.id, status=d.status, changed=d.status != before, server_time=ctx.now())
+    d, changed = await responses.respond_as_resident(session, ctx, delivery_id, body.status, actor_of(user))
+    out = S.RespondOut(delivery_id=d.id, status=d.status, changed=changed, server_time=ctx.now())
     remember_idempotent(session, user, key, endpoint, out.model_dump(mode="json"))
     await finalize(session, ctx)
     return out

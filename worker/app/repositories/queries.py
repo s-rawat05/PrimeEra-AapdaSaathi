@@ -33,11 +33,13 @@ class DeliveryCtx:
 async def get_delivery_ctx(session: AsyncSession, delivery_id: str, lock: bool = True) -> DeliveryCtx:
     q = select(Delivery).where(Delivery.id == delivery_id)
     if lock:
-        q = q.with_for_update()
+        # populate_existing: if this session already loaded the row, overwrite it with the locked,
+        # current version — otherwise decisions would be made on stale status (lost-update race).
+        q = q.with_for_update().execution_options(populate_existing=True)
     d = (await session.execute(q)).scalar_one_or_none()
     if d is None:
         raise NotFound("Delivery")
-    inc = await session.get(Incident, d.incident_id)
+    inc = await session.get(Incident, d.incident_id, populate_existing=lock)
     res = await session.get(Resident, d.resident_id)
     return DeliveryCtx(d, inc, res)
 
@@ -45,7 +47,7 @@ async def get_delivery_ctx(session: AsyncSession, delivery_id: str, lock: bool =
 async def get_task(session: AsyncSession, task_id: str, lock: bool = True) -> Task:
     q = select(Task).where(Task.id == task_id)
     if lock:
-        q = q.with_for_update()
+        q = q.with_for_update().execution_options(populate_existing=True)
     t = (await session.execute(q)).scalar_one_or_none()
     if t is None:
         raise NotFound("Task")

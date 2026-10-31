@@ -139,12 +139,13 @@ async def apply_status(
 
 async def respond_as_resident(
     session: AsyncSession, ctx: AppContext, delivery_id: str, status: str, actor: Actor
-) -> Delivery:
+) -> tuple[Delivery, bool]:
+    """Returns (delivery, changed). `changed` is decided under the row lock."""
     dc = await get_delivery_ctx(session, delivery_id)
     if dc.resident.user_id != actor.user_id:
         raise Forbidden("This alert does not belong to you")
-    await apply_status(session, ctx, dc, status, channel="app", actor=actor)
-    return dc.delivery
+    changed = await apply_status(session, ctx, dc, status, channel="app", actor=actor)
+    return dc.delivery, changed
 
 
 async def respond_as_caregiver(
