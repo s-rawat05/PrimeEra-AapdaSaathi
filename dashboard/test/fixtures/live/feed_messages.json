@@ -1,0 +1,32 @@
+{
+ "items": [
+  {
+   "id": "ce6ffe12-158b-43fd-80c5-9a49eeaf7ea8",
+   "identifier": "AAPDASAATHI-DEMO-FLOOD-0001",
+   "sender": "demo-control-room@aapdasaathi.invalid",
+   "sent": "2026-07-14T10:30:00Z",
+   "status": "Exercise",
+   "msg_type": "Alert",
+   "event": "Flash Flood",
+   "severity": "Severe",
+   "urgency": "Immediate",
+   "certainty": "Likely",
+   "onset": "2026-07-14T10:50:00Z",
+   "expires": "2026-07-14T16:30:00Z",
+   "headline": "DEMO EXERCISE: Flash flood likely along the stream in Demo Ward DW-01 within 20 minutes.",
+   "area_desc": "Demo Ward DW-01 Sarovar Nagar (fictional)",
+   "official_url": null,
+   "is_valid": true,
+   "validation_errors": [],
+   "is_fixture": true,
+   "superseded_by": null,
+   "fetched_at": "2026-10-31T16:58:58.404613Z",
+   "incident_ids": [
+    "1bf61cf8-0b86-4d2c-a652-82517840d7ba"
+   ]
+  }
+ ],
+ "total": 1,
+ "limit": 50,
+ "offset": 0
+}

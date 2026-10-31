@@ -1,0 +1,68 @@
+[
+ {
+  "id": "3a511a38-9b2c-4297-894f-07b560f6ca0c",
+  "hazard_type": "*",
+  "language": "en",
+  "style": "easy_read",
+  "title": "Danger: {event}",
+  "body": "There is danger near you: {event}.\nOfficial message: {headline}\nTell us if you are safe.",
+  "pictogram": null,
+  "audio_asset_url": null,
+  "is_active": true
+ },
+ {
+  "id": "78ab0147-c92a-4cae-9b72-940b5e833395",
+  "hazard_type": "*",
+  "language": "en",
+  "style": "sms",
+  "title": "AapdaSaathi",
+  "body": "AapdaSaathi ALERT ({sender}): {headline} Reply 1=SAFE 2=HELP",
+  "pictogram": null,
+  "audio_asset_url": null,
+  "is_active": true
+ },
+ {
+  "id": "27fd6076-24c2-464f-8a51-7a7634f9b20a",
+  "hazard_type": "*",
+  "language": "en",
+  "style": "standard",
+  "title": "AapdaSaathi: {event} alert",
+  "body": "Official alert from {sender}: {headline}\nInstruction: {instruction}",
+  "pictogram": null,
+  "audio_asset_url": null,
+  "is_active": true
+ },
+ {
+  "id": "79e09c03-751a-4987-b1a1-ca5f9fb3ef4d",
+  "hazard_type": "*",
+  "language": "hi",
+  "style": "easy_read",
+  "title": "खतरा: {event}",
+  "body": "आपके पास खतरा है: {event}।\nआधिकारिक संदेश: {headline}\nबताइए आप सुरक्षित हैं या नहीं।",
+  "pictogram": null,
+  "audio_asset_url": null,
+  "is_active": true
+ },
+ {
+  "id": "74062ad8-9684-4881-817c-db85031b83fd",
+  "hazard_type": "*",
+  "language": "hi",
+  "style": "sms",
+  "title": "AapdaSaathi",
+  "body": "आपदा साथी चेतावनी ({sender}): {headline} उत्तर दें 1=सुरक्षित 2=मदद",
+  "pictogram": null,
+  "audio_asset_url": null,
+  "is_active": true
+ },
+ {
+  "id": "15c7c34e-b2e1-42b9-884c-16f0c811189d",
+  "hazard_type": "*",
+  "language": "hi",
+  "style": "standard",
+  "title": "आपदा साथी: {event} चेतावनी",
+  "body": "{sender} की आधिकारिक चेतावनी: {headline}\nनिर्देश: {instruction}",
+  "pictogram": null,
+  "audio_asset_url": null,
+  "is_active": true
+ }
+]

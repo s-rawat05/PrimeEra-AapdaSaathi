@@ -56,7 +56,7 @@ create index ix_wards_lgd_district_code on wards (lgd_district_code);
 
 create table shelters (
   id varchar(36) primary key,
-  ward_id varchar(36) references wards(id) on delete cascade,
+  ward_id varchar(36) not null references wards(id) on delete cascade,
   name varchar(160) not null,
   address text not null,
   lat double precision not null,
@@ -86,7 +86,7 @@ create table residents (
   reverify_due_at timestamptz,
   is_demo boolean not null default false,
   created_at timestamptz not null default now(),
-  updated_at timestamptz default now()
+  updated_at timestamptz not null default now()
 );
 create index ix_residents_phone on residents (phone);
 create index ix_residents_ward_id on residents (ward_id);
@@ -100,12 +100,12 @@ create table resident_locations (
   address_text text,
   landmark text,
   source varchar(20) not null default 'registration',
-  updated_at timestamptz default now()
+  updated_at timestamptz not null default now()
 );
 
 create table consent_records (
   id varchar(36) primary key,
-  resident_id varchar(36) references residents(id) on delete cascade,
+  resident_id varchar(36) not null references residents(id) on delete cascade,
   consent_type varchar(30) not null
     constraint ck_consent_type check (consent_type in ('registry','location','caregiver_share','sms')),
   granted boolean not null,
@@ -120,8 +120,8 @@ create index ix_consent_records_resident_id on consent_records (resident_id);
 
 create table caregiver_links (
   id varchar(36) primary key,
-  caregiver_user_id varchar(36) references users(id) on delete cascade,
-  resident_id varchar(36) references residents(id) on delete cascade,
+  caregiver_user_id varchar(36) not null references users(id) on delete cascade,
+  resident_id varchar(36) not null references residents(id) on delete cascade,
   relationship varchar(40) not null default 'family',
   can_view_location boolean not null default false,
   created_at timestamptz not null default now(),
@@ -132,8 +132,8 @@ create index ix_caregiver_links_resident_id on caregiver_links (resident_id);
 
 create table neighbour_links (
   id varchar(36) primary key,
-  resident_id varchar(36) references residents(id) on delete cascade,
-  neighbour_user_id varchar(36) references users(id) on delete cascade,
+  resident_id varchar(36) not null references residents(id) on delete cascade,
+  neighbour_user_id varchar(36) not null references users(id) on delete cascade,
   priority integer not null default 1,
   distance_m double precision,
   created_at timestamptz not null default now(),
@@ -144,7 +144,7 @@ create index ix_neighbour_links_neighbour_user_id on neighbour_links (neighbour_
 
 create table volunteers (
   id varchar(36) primary key,
-  user_id varchar(36) unique references users(id) on delete cascade,
+  user_id varchar(36) not null unique references users(id) on delete cascade,
   ward_id varchar(36) references wards(id) on delete set null,
   is_available boolean not null default true,
   base_lat double precision not null,
@@ -153,14 +153,14 @@ create table volunteers (
   skills jsonb not null default '[]'::jsonb,
   verified boolean not null default true,
   is_demo boolean not null default false,
-  updated_at timestamptz default now()
+  updated_at timestamptz not null default now()
 );
 create index ix_volunteers_ward_id on volunteers (ward_id);
 
 create table pre_assigned_helpers (
   id varchar(36) primary key,
-  resident_id varchar(36) references residents(id) on delete cascade,
-  volunteer_id varchar(36) references volunteers(id) on delete cascade,
+  resident_id varchar(36) not null references residents(id) on delete cascade,
+  volunteer_id varchar(36) not null references volunteers(id) on delete cascade,
   priority integer not null default 1,
   created_at timestamptz not null default now(),
   unique (resident_id, volunteer_id)
@@ -252,7 +252,7 @@ create table incidents (
   interval_override_seconds integer,
   created_by_user_id varchar(36) references users(id) on delete set null,
   created_at timestamptz not null default now(),
-  updated_at timestamptz default now(),
+  updated_at timestamptz not null default now(),
   closed_at timestamptz,
   closed_by_user_id varchar(36) references users(id) on delete set null,
   close_note text,
@@ -264,8 +264,8 @@ create index ix_incidents_cap_identifier on incidents (cap_identifier);
 
 create table incident_wards (
   id varchar(36) primary key,
-  incident_id varchar(36) references incidents(id) on delete cascade,
-  ward_id varchar(36) references wards(id) on delete cascade,
+  incident_id varchar(36) not null references incidents(id) on delete cascade,
+  ward_id varchar(36) not null references wards(id) on delete cascade,
   match_method varchar(20) not null,
   match_note text,
   unique (incident_id, ward_id)
@@ -298,7 +298,7 @@ create table deliveries (
   reminders_sent integer not null default 0,
   version integer not null default 1,
   created_at timestamptz not null default now(),
-  updated_at timestamptz default now(),
+  updated_at timestamptz not null default now(),
   constraint uq_delivery_incident_resident unique (incident_id, resident_id)
 );
 create index ix_deliveries_due on deliveries (next_action_at, status);
@@ -308,7 +308,7 @@ create index ix_deliveries_pending_due on deliveries (next_action_at) where next
 
 create table tasks (
   id varchar(36) primary key,
-  incident_id varchar(36) references incidents(id) on delete cascade,
+  incident_id varchar(36) not null references incidents(id) on delete cascade,
   delivery_id varchar(36) not null references deliveries(id) on delete cascade,
   resident_id varchar(36) not null references residents(id) on delete cascade,
   kind varchar(20) not null
@@ -393,7 +393,7 @@ create table audit_log (
   reason text,
   before jsonb,
   after jsonb,
-  created_at timestamptz default now()
+  created_at timestamptz not null default now()
 );
 create index ix_audit_entity on audit_log (entity_type, entity_id);
 create index ix_audit_log_actor_user_id on audit_log (actor_user_id);
@@ -401,11 +401,11 @@ create index ix_audit_log_created_at on audit_log (created_at);
 
 create table device_registrations (
   id varchar(36) primary key,
-  user_id varchar(36) references users(id) on delete cascade,
+  user_id varchar(36) not null references users(id) on delete cascade,
   fcm_token varchar(400) not null,
   platform varchar(20) not null,
   created_at timestamptz not null default now(),
-  last_seen_at timestamptz default now(),
+  last_seen_at timestamptz not null default now(),
   unique (user_id, fcm_token)
 );
 create index ix_device_registrations_user_id on device_registrations (user_id);
@@ -420,7 +420,7 @@ create table alert_templates (
   pictogram varchar(40),
   audio_asset_url varchar(400),
   is_active boolean not null default true,
-  updated_at timestamptz default now(),
+  updated_at timestamptz not null default now(),
   unique (hazard_type, language, style)
 );
 

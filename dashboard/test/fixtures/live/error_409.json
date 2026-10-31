@@ -1,0 +1,6 @@
+{
+ "error": {
+  "code": "invalid_transition",
+  "message": "Task is ASSIGNED, not awaiting approval"
+ }
+}

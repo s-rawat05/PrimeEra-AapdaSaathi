@@ -384,16 +384,23 @@ async def _defer(ctx: AppContext, delivery_id: str) -> None:
 
 
 async def _heartbeat(ctx: AppContext, result: str) -> None:
+    """Atomic upsert: several workers on the same host may beat at the same moment."""
+    if db.is_postgres:
+        from sqlalchemy.dialects.postgresql import insert
+    else:
+        from sqlalchemy.dialects.sqlite import insert
+    values = {
+        "worker_id": f"{WORKER_ID}:escalation",
+        "job": "escalation",
+        "last_beat_at": ctx.now(),
+        "last_result": result,
+    }
+    stmt = insert(WorkerHeartbeat).values(**values)
+    stmt = stmt.on_conflict_do_update(
+        index_elements=["worker_id"], set_={"last_beat_at": values["last_beat_at"], "last_result": result}
+    )
     async with db.session() as session:
-        hb = await session.get(WorkerHeartbeat, f"{WORKER_ID}:escalation")
-        if hb is None:
-            session.add(
-                WorkerHeartbeat(
-                    worker_id=f"{WORKER_ID}:escalation", job="escalation", last_beat_at=ctx.now(), last_result=result
-                )
-            )
-        else:
-            hb.last_beat_at, hb.last_result = ctx.now(), result
+        await session.execute(stmt)
         await session.commit()
 
 

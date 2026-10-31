@@ -1,0 +1,171 @@
+[
+ {
+  "type": "hello",
+  "role": "operator"
+ },
+ {
+  "type": "notification.created",
+  "incident_id": "1bf61cf8-0b86-4d2c-a652-82517840d7ba",
+  "task_id": null
+ },
+ {
+  "type": "notification.created",
+  "incident_id": "1bf61cf8-0b86-4d2c-a652-82517840d7ba",
+  "task_id": "2c051cfa-27c8-4f95-ad75-5f2250e442e0"
+ },
+ {
+  "type": "task.updated",
+  "incident_id": "1bf61cf8-0b86-4d2c-a652-82517840d7ba",
+  "task_id": "2c051cfa-27c8-4f95-ad75-5f2250e442e0"
+ },
+ {
+  "type": "task.updated",
+  "incident_id": "1bf61cf8-0b86-4d2c-a652-82517840d7ba",
+  "task_id": "22887921-0a82-4520-94f0-5a76fe1511f2"
+ },
+ {
+  "type": "delivery.updated",
+  "incident_id": "1bf61cf8-0b86-4d2c-a652-82517840d7ba",
+  "delivery_id": "ef38fbe9-ed84-4467-b9fa-602dea8ecdfb",
+  "status": "NO_REPLY"
+ },
+ {
+  "type": "notification.created",
+  "incident_id": "1bf61cf8-0b86-4d2c-a652-82517840d7ba",
+  "task_id": "d754c59c-18c5-4c99-8e3c-042c5997016d"
+ },
+ {
+  "type": "task.updated",
+  "incident_id": "1bf61cf8-0b86-4d2c-a652-82517840d7ba",
+  "task_id": "d754c59c-18c5-4c99-8e3c-042c5997016d"
+ },
+ {
+  "type": "delivery.updated",
+  "incident_id": "1bf61cf8-0b86-4d2c-a652-82517840d7ba",
+  "delivery_id": "ae319e33-aac8-464a-9dac-ad664b3aac83",
+  "status": "NO_REPLY"
+ },
+ {
+  "type": "notification.created",
+  "incident_id": "1bf61cf8-0b86-4d2c-a652-82517840d7ba",
+  "task_id": "abb06e0d-461e-40db-ac66-d4396a7967fc"
+ },
+ {
+  "type": "task.updated",
+  "incident_id": "1bf61cf8-0b86-4d2c-a652-82517840d7ba",
+  "task_id": "abb06e0d-461e-40db-ac66-d4396a7967fc"
+ },
+ {
+  "type": "delivery.updated",
+  "incident_id": "1bf61cf8-0b86-4d2c-a652-82517840d7ba",
+  "delivery_id": "ce9f94fc-bfb3-4709-ad9a-68ad3f037fab",
+  "status": "NO_REPLY"
+ },
+ {
+  "type": "notification.created",
+  "incident_id": "1bf61cf8-0b86-4d2c-a652-82517840d7ba",
+  "task_id": "a6fc8484-b802-4912-be27-f6b9023bd97b"
+ },
+ {
+  "type": "task.updated",
+  "incident_id": "1bf61cf8-0b86-4d2c-a652-82517840d7ba",
+  "task_id": "a6fc8484-b802-4912-be27-f6b9023bd97b"
+ },
+ {
+  "type": "delivery.updated",
+  "incident_id": "1bf61cf8-0b86-4d2c-a652-82517840d7ba",
+  "delivery_id": "6b05d885-f9ac-4259-87af-c80f9a97261b",
+  "status": "NO_REPLY"
+ },
+ {
+  "type": "notification.created",
+  "incident_id": "1bf61cf8-0b86-4d2c-a652-82517840d7ba",
+  "task_id": null
+ },
+ {
+  "type": "delivery.updated",
+  "incident_id": "1bf61cf8-0b86-4d2c-a652-82517840d7ba",
+  "delivery_id": "500bffc6-e0d3-4c14-814a-0a2039c5148c",
+  "status": "NO_REPLY"
+ },
+ {
+  "type": "notification.created",
+  "incident_id": "1bf61cf8-0b86-4d2c-a652-82517840d7ba",
+  "task_id": "474f9523-f6ab-435d-9378-5c5be855a3a0"
+ },
+ {
+  "type": "task.updated",
+  "incident_id": "1bf61cf8-0b86-4d2c-a652-82517840d7ba",
+  "task_id": "474f9523-f6ab-435d-9378-5c5be855a3a0"
+ },
+ {
+  "type": "delivery.updated",
+  "incident_id": "1bf61cf8-0b86-4d2c-a652-82517840d7ba",
+  "delivery_id": "b1f7340e-2251-40a6-b340-06638ab08c79",
+  "status": "NO_REPLY"
+ },
+ {
+  "type": "delivery.updated",
+  "incident_id": "1bf61cf8-0b86-4d2c-a652-82517840d7ba",
+  "delivery_id": "14586fda-5fa0-43f0-a158-b2a36b3f6d36",
+  "status": "NO_REPLY"
+ },
+ {
+  "type": "delivery.updated",
+  "incident_id": "1bf61cf8-0b86-4d2c-a652-82517840d7ba",
+  "delivery_id": "e74b72a1-8c1d-4d55-85d7-0742117d62f0",
+  "status": "NO_REPLY"
+ },
+ {
+  "type": "delivery.updated",
+  "incident_id": "1bf61cf8-0b86-4d2c-a652-82517840d7ba",
+  "delivery_id": "2f1e4af1-a247-48ac-b8ff-828c4be40341",
+  "status": "NO_REPLY"
+ },
+ {
+  "type": "delivery.updated",
+  "incident_id": "1bf61cf8-0b86-4d2c-a652-82517840d7ba",
+  "delivery_id": "83174dc3-84f7-4181-a424-f21d5d867bbd",
+  "status": "NO_REPLY"
+ },
+ {
+  "type": "delivery.updated",
+  "incident_id": "1bf61cf8-0b86-4d2c-a652-82517840d7ba",
+  "delivery_id": "75af56da-2c8b-4529-8718-9d54a70df8b0",
+  "status": "NO_REPLY"
+ },
+ {
+  "type": "delivery.updated",
+  "incident_id": "1bf61cf8-0b86-4d2c-a652-82517840d7ba",
+  "delivery_id": "9c19d7a9-f855-49ae-b757-7c3156d253d0",
+  "status": "NO_REPLY"
+ },
+ {
+  "type": "delivery.updated",
+  "incident_id": "1bf61cf8-0b86-4d2c-a652-82517840d7ba",
+  "delivery_id": "36ea989d-369c-47e9-91b3-aab43c610019",
+  "status": "NO_REPLY"
+ },
+ {
+  "type": "delivery.updated",
+  "incident_id": "1bf61cf8-0b86-4d2c-a652-82517840d7ba",
+  "delivery_id": "3b62a23e-e7d2-4a19-8dc0-d83e2f1a16d2",
+  "status": "NO_REPLY"
+ },
+ {
+  "type": "delivery.updated",
+  "incident_id": "1bf61cf8-0b86-4d2c-a652-82517840d7ba",
+  "delivery_id": "eb0d4edc-a623-4f19-b85d-66710d03a5db",
+  "status": "NO_REPLY"
+ },
+ {
+  "type": "delivery.updated",
+  "incident_id": "1bf61cf8-0b86-4d2c-a652-82517840d7ba",
+  "delivery_id": "c7b7f05b-909c-4abd-ac5d-4ffb061a0908",
+  "status": "NO_REPLY"
+ },
+ {
+  "type": "incident.updated",
+  "incident_id": "1bf61cf8-0b86-4d2c-a652-82517840d7ba"
+ }
+]

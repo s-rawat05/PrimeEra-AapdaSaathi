@@ -1,0 +1,19 @@
+{
+ "id": "b4c6d4b4-47e1-4c48-a384-01dbade88c70",
+ "user_id": "895a49be-3350-4bf3-9c12-ba4fc7087d0e",
+ "full_name": "Aman Verma (NSS)",
+ "phone_masked": "+91••••••0301",
+ "ward_id": "a62a2b54-e1a2-405f-a9dc-c48d814b568b",
+ "ward_name": "Sarovar Nagar (DEMO ward DW-01)",
+ "is_available": true,
+ "base_lat": 29.348,
+ "base_lng": 79.5575,
+ "max_radius_m": 3000.0,
+ "skills": [
+  "first_aid",
+  "evacuation_support"
+ ],
+ "verified": true,
+ "is_demo": true,
+ "active_task_id": null
+}

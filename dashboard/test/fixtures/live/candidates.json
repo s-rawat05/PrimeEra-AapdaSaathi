@@ -1,0 +1,26 @@
+[
+ {
+  "volunteer_id": "b4c6d4b4-47e1-4c48-a384-01dbade88c70",
+  "name": "Aman Verma (NSS)",
+  "eligible": false,
+  "distance_m": 223.0,
+  "walk_minutes": 4.2,
+  "reason": "Already on an active task"
+ },
+ {
+  "volunteer_id": "2a8de1ff-13ee-4436-9323-2193ea8b122f",
+  "name": "Sneha Karki (NCC)",
+  "eligible": false,
+  "distance_m": 1068.0,
+  "walk_minutes": 19.9,
+  "reason": "Cannot arrive safely in time: est. walk 20 min + 10 min assist buffer > 20 min before onset"
+ },
+ {
+  "volunteer_id": "fd80ba82-8e51-4c7c-ab61-43032c043338",
+  "name": "Dev Bisht (Civil Defence)",
+  "eligible": false,
+  "distance_m": 5955.0,
+  "walk_minutes": 111.2,
+  "reason": "Outside service radius (5955 m > 3000 m)"
+ }
+]

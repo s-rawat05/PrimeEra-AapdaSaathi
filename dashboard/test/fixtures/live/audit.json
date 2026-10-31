@@ -1,0 +1,353 @@
+{
+ "items": [
+  {
+   "id": "bfb743f7-8181-4276-8c20-6759f554e17d",
+   "actor_user_id": "8821d62a-41a9-40ee-ba79-27a9b45f7489",
+   "actor_name": "Arjun Mehta (Control Room)",
+   "actor_role": "operator",
+   "action": "incident.closed",
+   "entity_type": "incident",
+   "entity_id": "ade2c4e7-0d48-4978-91ab-7bd3832fd86d",
+   "reason": "test done",
+   "before": null,
+   "after": null,
+   "created_at": "2026-10-31T17:32:02.152197Z"
+  },
+  {
+   "id": "658fda71-ec57-4a8b-8c19-d0b2c5144a17",
+   "actor_user_id": "8821d62a-41a9-40ee-ba79-27a9b45f7489",
+   "actor_name": "Arjun Mehta (Control Room)",
+   "actor_role": "operator",
+   "action": "incident.update",
+   "entity_type": "incident",
+   "entity_id": "ade2c4e7-0d48-4978-91ab-7bd3832fd86d",
+   "reason": "Upgraded by DDMA",
+   "before": {
+    "title": "Manual drill test",
+    "severity": "Moderate",
+    "onset": "2026-10-31 19:01:57.257135+00:00",
+    "approval": false
+   },
+   "after": {
+    "title": "Manual drill test",
+    "severity": "Severe",
+    "onset": "2026-10-31 19:01:57.257135+00:00",
+    "approval": false
+   },
+   "created_at": "2026-10-31T17:31:59.981487Z"
+  },
+  {
+   "id": "2839f753-4d74-45ac-b79c-507fb74868e3",
+   "actor_user_id": "8821d62a-41a9-40ee-ba79-27a9b45f7489",
+   "actor_name": "Arjun Mehta (Control Room)",
+   "actor_role": "operator",
+   "action": "incident.create",
+   "entity_type": "incident",
+   "entity_id": "ade2c4e7-0d48-4978-91ab-7bd3832fd86d",
+   "reason": null,
+   "before": null,
+   "after": {
+    "source": "manual",
+    "title": "Manual drill test"
+   },
+   "created_at": "2026-10-31T17:31:57.261488Z"
+  },
+  {
+   "id": "37e58645-ac43-4864-95e5-2ffb137eedbe",
+   "actor_user_id": "8821d62a-41a9-40ee-ba79-27a9b45f7489",
+   "actor_name": "Arjun Mehta (Control Room)",
+   "actor_role": "operator",
+   "action": "incident.closed",
+   "entity_type": "incident",
+   "entity_id": "1bf61cf8-0b86-4d2c-a652-82517840d7ba",
+   "reason": "Drill complete",
+   "before": null,
+   "after": null,
+   "created_at": "2026-10-31T17:31:46.913409Z"
+  },
+  {
+   "id": "de6d3b0e-5c6c-41b6-8b9a-814975a556f7",
+   "actor_user_id": "8821d62a-41a9-40ee-ba79-27a9b45f7489",
+   "actor_name": "Arjun Mehta (Control Room)",
+   "actor_role": "operator",
+   "action": "feed.poll",
+   "entity_type": "feed",
+   "entity_id": null,
+   "reason": null,
+   "before": null,
+   "after": null,
+   "created_at": "2026-10-31T17:31:39.413974Z"
+  },
+  {
+   "id": "646e1dad-bb57-497f-a685-e1f6c7051ce8",
+   "actor_user_id": "8821d62a-41a9-40ee-ba79-27a9b45f7489",
+   "actor_name": "Arjun Mehta (Control Room)",
+   "actor_role": "operator",
+   "action": "dispatch.request",
+   "entity_type": "delivery",
+   "entity_id": "ef38fbe9-ed84-4467-b9fa-602dea8ecdfb",
+   "reason": null,
+   "before": null,
+   "after": null,
+   "created_at": "2026-10-31T17:31:35.353004Z"
+  },
+  {
+   "id": "8cdd58ac-4939-4fc9-a8d7-93c61fb30b20",
+   "actor_user_id": "8821d62a-41a9-40ee-ba79-27a9b45f7489",
+   "actor_name": "Arjun Mehta (Control Room)",
+   "actor_role": "operator",
+   "action": "dispatch.reassign",
+   "entity_type": "task",
+   "entity_id": "73b4fc87-6f2b-4be2-ab02-4df1f6a2d4ad",
+   "reason": "Volunteer phone off",
+   "before": null,
+   "after": {
+    "to": null
+   },
+   "created_at": "2026-10-31T17:31:33.246166Z"
+  },
+  {
+   "id": "f5535500-2739-41f1-a5cf-6ced1899e164",
+   "actor_user_id": "8821d62a-41a9-40ee-ba79-27a9b45f7489",
+   "actor_name": "Arjun Mehta (Control Room)",
+   "actor_role": "operator",
+   "action": "dispatch.reject",
+   "entity_type": "task",
+   "entity_id": "22887921-0a82-4520-94f0-5a76fe1511f2",
+   "reason": "Route flooded",
+   "before": null,
+   "after": null,
+   "created_at": "2026-10-31T17:31:27.046827Z"
+  },
+  {
+   "id": "43fb564a-dcc8-4fb4-9c30-24e74befe0d9",
+   "actor_user_id": "8821d62a-41a9-40ee-ba79-27a9b45f7489",
+   "actor_name": "Arjun Mehta (Control Room)",
+   "actor_role": "operator",
+   "action": "dispatch.approve",
+   "entity_type": "task",
+   "entity_id": "73b4fc87-6f2b-4be2-ab02-4df1f6a2d4ad",
+   "reason": null,
+   "before": null,
+   "after": null,
+   "created_at": "2026-10-31T17:31:24.942347Z"
+  },
+  {
+   "id": "dea22233-0532-4bcc-b2cc-8f3a1bb736cd",
+   "actor_user_id": "8821d62a-41a9-40ee-ba79-27a9b45f7489",
+   "actor_name": "Arjun Mehta (Control Room)",
+   "actor_role": "operator",
+   "action": "delivery.resend",
+   "entity_type": "delivery",
+   "entity_id": "6b05d885-f9ac-4259-87af-c80f9a97261b",
+   "reason": null,
+   "before": null,
+   "after": null,
+   "created_at": "2026-10-31T17:31:18.699618Z"
+  },
+  {
+   "id": "7aa4da5d-fce7-4a63-95e5-42433b7d9b04",
+   "actor_user_id": "8821d62a-41a9-40ee-ba79-27a9b45f7489",
+   "actor_name": "Arjun Mehta (Control Room)",
+   "actor_role": "operator",
+   "action": "delivery.override",
+   "entity_type": "delivery",
+   "entity_id": "ae319e33-aac8-464a-9dac-ad664b3aac83",
+   "reason": "Confirmed by phone",
+   "before": {
+    "status": "NO_REPLY"
+   },
+   "after": {
+    "status": "SAFE"
+   },
+   "created_at": "2026-10-31T17:31:16.582877Z"
+  },
+  {
+   "id": "02416aed-bc4a-4f59-86ee-4a37574ac406",
+   "actor_user_id": "8821d62a-41a9-40ee-ba79-27a9b45f7489",
+   "actor_name": "Arjun Mehta (Control Room)",
+   "actor_role": "operator",
+   "action": "location.view",
+   "entity_type": "resident",
+   "entity_id": "8e86240a-ea5b-4a3e-b9e9-e872a6d162fd",
+   "reason": "incident 1bf61cf8-0b86-4d2c-a652-82517840d7ba",
+   "before": null,
+   "after": null,
+   "created_at": "2026-10-31T17:31:06.118265Z"
+  },
+  {
+   "id": "9140c7e3-8212-4d0a-87d2-d3a0b466d3e6",
+   "actor_user_id": "8821d62a-41a9-40ee-ba79-27a9b45f7489",
+   "actor_name": "Arjun Mehta (Control Room)",
+   "actor_role": "operator",
+   "action": "demo.simulate",
+   "entity_type": "incident",
+   "entity_id": "1bf61cf8-0b86-4d2c-a652-82517840d7ba",
+   "reason": null,
+   "before": null,
+   "after": {
+    "fixture": "demo_flash_flood_alert"
+   },
+   "created_at": "2026-10-31T17:30:38.887883Z"
+  },
+  {
+   "id": "7bf5fe81-f7a8-4b1f-a321-8c173e650522",
+   "actor_user_id": "8821d62a-41a9-40ee-ba79-27a9b45f7489",
+   "actor_name": "Arjun Mehta (Control Room)",
+   "actor_role": "operator",
+   "action": "incident.create",
+   "entity_type": "incident",
+   "entity_id": "1bf61cf8-0b86-4d2c-a652-82517840d7ba",
+   "reason": null,
+   "before": null,
+   "after": {
+    "source": "simulated",
+    "title": "[SIMULATED] DEMO EXERCISE: Flash flood likely along the stream in Demo Ward DW-01 within 20 minutes."
+   },
+   "created_at": "2026-10-31T17:30:38.224936Z"
+  },
+  {
+   "id": "951e8845-2c5f-4ca3-8357-82a4b88b7164",
+   "actor_user_id": "8821d62a-41a9-40ee-ba79-27a9b45f7489",
+   "actor_name": "Arjun Mehta (Control Room)",
+   "actor_role": "operator",
+   "action": "demo.reset",
+   "entity_type": "demo",
+   "entity_id": null,
+   "reason": null,
+   "before": null,
+   "after": {
+    "incidents": 1,
+    "sms": 1
+   },
+   "created_at": "2026-10-31T17:30:32.040950Z"
+  },
+  {
+   "id": "cd5284d6-e44e-431b-8cd9-453b8bcf6de8",
+   "actor_user_id": "b3eb5819-d838-4798-b761-d6c3a5ba68a0",
+   "actor_name": "Priya Nair (Demo Admin)",
+   "actor_role": "admin",
+   "action": "auth.demo_login",
+   "entity_type": "user",
+   "entity_id": "b3eb5819-d838-4798-b761-d6c3a5ba68a0",
+   "reason": null,
+   "before": null,
+   "after": null,
+   "created_at": "2026-10-31T17:30:27.901632Z"
+  },
+  {
+   "id": "6837dcc0-4ed0-4d7d-b027-d865da887768",
+   "actor_user_id": "8821d62a-41a9-40ee-ba79-27a9b45f7489",
+   "actor_name": "Arjun Mehta (Control Room)",
+   "actor_role": "operator",
+   "action": "auth.demo_login",
+   "entity_type": "user",
+   "entity_id": "8821d62a-41a9-40ee-ba79-27a9b45f7489",
+   "reason": null,
+   "before": null,
+   "after": null,
+   "created_at": "2026-10-31T17:30:25.846674Z"
+  },
+  {
+   "id": "2eefe17f-ff93-4248-b431-fcaec7ec7fc7",
+   "actor_user_id": "b3eb5819-d838-4798-b761-d6c3a5ba68a0",
+   "actor_name": "Priya Nair (Demo Admin)",
+   "actor_role": "admin",
+   "action": "registry.list",
+   "entity_type": "resident",
+   "entity_id": null,
+   "reason": null,
+   "before": null,
+   "after": {
+    "count": 5
+   },
+   "created_at": "2026-10-31T16:59:40.205536Z"
+  },
+  {
+   "id": "5e2d581c-6a6b-4f5b-af25-0e85736af240",
+   "actor_user_id": "8821d62a-41a9-40ee-ba79-27a9b45f7489",
+   "actor_name": "Arjun Mehta (Control Room)",
+   "actor_role": "operator",
+   "action": "location.view",
+   "entity_type": "resident",
+   "entity_id": "8e86240a-ea5b-4a3e-b9e9-e872a6d162fd",
+   "reason": "incident e2b8eee8-5dfc-4f7c-8151-e13987c06f78",
+   "before": null,
+   "after": null,
+   "created_at": "2026-10-31T16:59:25.751793Z"
+  },
+  {
+   "id": "bef5071e-1a99-4fb8-bad9-fab32b6636dd",
+   "actor_user_id": "8821d62a-41a9-40ee-ba79-27a9b45f7489",
+   "actor_name": "Arjun Mehta (Control Room)",
+   "actor_role": "operator",
+   "action": "demo.simulate",
+   "entity_type": "incident",
+   "entity_id": "e2b8eee8-5dfc-4f7c-8151-e13987c06f78",
+   "reason": null,
+   "before": null,
+   "after": {
+    "fixture": "demo_flash_flood_alert"
+   },
+   "created_at": "2026-10-31T16:58:58.835536Z"
+  },
+  {
+   "id": "b5d5d9da-5294-4512-a8d0-c64526c0d078",
+   "actor_user_id": "8821d62a-41a9-40ee-ba79-27a9b45f7489",
+   "actor_name": "Arjun Mehta (Control Room)",
+   "actor_role": "operator",
+   "action": "incident.create",
+   "entity_type": "incident",
+   "entity_id": "e2b8eee8-5dfc-4f7c-8151-e13987c06f78",
+   "reason": null,
+   "before": null,
+   "after": {
+    "source": "simulated",
+    "title": "[SIMULATED] DEMO EXERCISE: Flash flood likely along the stream in Demo Ward DW-01 within 20 minutes."
+   },
+   "created_at": "2026-10-31T16:58:58.421473Z"
+  },
+  {
+   "id": "96d0b973-dad4-4d91-8bd1-e07efe821f38",
+   "actor_user_id": "b3eb5819-d838-4798-b761-d6c3a5ba68a0",
+   "actor_name": "Priya Nair (Demo Admin)",
+   "actor_role": "admin",
+   "action": "auth.demo_login",
+   "entity_type": "user",
+   "entity_id": "b3eb5819-d838-4798-b761-d6c3a5ba68a0",
+   "reason": null,
+   "before": null,
+   "after": null,
+   "created_at": "2026-10-31T16:58:54.292921Z"
+  },
+  {
+   "id": "8d0385ea-257e-4f24-99d2-a2d38c5dcf2e",
+   "actor_user_id": "8821d62a-41a9-40ee-ba79-27a9b45f7489",
+   "actor_name": "Arjun Mehta (Control Room)",
+   "actor_role": "operator",
+   "action": "auth.demo_login",
+   "entity_type": "user",
+   "entity_id": "8821d62a-41a9-40ee-ba79-27a9b45f7489",
+   "reason": null,
+   "before": null,
+   "after": null,
+   "created_at": "2026-10-31T16:58:52.218592Z"
+  },
+  {
+   "id": "391b46ba-f479-456d-9515-8b57d1e41fc2",
+   "actor_user_id": null,
+   "actor_name": null,
+   "actor_role": "system",
+   "action": "resident.registration_expired",
+   "entity_type": "resident",
+   "entity_id": "bab004ec-e5c1-412f-a2ff-581f9ace91a3",
+   "reason": null,
+   "before": null,
+   "after": null,
+   "created_at": "2026-10-31T16:58:20.306861Z"
+  }
+ ],
+ "total": 24,
+ "limit": 30,
+ "offset": 0
+}

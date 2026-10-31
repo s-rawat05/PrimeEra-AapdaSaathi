@@ -1,17 +1,30 @@
-# aapda_command
+# AapdaSaathi Command (Flutter Web)
 
-AapdaSaathi admin portal and command centre
+Admin portal + live command centre for the AapdaSaathi backend (`worker/`). Every control calls the real API
+(`docs/api-contract.md`); realtime events only trigger refetches, with a 10 s polling fallback.
 
-## Getting Started
+## Run
 
-This project is a starting point for a Flutter application.
+```powershell
+$env:Path = "C:\dev\flutter\bin;" + $env:Path
+flutter run -d chrome --dart-define=API_BASE_URL=http://localhost:8102   # default: http://localhost:8000
+flutter build web --dart-define=API_BASE_URL=https://api.example.org     # output: build/web
+```
 
-A few resources to get you started if this is your first Flutter project:
+The backend must allow the dashboard origin (`CORS_ORIGINS`). In demo mode the login page offers the fictional
+admin/operator personas.
 
-- [Learn Flutter](https://docs.flutter.dev/get-started/learn-flutter)
-- [Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Flutter learning resources](https://docs.flutter.dev/reference/learning-resources)
+## Layout
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+- `lib/core` – config (`API_BASE_URL`), `AapdaApi` interface + `HttpAapdaApi`, error model, WebSocket realtime hub, session store
+- `lib/models` – typed models matching `docs/openapi.json`
+- `lib/services` – auth/session controller, dependency scope, CSV file saver (Blob download on web)
+- `lib/routing` – responsive shell (NavigationRail ≥ 1000 px, drawer below) and role-based sections
+- `lib/features/*` – authentication, overview (command centre), live_map, dispatch (case panel, tasks), incidents
+  (list, dialogs, timeline, SACHET feed), residents, wards, volunteers, neighbour_links, audit, reports, settings
+  (templates, users), demo_controls (drills, SMS simulator)
+
+## Tests
+
+`flutter test` – widget tests use `test/support/fake_api.dart`, which serves JSON captured from a real backend
+(`test/fixtures/live/`) through the app's parsers; `test/models_live_test.dart` parses every captured response.

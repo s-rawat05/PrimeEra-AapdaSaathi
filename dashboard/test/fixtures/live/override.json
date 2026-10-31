@@ -1,0 +1,36 @@
+{
+ "delivery_id": "ae319e33-aac8-464a-9dac-ad664b3aac83",
+ "resident_id": "c3e5593d-cb5d-4e56-84c7-87c371e6e7bb",
+ "resident_name": "Mohan Lal Arya",
+ "phone_masked": "+91••••••0005",
+ "ward_name": "Sarovar Nagar (DEMO ward DW-01)",
+ "needs": [
+  "bedridden"
+ ],
+ "lives_alone": true,
+ "status": "SAFE",
+ "priority_total": 0,
+ "priority_components": [
+  {
+   "factor": "Confirmed safe",
+   "points": 0
+  }
+ ],
+ "alerted_at": "2026-10-31T17:30:38.326794Z",
+ "seen_at": null,
+ "replied_at": null,
+ "reply_channel": null,
+ "resolved_by": "operator",
+ "escalation_level": 2,
+ "escalation_step": "resolved",
+ "next_action_at": null,
+ "needs_operator": false,
+ "needs_rescue": false,
+ "rescue_reason": null,
+ "channels": [
+  "sms"
+ ],
+ "lat": 29.354,
+ "lng": 79.561,
+ "open_tasks": []
+}

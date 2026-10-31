@@ -1,0 +1,30 @@
+{
+ "id": "73b4fc87-6f2b-4be2-ab02-4df1f6a2d4ad",
+ "incident_id": "1bf61cf8-0b86-4d2c-a652-82517840d7ba",
+ "incident_title": "[SIMULATED] DEMO EXERCISE: Flash flood likely along the stream in Demo Ward DW-01 within 20 minutes.",
+ "hazard_type": "Flood",
+ "is_demo": true,
+ "delivery_id": "ce9f94fc-bfb3-4709-ad9a-68ad3f037fab",
+ "resident_id": "2f0d70a2-c3bd-42e1-8c88-1aa8113ff62a",
+ "resident_first_name": "Sunita",
+ "resident_needs": [
+  "mobility"
+ ],
+ "kind": "volunteer_assist",
+ "status": "ASSIGNED",
+ "assignee_user_id": "52b15200-fce8-428e-a768-263ee139d7d3",
+ "assignee_name": "Sneha Karki (NCC)",
+ "volunteer_id": "2a8de1ff-13ee-4436-9323-2193ea8b122f",
+ "reason": "No reply; neighbour check unresolved",
+ "outcome": null,
+ "outcome_note": null,
+ "cant_go_reason": null,
+ "distance_m": 339.0,
+ "est_walk_minutes": 6.3,
+ "attempt_no": 1,
+ "created_at": "2026-10-31T17:31:12.777044Z",
+ "approved_at": "2026-10-31T17:31:24.941706Z",
+ "accepted_at": null,
+ "reached_at": null,
+ "closed_at": null
+}

@@ -1,0 +1,14 @@
+{
+ "id": "a62a2b54-e1a2-405f-a9dc-c48d814b568b",
+ "code": "DW-01",
+ "name": "Sarovar Nagar (DEMO ward DW-01)",
+ "district": "Demo District",
+ "state": "Uttarakhand (demo)",
+ "lgd_district_code": null,
+ "centroid_lat": 29.351,
+ "centroid_lng": 79.559,
+ "access_status": "open",
+ "access_note": null,
+ "is_demo": true,
+ "boundary_geojson": null
+}

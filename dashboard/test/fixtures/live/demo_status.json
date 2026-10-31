@@ -1,0 +1,184 @@
+{
+ "demo_mode_enabled": true,
+ "notify_real_residents": false,
+ "demo_wards": [
+  {
+   "id": "a62a2b54-e1a2-405f-a9dc-c48d814b568b",
+   "code": "DW-01",
+   "name": "Sarovar Nagar (DEMO ward DW-01)",
+   "district": "Demo District",
+   "state": "Uttarakhand (demo)",
+   "lgd_district_code": null,
+   "centroid_lat": 29.351,
+   "centroid_lng": 79.559,
+   "access_status": "open",
+   "access_note": null,
+   "is_demo": true,
+   "boundary_geojson": null
+  },
+  {
+   "id": "ab856d7f-7f47-4fa4-b3f2-fc4c63713be5",
+   "code": "DW-02",
+   "name": "Pahadi Tola (DEMO ward DW-02)",
+   "district": "Demo District",
+   "state": "Uttarakhand (demo)",
+   "lgd_district_code": null,
+   "centroid_lat": 29.351,
+   "centroid_lng": 79.572,
+   "access_status": "open",
+   "access_note": null,
+   "is_demo": true,
+   "boundary_geojson": null
+  }
+ ],
+ "demo_residents": 19,
+ "active_demo_incidents": 1,
+ "escalation_interval_seconds": 30,
+ "fixtures": [
+  "demo_flash_flood_alert",
+  "demo_flash_flood_cancel",
+  "demo_flash_flood_update",
+  "demo_landslide_long_lead",
+  "sachet_uttarakhand_real_1793430002314009"
+ ],
+ "personas": [
+  {
+   "user_id": "b3eb5819-d838-4798-b761-d6c3a5ba68a0",
+   "full_name": "Priya Nair (Demo Admin)",
+   "role": "admin",
+   "description": "Configures wards, registry, volunteers and templates."
+  },
+  {
+   "user_id": "718185f7-cd2f-499b-9ea0-3f839ae1e8a5",
+   "full_name": "Neha Bisht",
+   "role": "caregiver",
+   "description": "Caregiver (daughter) of Kamla Devi and Saroj."
+  },
+  {
+   "user_id": "53c5b351-133f-4d7f-8434-31c479179e65",
+   "full_name": "Pooja Joshi",
+   "role": "neighbour",
+   "description": "Second-priority neighbour for Mohan and Leela."
+  },
+  {
+   "user_id": "57410006-bc26-4156-b22a-de3c3403b900",
+   "full_name": "Vikram Rawat",
+   "role": "neighbour",
+   "description": "Neighbour linked to Sunita, Mohan and Kamla."
+  },
+  {
+   "user_id": "8821d62a-41a9-40ee-ba79-27a9b45f7489",
+   "full_name": "Arjun Mehta (Control Room)",
+   "role": "operator",
+   "description": "Runs the live command centre: approvals, overrides, reports."
+  },
+  {
+   "user_id": "b4a30c03-e629-4e34-a458-046be45ac887",
+   "full_name": "Anita Negi",
+   "role": "resident",
+   "description": "Blind; alerts are spoken aloud with screen-reader labels."
+  },
+  {
+   "user_id": "9fe87166-7fba-439e-9c15-051c9d50665e",
+   "full_name": "Bhuwan Chandra",
+   "role": "resident",
+   "description": "Easy-read pictogram alerts, one step at a time."
+  },
+  {
+   "user_id": "42e22be3-c6a7-4fcb-97e7-b07cc4a3afda",
+   "full_name": "Deepa Kandpal",
+   "role": "resident",
+   "description": "Combined profile: hearing + elderly living alone."
+  },
+  {
+   "user_id": "0ef77786-508f-471a-bee4-2a1e01a5514d",
+   "full_name": "Harish Pant",
+   "role": "resident",
+   "description": "No declared needs."
+  },
+  {
+   "user_id": "9f028ec9-6ab1-4b8c-87c6-08c4974d8675",
+   "full_name": "Kamla Devi Bisht",
+   "role": "resident",
+   "description": "78, lives alone, uses a walker. Caregiver: daughter Neha. Pre-assigned helper."
+  },
+  {
+   "user_id": "c349e9b8-6f57-4849-90b0-589c2cedbd47",
+   "full_name": "Leela Bhatt",
+   "role": "resident",
+   "description": "Combined profile: low vision + mobility limitation."
+  },
+  {
+   "user_id": "a17586dc-e3e5-4ee9-8f39-fa3c8be93cb7",
+   "full_name": "Meena Kumari",
+   "role": "resident",
+   "description": "Elderly, lives alone — shorter escalation intervals and repeated reminders."
+  },
+  {
+   "user_id": "63a44e0c-bca5-4f49-8347-b42fe2e1e584",
+   "full_name": "Naveen Tiwari",
+   "role": "resident",
+   "description": "No declared needs."
+  },
+  {
+   "user_id": "a7063cd3-b705-42c9-9b81-2fba76d63a7c",
+   "full_name": "Prakash Rana",
+   "role": "resident",
+   "description": "Consent EXPIRED — demonstrates re-verification (not alerted)."
+  },
+  {
+   "user_id": "377fdb76-859f-4070-a809-4b5ee859622a",
+   "full_name": "Pushpa Arya",
+   "role": "resident",
+   "description": "Speech impairment; responds by tap or SMS only."
+  },
+  {
+   "user_id": "49a4a4e0-4784-47dc-9482-6fa5bd01e6d5",
+   "full_name": "Rahul Mehra",
+   "role": "resident",
+   "description": "No declared needs."
+  },
+  {
+   "user_id": "6f8fbc51-51a5-4767-bcfe-a7ba7e87ce7c",
+   "full_name": "Ramesh Joshi",
+   "role": "resident",
+   "description": "Deaf; app alerts flash the screen, vibrate and blink the torch."
+  },
+  {
+   "user_id": "158db071-4512-4e06-8f24-f6b709149c8e",
+   "full_name": "Saroj Pandey",
+   "role": "resident",
+   "description": "Bedridden; registered with guardian consent."
+  },
+  {
+   "user_id": "57c55a17-ece1-4e89-a874-f8ca34e84eff",
+   "full_name": "Sunita Rawat",
+   "role": "resident",
+   "description": "Wheelchair user; neighbour Vikram is linked."
+  },
+  {
+   "user_id": "4c06f88c-207a-4295-b329-2989e16ff320",
+   "full_name": "Tara Datt",
+   "role": "resident",
+   "description": "Lives in the second demo ward."
+  },
+  {
+   "user_id": "895a49be-3350-4bf3-9c12-ba4fc7087d0e",
+   "full_name": "Aman Verma (NSS)",
+   "role": "volunteer",
+   "description": "Verified volunteer ~400 m from the ward."
+  },
+  {
+   "user_id": "1e4ffa13-5a34-48d6-9092-af6a74e20964",
+   "full_name": "Dev Bisht (Civil Defence)",
+   "role": "volunteer",
+   "description": "Volunteer 6 km away — outside radius."
+  },
+  {
+   "user_id": "52b15200-fce8-428e-a768-263ee139d7d3",
+   "full_name": "Sneha Karki (NCC)",
+   "role": "volunteer",
+   "description": "Verified volunteer stationed in the ward."
+  }
+ ]
+}

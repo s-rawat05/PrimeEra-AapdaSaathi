@@ -1,0 +1,56 @@
+[
+ {
+  "id": "1b815159-f0bf-4660-b329-4d4ae1fcfac0",
+  "resident_id": "854d3c60-07e2-4af5-b014-f681717c74b8",
+  "resident_name": "Deepa Kandpal",
+  "neighbour_user_id": "53c5b351-133f-4d7f-8434-31c479179e65",
+  "neighbour_name": "Pooja Joshi",
+  "priority": 1,
+  "distance_m": 110.0
+ },
+ {
+  "id": "52369481-87e9-4f86-b6a1-2c4a6b66f1ee",
+  "resident_id": "8e86240a-ea5b-4a3e-b9e9-e872a6d162fd",
+  "resident_name": "Kamla Devi Bisht",
+  "neighbour_user_id": "57410006-bc26-4156-b22a-de3c3403b900",
+  "neighbour_name": "Vikram Rawat",
+  "priority": 1,
+  "distance_m": 120.0
+ },
+ {
+  "id": "1e424fdb-e5ce-4cec-9d41-d982adb12971",
+  "resident_id": "98d2afa3-b6f7-4927-90f4-c5ace0855d42",
+  "resident_name": "Leela Bhatt",
+  "neighbour_user_id": "53c5b351-133f-4d7f-8434-31c479179e65",
+  "neighbour_name": "Pooja Joshi",
+  "priority": 1,
+  "distance_m": 80.0
+ },
+ {
+  "id": "19733c69-a42c-4e0f-ae0e-2bc743b390e5",
+  "resident_id": "c3e5593d-cb5d-4e56-84c7-87c371e6e7bb",
+  "resident_name": "Mohan Lal Arya",
+  "neighbour_user_id": "57410006-bc26-4156-b22a-de3c3403b900",
+  "neighbour_name": "Vikram Rawat",
+  "priority": 1,
+  "distance_m": 90.0
+ },
+ {
+  "id": "2d022551-a3ec-41d7-897a-bef8ef0f74a1",
+  "resident_id": "c3e5593d-cb5d-4e56-84c7-87c371e6e7bb",
+  "resident_name": "Mohan Lal Arya",
+  "neighbour_user_id": "53c5b351-133f-4d7f-8434-31c479179e65",
+  "neighbour_name": "Pooja Joshi",
+  "priority": 2,
+  "distance_m": 150.0
+ },
+ {
+  "id": "23189dac-2891-4c94-824e-f19187b1620a",
+  "resident_id": "2f0d70a2-c3bd-42e1-8c88-1aa8113ff62a",
+  "resident_name": "Sunita Rawat",
+  "neighbour_user_id": "57410006-bc26-4156-b22a-de3c3403b900",
+  "neighbour_name": "Vikram Rawat",
+  "priority": 1,
+  "distance_m": 60.0
+ }
+]

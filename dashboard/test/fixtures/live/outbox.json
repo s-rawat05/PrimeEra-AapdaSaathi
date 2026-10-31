@@ -1,0 +1,30 @@
+[
+ {
+  "id": "979fbafe-bd18-4cf2-bc66-d51d2b76ea2e",
+  "channel": "sms",
+  "recipient_kind": "resident",
+  "recipient_phone": "+919000000003",
+  "title": null,
+  "body": "आपदा साथी: मदद अनुरोध मिला। सहायक/नियंत्रण कक्ष को सूचित किया जा रहा है।",
+  "status": "sent",
+  "provider": "simulator",
+  "error": null,
+  "round": "ack",
+  "created_at": "2026-10-31T17:31:08.218573Z",
+  "sent_at": "2026-10-31T17:31:08.234048Z"
+ },
+ {
+  "id": "a844dbe9-7d23-411e-aeab-bbe5f041e9d5",
+  "channel": "sms",
+  "recipient_kind": "resident",
+  "recipient_phone": "+919000000003",
+  "title": null,
+  "body": "आपदा साथी चेतावनी (demo-control-room@aapdasaathi.invalid): DEMO EXERCISE: Flash flood likely along the stream in Demo Ward DW-01 within 20 minutes. उत्तर दें 1=सुरक्षित 2=मदद",
+  "status": "sent",
+  "provider": "simulator",
+  "error": null,
+  "round": "initial",
+  "created_at": "2026-10-31T17:30:38.623188Z",
+  "sent_at": "2026-10-31T17:30:38.940891Z"
+ }
+]

@@ -23,8 +23,10 @@ async def test_every_orm_column_exists_in_migrations(env):
     async with db.session() as s:
         rows = (
             await s.execute(
-                text("select table_name, column_name, is_nullable from information_schema.columns "
-                     "where table_schema = 'public'")
+                text(
+                    "select table_name, column_name, is_nullable from information_schema.columns "
+                    "where table_schema = 'public'"
+                )
             )
         ).all()
     pg = {(t, c): n for t, c, n in rows}
@@ -34,10 +36,10 @@ async def test_every_orm_column_exists_in_migrations(env):
             key = (table.name, col.name)
             if key not in pg:
                 missing.append(key)
-            elif not col.nullable and not col.primary_key and pg[key] == "YES":
-                nullability.append(key)
+            elif not col.primary_key and (not col.nullable) != (pg[key] == "NO"):
+                nullability.append((*key, "ORM nullable" if col.nullable else "ORM NOT NULL"))
     assert not missing, f"columns in ORM but not in migrations: {missing}"
-    assert not nullability, f"NOT NULL in ORM but nullable in migrations: {nullability}"
+    assert not nullability, f"nullability differs between ORM and migrations: {nullability}"
 
 
 async def test_postgis_generated_geometry_and_rls(env):
@@ -47,12 +49,18 @@ async def test_postgis_generated_geometry_and_rls(env):
             text("select st_contains(geom, st_setsrid(st_makepoint(79.56, 29.35), 4326)) from wards where code='DW-01'")
         )
         rls_off = (
-            await s.execute(
-                text("select relname from pg_class c join pg_namespace n on n.oid = c.relnamespace "
-                     "where n.nspname = 'public' and c.relkind = 'r' and not c.relrowsecurity "
-                     "and relname not in ('schema_migrations', 'spatial_ref_sys')")
+            (
+                await s.execute(
+                    text(
+                        "select relname from pg_class c join pg_namespace n on n.oid = c.relnamespace "
+                        "where n.nspname = 'public' and c.relkind = 'r' and not c.relrowsecurity "
+                        "and relname not in ('schema_migrations', 'spatial_ref_sys')"
+                    )
+                )
             )
-        ).scalars().all()
+            .scalars()
+            .all()
+        )
     assert geom_type == "POLYGON" and inside is True
     assert rls_off == [], f"tables without RLS: {rls_off}"
 
@@ -69,9 +77,12 @@ async def test_rls_blocks_anonymous_and_scopes_residents(env):
 async def test_audit_log_is_append_only(env):
     async with db.engine.connect() as conn:
         trans = await conn.begin()
-        await conn.execute(text(
-            "insert into audit_log(id, action, entity_type, created_at) values "
-            "('00000000-0000-4000-8000-0000000000aa', 't', 'test', now())"))
+        await conn.execute(
+            text(
+                "insert into audit_log(id, action, entity_type, created_at) values "
+                "('00000000-0000-4000-8000-0000000000aa', 't', 'test', now())"
+            )
+        )
         with pytest.raises(Exception, match="append-only"):
             await conn.execute(text("delete from audit_log where id = '00000000-0000-4000-8000-0000000000aa'"))
         await trans.rollback()

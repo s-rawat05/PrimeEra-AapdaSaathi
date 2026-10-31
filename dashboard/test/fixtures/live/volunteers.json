@@ -1,0 +1,59 @@
+[
+ {
+  "id": "b4c6d4b4-47e1-4c48-a384-01dbade88c70",
+  "user_id": "895a49be-3350-4bf3-9c12-ba4fc7087d0e",
+  "full_name": "Aman Verma (NSS)",
+  "phone_masked": "+91••••••0301",
+  "ward_id": "a62a2b54-e1a2-405f-a9dc-c48d814b568b",
+  "ward_name": "Sarovar Nagar (DEMO ward DW-01)",
+  "is_available": true,
+  "base_lat": 29.348,
+  "base_lng": 79.5575,
+  "max_radius_m": 3000.0,
+  "skills": [
+   "first_aid",
+   "evacuation_support"
+  ],
+  "verified": true,
+  "is_demo": true,
+  "active_task_id": null
+ },
+ {
+  "id": "fd80ba82-8e51-4c7c-ab61-43032c043338",
+  "user_id": "1e4ffa13-5a34-48d6-9092-af6a74e20964",
+  "full_name": "Dev Bisht (Civil Defence)",
+  "phone_masked": "+91••••••0303",
+  "ward_id": null,
+  "ward_name": null,
+  "is_available": true,
+  "base_lat": 29.392,
+  "base_lng": 79.52,
+  "max_radius_m": 3000.0,
+  "skills": [
+   "first_aid",
+   "evacuation_support"
+  ],
+  "verified": true,
+  "is_demo": true,
+  "active_task_id": null
+ },
+ {
+  "id": "2a8de1ff-13ee-4436-9323-2193ea8b122f",
+  "user_id": "52b15200-fce8-428e-a768-263ee139d7d3",
+  "full_name": "Sneha Karki (NCC)",
+  "phone_masked": "+91••••••0302",
+  "ward_id": "a62a2b54-e1a2-405f-a9dc-c48d814b568b",
+  "ward_name": "Sarovar Nagar (DEMO ward DW-01)",
+  "is_available": true,
+  "base_lat": 29.35,
+  "base_lng": 79.566,
+  "max_radius_m": 3000.0,
+  "skills": [
+   "first_aid",
+   "evacuation_support"
+  ],
+  "verified": true,
+  "is_demo": true,
+  "active_task_id": null
+ }
+]

@@ -1,0 +1,26 @@
+[
+ {
+  "id": "8b2c308d-aacf-4df9-93bf-18d42f462718",
+  "ward_id": "a62a2b54-e1a2-405f-a9dc-c48d814b568b",
+  "name": "Demo Relief Post A — Community Hall (fictional)",
+  "address": "Upper lane, Sarovar Nagar (fictional)",
+  "lat": 29.3545,
+  "lng": 79.556,
+  "source": "Fictional designation for the demo",
+  "is_demo": true,
+  "distance_m": null,
+  "est_walk_minutes": null
+ },
+ {
+  "id": "eadb72da-6863-4d0f-a552-1b56d61eb23b",
+  "ward_id": "ab856d7f-7f47-4fa4-b3f2-fc4c63713be5",
+  "name": "Demo Relief Post B — School Ground (fictional)",
+  "address": "Hill road, Pahadi Tola (fictional)",
+  "lat": 29.354,
+  "lng": 79.574,
+  "source": "Fictional designation for the demo",
+  "is_demo": true,
+  "distance_m": null,
+  "est_walk_minutes": null
+ }
+]

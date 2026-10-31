@@ -1,0 +1,276 @@
+{
+ "wards": [
+  {
+   "id": "a62a2b54-e1a2-405f-a9dc-c48d814b568b",
+   "code": "DW-01",
+   "name": "Sarovar Nagar (DEMO ward DW-01)",
+   "district": "Demo District",
+   "state": "Uttarakhand (demo)",
+   "lgd_district_code": null,
+   "centroid_lat": 29.351,
+   "centroid_lng": 79.559,
+   "access_status": "open",
+   "access_note": null,
+   "is_demo": true,
+   "boundary_geojson": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       79.552,
+       29.346
+      ],
+      [
+       79.566,
+       29.346
+      ],
+      [
+       79.566,
+       29.356
+      ],
+      [
+       79.552,
+       29.356
+      ],
+      [
+       79.552,
+       29.346
+      ]
+     ]
+    ]
+   }
+  }
+ ],
+ "markers": [
+  {
+   "delivery_id": "ef38fbe9-ed84-4467-b9fa-602dea8ecdfb",
+   "resident_first_name": "Kamla",
+   "status": "NO_REPLY",
+   "lat": 29.348,
+   "lng": 79.555,
+   "priority": 75,
+   "needs": [
+    "elderly_alone",
+    "mobility"
+   ],
+   "precision": "~110 m grid"
+  },
+  {
+   "delivery_id": "ae319e33-aac8-464a-9dac-ad664b3aac83",
+   "resident_first_name": "Mohan",
+   "status": "NO_REPLY",
+   "lat": 29.354,
+   "lng": 79.561,
+   "priority": 75,
+   "needs": [
+    "bedridden"
+   ],
+   "precision": "~110 m grid"
+  },
+  {
+   "delivery_id": "6b05d885-f9ac-4259-87af-c80f9a97261b",
+   "resident_first_name": "Leela",
+   "status": "NO_REPLY",
+   "lat": 29.352,
+   "lng": 79.559,
+   "priority": 55,
+   "needs": [
+    "vision",
+    "mobility"
+   ],
+   "precision": "~110 m grid"
+  },
+  {
+   "delivery_id": "500bffc6-e0d3-4c14-814a-0a2039c5148c",
+   "resident_first_name": "Saroj",
+   "status": "NO_REPLY",
+   "lat": 29.353,
+   "lng": 79.555,
+   "priority": 55,
+   "needs": [
+    "bedridden",
+    "cognitive"
+   ],
+   "precision": "~110 m grid"
+  },
+  {
+   "delivery_id": "ce9f94fc-bfb3-4709-ad9a-68ad3f037fab",
+   "resident_first_name": "Sunita",
+   "status": "NO_REPLY",
+   "lat": 29.35,
+   "lng": 79.562,
+   "priority": 55,
+   "needs": [
+    "mobility"
+   ],
+   "precision": "~110 m grid"
+  },
+  {
+   "delivery_id": "b1f7340e-2251-40a6-b340-06638ab08c79",
+   "resident_first_name": "Deepa",
+   "status": "NO_REPLY",
+   "lat": 29.355,
+   "lng": 79.553,
+   "priority": 35,
+   "needs": [
+    "hearing",
+    "elderly_alone"
+   ],
+   "precision": "~110 m grid"
+  },
+  {
+   "delivery_id": "14586fda-5fa0-43f0-a158-b2a36b3f6d36",
+   "resident_first_name": "Kishan",
+   "status": "NO_REPLY",
+   "lat": 29.354,
+   "lng": 79.564,
+   "priority": 35,
+   "needs": [
+    "feature_phone"
+   ],
+   "precision": "~110 m grid"
+  },
+  {
+   "delivery_id": "e74b72a1-8c1d-4d55-85d7-0742117d62f0",
+   "resident_first_name": "Meena",
+   "status": "NO_REPLY",
+   "lat": 29.347,
+   "lng": 79.556,
+   "priority": 35,
+   "needs": [
+    "elderly_alone"
+   ],
+   "precision": "~110 m grid"
+  },
+  {
+   "delivery_id": "75af56da-2c8b-4529-8718-9d54a70df8b0",
+   "resident_first_name": "Anita",
+   "status": "NO_REPLY",
+   "lat": 29.351,
+   "lng": 79.554,
+   "priority": 15,
+   "needs": [
+    "vision"
+   ],
+   "precision": "~110 m grid"
+  },
+  {
+   "delivery_id": "9c19d7a9-f855-49ae-b757-7c3156d253d0",
+   "resident_first_name": "Bhuwan",
+   "status": "NO_REPLY",
+   "lat": 29.355,
+   "lng": 79.556,
+   "priority": 15,
+   "needs": [
+    "cognitive"
+   ],
+   "precision": "~110 m grid"
+  },
+  {
+   "delivery_id": "83174dc3-84f7-4181-a424-f21d5d867bbd",
+   "resident_first_name": "Govind",
+   "status": "NO_REPLY",
+   "lat": 29.349,
+   "lng": 79.56,
+   "priority": 15,
+   "needs": [
+    "feature_phone"
+   ],
+   "precision": "~110 m grid"
+  },
+  {
+   "delivery_id": "3b62a23e-e7d2-4a19-8dc0-d83e2f1a16d2",
+   "resident_first_name": "Harish",
+   "status": "NO_REPLY",
+   "lat": 29.352,
+   "lng": 79.564,
+   "priority": 15,
+   "needs": [],
+   "precision": "~110 m grid"
+  },
+  {
+   "delivery_id": "eb0d4edc-a623-4f19-b85d-66710d03a5db",
+   "resident_first_name": "Naveen",
+   "status": "NO_REPLY",
+   "lat": 29.349,
+   "lng": 79.558,
+   "priority": 15,
+   "needs": [],
+   "precision": "~110 m grid"
+  },
+  {
+   "delivery_id": "36ea989d-369c-47e9-91b3-aab43c610019",
+   "resident_first_name": "Pushpa",
+   "status": "NO_REPLY",
+   "lat": 29.348,
+   "lng": 79.563,
+   "priority": 15,
+   "needs": [
+    "speech"
+   ],
+   "precision": "~110 m grid"
+  },
+  {
+   "delivery_id": "c7b7f05b-909c-4abd-ac5d-4ffb061a0908",
+   "resident_first_name": "Rahul",
+   "status": "NO_REPLY",
+   "lat": 29.351,
+   "lng": 79.555,
+   "priority": 15,
+   "needs": [],
+   "precision": "~110 m grid"
+  },
+  {
+   "delivery_id": "2f1e4af1-a247-48ac-b8ff-828c4be40341",
+   "resident_first_name": "Ramesh",
+   "status": "NO_REPLY",
+   "lat": 29.352,
+   "lng": 79.557,
+   "priority": 15,
+   "needs": [
+    "hearing"
+   ],
+   "precision": "~110 m grid"
+  }
+ ],
+ "volunteers": [
+  {
+   "volunteer_id": "b4c6d4b4-47e1-4c48-a384-01dbade88c70",
+   "name": "Aman Verma (NSS)",
+   "lat": 29.348,
+   "lng": 79.5575,
+   "is_available": true,
+   "busy": true
+  },
+  {
+   "volunteer_id": "2a8de1ff-13ee-4436-9323-2193ea8b122f",
+   "name": "Sneha Karki (NCC)",
+   "lat": 29.35,
+   "lng": 79.566,
+   "is_available": true,
+   "busy": false
+  },
+  {
+   "volunteer_id": "fd80ba82-8e51-4c7c-ab61-43032c043338",
+   "name": "Dev Bisht (Civil Defence)",
+   "lat": 29.392,
+   "lng": 79.52,
+   "is_available": true,
+   "busy": false
+  }
+ ],
+ "shelters": [
+  {
+   "id": "8b2c308d-aacf-4df9-93bf-18d42f462718",
+   "ward_id": "a62a2b54-e1a2-405f-a9dc-c48d814b568b",
+   "name": "Demo Relief Post A — Community Hall (fictional)",
+   "address": "Upper lane, Sarovar Nagar (fictional)",
+   "lat": 29.3545,
+   "lng": 79.556,
+   "source": "Fictional designation for the demo",
+   "is_demo": true,
+   "distance_m": null,
+   "est_walk_minutes": null
+  }
+ ]
+}

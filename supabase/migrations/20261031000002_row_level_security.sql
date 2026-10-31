@@ -40,6 +40,11 @@ language sql stable security definer set search_path = public as $$
   select id from residents where user_id = app.current_user_id()
 $$;
 
+-- Policies run as the querying role, so client roles must be able to call the helpers
+-- (security definer functions; they only reveal the caller's own id/role/assignments).
+grant usage on schema app to anon, authenticated;
+grant execute on all functions in schema app to anon, authenticated;
+
 -- Enable RLS everywhere. No policy = no access for anon/authenticated.
 do $$
 declare t text;

@@ -1,0 +1,117 @@
+{
+ "items": [
+  {
+   "id": "b3eb5819-d838-4798-b761-d6c3a5ba68a0",
+   "full_name": "Priya Nair (Demo Admin)",
+   "role": "admin",
+   "phone_masked": "+91••••••0101",
+   "email": "admin@demo.aapdasaathi.invalid",
+   "language": "en",
+   "is_demo": true,
+   "is_active": true,
+   "created_at": "2026-10-31T16:58:20.152609Z"
+  },
+  {
+   "id": "718185f7-cd2f-499b-9ea0-3f839ae1e8a5",
+   "full_name": "Neha Bisht",
+   "role": "caregiver",
+   "phone_masked": "+91••••••0201",
+   "email": null,
+   "language": "hi",
+   "is_demo": true,
+   "is_active": true,
+   "created_at": "2026-10-31T16:58:20.155655Z"
+  },
+  {
+   "id": "53c5b351-133f-4d7f-8434-31c479179e65",
+   "full_name": "Pooja Joshi",
+   "role": "neighbour",
+   "phone_masked": "+91••••••0203",
+   "email": null,
+   "language": "en",
+   "is_demo": true,
+   "is_active": true,
+   "created_at": "2026-10-31T16:58:20.157853Z"
+  },
+  {
+   "id": "57410006-bc26-4156-b22a-de3c3403b900",
+   "full_name": "Vikram Rawat",
+   "role": "neighbour",
+   "phone_masked": "+91••••••0202",
+   "email": null,
+   "language": "hi",
+   "is_demo": true,
+   "is_active": true,
+   "created_at": "2026-10-31T16:58:20.156888Z"
+  },
+  {
+   "id": "8821d62a-41a9-40ee-ba79-27a9b45f7489",
+   "full_name": "Arjun Mehta (Control Room)",
+   "role": "operator",
+   "phone_masked": "+91••••••0102",
+   "email": "operator@demo.aapdasaathi.invalid",
+   "language": "en",
+   "is_demo": true,
+   "is_active": true,
+   "created_at": "2026-10-31T16:58:20.154472Z"
+  },
+  {
+   "id": "b4a30c03-e629-4e34-a458-046be45ac887",
+   "full_name": "Anita Negi",
+   "role": "resident",
+   "phone_masked": "+91••••••0006",
+   "email": null,
+   "language": "en",
+   "is_demo": true,
+   "is_active": true,
+   "created_at": "2026-10-31T16:58:20.184909Z"
+  },
+  {
+   "id": "9fe87166-7fba-439e-9c15-051c9d50665e",
+   "full_name": "Bhuwan Chandra",
+   "role": "resident",
+   "phone_masked": "+91••••••0007",
+   "email": null,
+   "language": "hi",
+   "is_demo": true,
+   "is_active": true,
+   "created_at": "2026-10-31T16:58:20.188349Z"
+  },
+  {
+   "id": "42e22be3-c6a7-4fcb-97e7-b07cc4a3afda",
+   "full_name": "Deepa Kandpal",
+   "role": "resident",
+   "phone_masked": "+91••••••0010",
+   "email": null,
+   "language": "hi",
+   "is_demo": true,
+   "is_active": true,
+   "created_at": "2026-10-31T16:58:20.198441Z"
+  },
+  {
+   "id": "0ef77786-508f-471a-bee4-2a1e01a5514d",
+   "full_name": "Harish Pant",
+   "role": "resident",
+   "phone_masked": "+91••••••0009",
+   "email": null,
+   "language": "en",
+   "is_demo": true,
+   "is_active": true,
+   "created_at": "2026-10-31T16:58:20.194848Z"
+  },
+  {
+   "id": "9f028ec9-6ab1-4b8c-87c6-08c4974d8675",
+   "full_name": "Kamla Devi Bisht",
+   "role": "resident",
+   "phone_masked": "+91••••••0001",
+   "email": null,
+   "language": "hi",
+   "is_demo": true,
+   "is_active": true,
+   "created_at": "2026-10-31T16:58:20.164422Z"
+  }
+ ],
+ "total": 23,
+ "limit": 10,
+ "offset": 0
+}

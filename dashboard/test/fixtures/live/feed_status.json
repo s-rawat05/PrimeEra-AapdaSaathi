@@ -1,0 +1,18 @@
+{
+ "polling_enabled": false,
+ "notify_real_residents": false,
+ "feeds": [
+  {
+   "url": "https://sachet.ndma.gov.in/cap_public_website/rss/rss_uttarakhand.xml",
+   "healthy": false,
+   "last_fetch_at": null,
+   "last_success_at": null,
+   "last_status_code": null,
+   "last_error": null,
+   "consecutive_failures": 0,
+   "next_fetch_at": null,
+   "items_seen": 0,
+   "etag": null
+  }
+ ]
+}

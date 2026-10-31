@@ -1,0 +1,6 @@
+{
+ "error": {
+  "code": "incident_closed",
+  "message": "Exact locations are only available during an active incident"
+ }
+}

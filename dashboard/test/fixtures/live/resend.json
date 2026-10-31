@@ -1,0 +1,54 @@
+{
+ "delivery_id": "6b05d885-f9ac-4259-87af-c80f9a97261b",
+ "resident_id": "98d2afa3-b6f7-4927-90f4-c5ace0855d42",
+ "resident_name": "Leela Bhatt",
+ "phone_masked": "+91••••••0012",
+ "ward_name": "Sarovar Nagar (DEMO ward DW-01)",
+ "needs": [
+  "vision",
+  "mobility"
+ ],
+ "lives_alone": false,
+ "status": "NO_REPLY",
+ "priority_total": 55,
+ "priority_components": [
+  {
+   "factor": "Mobility limitation / bedridden",
+   "points": 40
+  },
+  {
+   "factor": "No reply",
+   "points": 15
+  },
+  {
+   "factor": "0 min since alert (1/min, max 60)",
+   "points": 0
+  }
+ ],
+ "alerted_at": "2026-10-31T17:30:38.399687Z",
+ "seen_at": null,
+ "replied_at": null,
+ "reply_channel": null,
+ "resolved_by": null,
+ "escalation_level": 2,
+ "escalation_step": "volunteer",
+ "next_action_at": "2026-10-31T17:31:42.802103Z",
+ "needs_operator": true,
+ "needs_rescue": true,
+ "rescue_reason": "No helper can safely arrive in time — prioritise rescue. (Aman Verma (NSS): Already on an active task; Sneha Karki (NCC): Already on an active task; Dev Bisht (Civil Defence): Outside service radius (5879 m > 3000 m))",
+ "channels": [
+  "in_app",
+  "sms"
+ ],
+ "lat": 29.352,
+ "lng": 79.559,
+ "open_tasks": [
+  {
+   "id": "a6fc8484-b802-4912-be27-f6b9023bd97b",
+   "kind": "neighbour_check",
+   "status": "ASSIGNED",
+   "assignee_name": "Pooja Joshi",
+   "est_walk_minutes": null
+  }
+ ]
+}

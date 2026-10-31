@@ -1,0 +1,48 @@
+{
+ "id": "ade2c4e7-0d48-4978-91ab-7bd3832fd86d",
+ "title": "Manual drill test",
+ "hazard_type": "Flood",
+ "source": "manual",
+ "source_label": "Manually created incident",
+ "status": "active",
+ "is_demo": true,
+ "severity": "Severe",
+ "urgency": "Expected",
+ "certainty": "Unknown",
+ "sent": "2026-10-31T17:31:57.257135Z",
+ "effective": null,
+ "onset": "2026-10-31T19:01:57.257135Z",
+ "expires": null,
+ "onset_fallback_used": false,
+ "onset_fallback_note": null,
+ "headline": "Test headline",
+ "description": null,
+ "instruction": "Test instruction",
+ "area_desc": null,
+ "official_url": null,
+ "cap_identifier": null,
+ "cap_sender": "Arjun Mehta (Control Room) (operator entry)",
+ "escalation_mode": "B",
+ "mode_label": "Scaled sequential (30 min–6 h)",
+ "requires_dispatch_approval": false,
+ "created_at": "2026-10-31T17:31:57.257186Z",
+ "closed_at": null,
+ "close_note": null,
+ "wards": [
+  {
+   "ward_id": "a62a2b54-e1a2-405f-a9dc-c48d814b568b",
+   "ward_name": "Sarovar Nagar (DEMO ward DW-01)",
+   "match_method": "manual",
+   "match_note": "Selected by operator"
+  }
+ ],
+ "counts": {
+  "SAFE": 0,
+  "HELP": 0,
+  "NO_REPLY": 16,
+  "UNREACHABLE": 0,
+  "PENDING": 0,
+  "total": 16
+ },
+ "pending_approvals": 0
+}

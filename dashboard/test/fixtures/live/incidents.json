@@ -1,0 +1,55 @@
+{
+ "items": [
+  {
+   "id": "1bf61cf8-0b86-4d2c-a652-82517840d7ba",
+   "title": "[SIMULATED] DEMO EXERCISE: Flash flood likely along the stream in Demo Ward DW-01 within 20 minutes.",
+   "hazard_type": "Flood",
+   "source": "simulated",
+   "source_label": "SIMULATED alert (drill)",
+   "status": "active",
+   "is_demo": true,
+   "severity": "Severe",
+   "urgency": "Immediate",
+   "certainty": "Likely",
+   "sent": "2026-07-14T10:30:00Z",
+   "effective": null,
+   "onset": "2026-10-31T17:50:38.220317Z",
+   "expires": "2026-10-31T23:30:38.220317Z",
+   "onset_fallback_used": true,
+   "onset_fallback_note": "DRILL TIMING: onset set to now + 20 min for this simulated. Official onset was 2026-07-14T16:20:00+05:30.",
+   "headline": "DEMO EXERCISE: Flash flood likely along the stream in Demo Ward DW-01 within 20 minutes.",
+   "description": "DEMO EXERCISE ONLY. Heavy rainfall upstream may cause a sudden rise in water level along the stream bed in the fictional demo ward.",
+   "instruction": "DEMO EXERCISE: Move away from the stream bed to Demo Relief Post A. Help elderly and disabled neighbours. Do not cross flowing water.",
+   "area_desc": "Demo Ward DW-01 Sarovar Nagar (fictional)",
+   "official_url": null,
+   "cap_identifier": "AAPDASAATHI-DEMO-FLOOD-0001",
+   "cap_sender": "demo-control-room@aapdasaathi.invalid",
+   "escalation_mode": "C",
+   "mode_label": "Parallel response (<30 min)",
+   "requires_dispatch_approval": true,
+   "created_at": "2026-10-31T17:30:38.220356Z",
+   "closed_at": null,
+   "close_note": null,
+   "wards": [
+    {
+     "ward_id": "a62a2b54-e1a2-405f-a9dc-c48d814b568b",
+     "ward_name": "Sarovar Nagar (DEMO ward DW-01)",
+     "match_method": "manual",
+     "match_note": "Simulated into fictional demo ward"
+    }
+   ],
+   "counts": {
+    "SAFE": 0,
+    "HELP": 0,
+    "NO_REPLY": 16,
+    "UNREACHABLE": 0,
+    "PENDING": 0,
+    "total": 16
+   },
+   "pending_approvals": 1
+  }
+ ],
+ "total": 1,
+ "limit": 50,
+ "offset": 0
+}
