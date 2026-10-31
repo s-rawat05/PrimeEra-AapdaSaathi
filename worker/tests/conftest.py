@@ -40,19 +40,30 @@ class Env:
 
 def make_settings(tmp_path: Path, **overrides) -> Settings:
     url = os.environ.get("TEST_DATABASE_URL") or f"sqlite+aiosqlite:///{tmp_path.as_posix()}/test.db"
-    base = dict(database_url=url, run_background_jobs=False, demo_mode_enabled=True, feed_poll_enabled=False,
-                demo_escalation_interval_seconds=30, rate_limit_per_minute=100000, sms_provider="simulator",
-                notify_real_residents=False, jwt_secret="test-secret-" + "x" * 40)
+    base = dict(
+        database_url=url,
+        run_background_jobs=False,
+        demo_mode_enabled=True,
+        feed_poll_enabled=False,
+        demo_escalation_interval_seconds=30,
+        rate_limit_per_minute=100000,
+        sms_provider="simulator",
+        notify_real_residents=False,
+        jwt_secret="test-secret-" + "x" * 40,
+    )
     base.update(overrides)
     return Settings(**base)
 
 
 async def _reset_postgres() -> None:
     async with db.engine.begin() as conn:
-        await conn.execute(text(
-            "DO $$ DECLARE r record; BEGIN FOR r IN SELECT tablename FROM pg_tables WHERE schemaname='public' "
-            "AND tablename NOT IN ('spatial_ref_sys') LOOP EXECUTE 'TRUNCATE TABLE ' || quote_ident(r.tablename) "
-            "|| ' CASCADE'; END LOOP; END $$;"))
+        await conn.execute(
+            text(
+                "DO $$ DECLARE r record; BEGIN FOR r IN SELECT tablename FROM pg_tables WHERE schemaname='public' "
+                "AND tablename NOT IN ('spatial_ref_sys') LOOP EXECUTE 'TRUNCATE TABLE ' || quote_ident(r.tablename) "
+                "|| ' CASCADE'; END LOOP; END $$;"
+            )
+        )
 
 
 @pytest_asyncio.fixture
@@ -75,4 +86,5 @@ async def env(tmp_path) -> Env:
 def cap_xml():
     def load(name: str) -> str:
         return (FIXTURES / "cap" / f"{name}.xml").read_text(encoding="utf-8")
+
     return load

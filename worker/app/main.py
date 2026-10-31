@@ -35,8 +35,12 @@ from app.services.realtime import EventBus
 
 class JsonFormatter(logging.Formatter):
     def format(self, record: logging.LogRecord) -> str:
-        out = {"ts": self.formatTime(record), "level": record.levelname, "logger": record.name,
-               "msg": record.getMessage()}
+        out = {
+            "ts": self.formatTime(record),
+            "level": record.levelname,
+            "logger": record.name,
+            "msg": record.getMessage(),
+        }
         if record.exc_info:
             out["exc"] = self.formatException(record.exc_info)
         return json.dumps(out, ensure_ascii=False)
@@ -57,8 +61,14 @@ log = logging.getLogger("aapdasaathi")
 
 def build_context(settings: Settings, clock: Clock | None = None) -> AppContext:
     sim = SimulatorSmsGateway({p.strip() for p in settings.sim_unreachable_phones.split(",") if p.strip()})
-    return AppContext(settings=settings, clock=clock or Clock(), sms=build_sms_gateway(settings),
-                      fcm=FcmGateway(settings), bus=EventBus(), extras={"sim_sms": sim})
+    return AppContext(
+        settings=settings,
+        clock=clock or Clock(),
+        sms=build_sms_gateway(settings),
+        fcm=FcmGateway(settings),
+        bus=EventBus(),
+        extras={"sim_sms": sim},
+    )
 
 
 async def _loop(name: str, interval: float, fn) -> None:
@@ -89,6 +99,7 @@ async def init_storage(settings: Settings, ctx: AppContext) -> None:
             has_demo = await s.scalar(select(Ward.id).where(Ward.is_demo.is_(True)).limit(1))
         if not has_demo:
             from app.demo.seed import seed_demo
+
             log.info("seeding fictional demo data: %s", await seed_demo(ctx.now()))
 
 
@@ -104,14 +115,20 @@ def create_app(settings: Settings | None = None, ctx: AppContext | None = None, 
         if manage_db:
             await init_storage(settings, ctx)
         if settings.run_background_jobs:
-            tasks.append(asyncio.create_task(_loop("escalation", settings.escalation_tick_seconds,
-                                                   lambda: engine.tick(ctx))))
+            tasks.append(
+                asyncio.create_task(_loop("escalation", settings.escalation_tick_seconds, lambda: engine.tick(ctx)))
+            )
             tasks.append(asyncio.create_task(_loop("outbox", 5, lambda: flush_outbox(ctx))))
             tasks.append(asyncio.create_task(_loop("consent-expiry", 3600, lambda: _expire_consents(ctx))))
             if settings.feed_poll_enabled:
                 tasks.append(asyncio.create_task(_loop("sachet", 10, lambda: sachet_ingest.poll_all(ctx))))
-        log.info("AapdaSaathi started env=%s notify_real_residents=%s demo=%s db=%s", settings.app_env,
-                 settings.notify_real_residents, settings.demo_mode_enabled, "sqlite" if db.is_sqlite else "postgres")
+        log.info(
+            "AapdaSaathi started env=%s notify_real_residents=%s demo=%s db=%s",
+            settings.app_env,
+            settings.notify_real_residents,
+            settings.demo_mode_enabled,
+            "sqlite" if db.is_sqlite else "postgres",
+        )
         yield
         for t in tasks:
             t.cancel()
@@ -125,14 +142,18 @@ def create_app(settings: Settings | None = None, ctx: AppContext | None = None, 
         description=(
             "Disaster-alert accountability platform by Team PRIME ERA (SAARTHI'26). "
             "App where possible. SMS everywhere. A human for those who don't reply.\n\n"
-            "All timestamps are UTC. Errors: `{\"error\": {\"code\", \"message\"}}`."
+            'All timestamps are UTC. Errors: `{"error": {"code", "message"}}`.'
         ),
         lifespan=lifespan,
     )
     app.state.ctx = ctx
-    app.add_middleware(CORSMiddleware, allow_origins=settings.cors_origin_list, allow_credentials=False,
-                       allow_methods=["GET", "POST", "PUT", "PATCH", "DELETE"],
-                       allow_headers=["Authorization", "Content-Type", "Idempotency-Key"])
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=settings.cors_origin_list,
+        allow_credentials=False,
+        allow_methods=["GET", "POST", "PUT", "PATCH", "DELETE"],
+        allow_headers=["Authorization", "Content-Type", "Idempotency-Key"],
+    )
 
     hits: dict[str, deque] = defaultdict(deque)
 

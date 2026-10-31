@@ -26,9 +26,7 @@ class Settings(BaseSettings):
     demo_escalation_interval_seconds: int = 30
 
     sachet_rss_urls: str = "https://sachet.ndma.gov.in/cap_public_website/rss/rss_uttarakhand.xml"
-    sachet_cap_url_template: str = (
-        "https://sachet.ndma.gov.in/cap_public_website/FetchXMLFile?identifier={identifier}"
-    )
+    sachet_cap_url_template: str = "https://sachet.ndma.gov.in/cap_public_website/FetchXMLFile?identifier={identifier}"
     feed_poll_seconds: int = Field(default=45, ge=15, le=600)
     feed_poll_enabled: bool = False
     feed_connect_timeout: float = 10.0

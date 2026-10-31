@@ -103,20 +103,22 @@ def _fields(incident: Incident, language: str) -> dict[str, str]:
     }
 
 
-async def render(
-    session: AsyncSession, incident: Incident, language: str, style: str
-) -> tuple[str, str]:
+async def render(session: AsyncSession, incident: Incident, language: str, style: str) -> tuple[str, str]:
     language = language if language in ("en", "hi") else "en"
     tpl = (
-        await session.execute(
-            select(AlertTemplate).where(
-                AlertTemplate.hazard_type.in_([incident.hazard_type, "*"]),
-                AlertTemplate.language == language,
-                AlertTemplate.style == style,
-                AlertTemplate.is_active.is_(True),
+        (
+            await session.execute(
+                select(AlertTemplate).where(
+                    AlertTemplate.hazard_type.in_([incident.hazard_type, "*"]),
+                    AlertTemplate.language == language,
+                    AlertTemplate.style == style,
+                    AlertTemplate.is_active.is_(True),
+                )
             )
         )
-    ).scalars().all()
+        .scalars()
+        .all()
+    )
     chosen = next((t for t in tpl if t.hazard_type == incident.hazard_type), None) or (tpl[0] if tpl else None)
     title_t, body_t = (chosen.title, chosen.body) if chosen else DEFAULTS[(language, style)]
     f = _SafeDict(_fields(incident, language))

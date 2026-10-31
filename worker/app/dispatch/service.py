@@ -73,7 +73,9 @@ async def evaluate_candidates(session: AsyncSession, ctx: AppContext, dc: Delive
                     Task.volunteer_id.is_not(None),
                 )
             )
-        ).scalars().all()
+        )
+        .scalars()
+        .all()
     )
     declined = set(
         (
@@ -85,13 +87,15 @@ async def evaluate_candidates(session: AsyncSession, ctx: AppContext, dc: Delive
                     Task.outcome.is_distinct_from("stood_down"),
                 )
             )
-        ).scalars().all()
+        )
+        .scalars()
+        .all()
     )
     pre = {
         p.volunteer_id: p.priority
-        for p in (
-            await session.execute(select(PreAssignedHelper).where(PreAssignedHelper.resident_id == res.id))
-        ).scalars().all()
+        for p in (await session.execute(select(PreAssignedHelper).where(PreAssignedHelper.resident_id == res.id)))
+        .scalars()
+        .all()
     }
     lat, lng, _ = await resident_point(session, res)
     ward = await session.get(Ward, res.ward_id)
@@ -131,9 +135,18 @@ async def _notify_volunteer(session: AsyncSession, ctx: AppContext, dc: Delivery
     )
     sms = f"AapdaSaathi TASK: assist {_first_name(dc.resident.full_name)} ({needs}). Open app to accept/decline."
     await dispatcher.notify_user(
-        session, ctx, dc.incident, user, recipient_kind="volunteer", key=f"t:{task.id}:assigned",
-        title=title, body=body, sms_body=sms, data={"type": "task", "task_id": task.id},
-        delivery_id=dc.delivery.id, task_id=task.id,
+        session,
+        ctx,
+        dc.incident,
+        user,
+        recipient_kind="volunteer",
+        key=f"t:{task.id}:assigned",
+        title=title,
+        body=body,
+        sms_body=sms,
+        data={"type": "task", "task_id": task.id},
+        delivery_id=dc.delivery.id,
+        task_id=task.id,
     )
 
 
@@ -166,9 +179,16 @@ async def request_volunteer(
         evals = [e for e in evals if e.candidate.pre_assigned_priority is not None]
         if not any(e.eligible for e in evals):
             if evals:
-                timeline(session, inc.id, "pre_assigned_unavailable",
-                         "Pre-assigned helper cannot go: " + "; ".join(e.reason for e in evals[:2]),
-                         actor=actor, delivery_id=d.id, resident_id=d.resident_id, at=ctx.now())
+                timeline(
+                    session,
+                    inc.id,
+                    "pre_assigned_unavailable",
+                    "Pre-assigned helper cannot go: " + "; ".join(e.reason for e in evals[:2]),
+                    actor=actor,
+                    delivery_id=d.id,
+                    resident_id=d.resident_id,
+                    at=ctx.now(),
+                )
             return None
     best = next((e for e in evals if e.eligible), None)
     now = ctx.now()
@@ -181,8 +201,15 @@ async def request_volunteer(
         d.rescue_reason = f"No helper can safely arrive in time — prioritise rescue. ({details})"
         d.version += 1
         timeline(
-            session, inc.id, "dispatch_blocked", d.rescue_reason, actor=actor, delivery_id=d.id,
-            resident_id=d.resident_id, at=now, data={"evaluations": [e.reason for e in evals[:5]]},
+            session,
+            inc.id,
+            "dispatch_blocked",
+            d.rescue_reason,
+            actor=actor,
+            delivery_id=d.id,
+            resident_id=d.resident_id,
+            at=now,
+            data={"evaluations": [e.reason for e in evals[:5]]},
         )
         emit(session, "delivery.updated", incident_id=inc.id, delivery_id=d.id, status=d.status)
         return None
@@ -216,8 +243,17 @@ async def request_volunteer(
         f"{'Awaiting operator approval: ' if needs_approval else ''}{best.candidate.name} "
         f"({best.reason}). Reason: {reason}"
     )
-    timeline(session, inc.id, "task_created", msg, actor=actor, delivery_id=d.id, resident_id=d.resident_id,
-             at=now, data={"task_id": task.id, "kind": kind, "status": task.status})
+    timeline(
+        session,
+        inc.id,
+        "task_created",
+        msg,
+        actor=actor,
+        delivery_id=d.id,
+        resident_id=d.resident_id,
+        at=now,
+        data={"task_id": task.id, "kind": kind, "status": task.status},
+    )
     if not needs_approval:
         await _notify_volunteer(session, ctx, dc, task)
     emit(session, "task.updated", audience=[task.assignee_user_id], incident_id=inc.id, task_id=task.id)
@@ -236,16 +272,25 @@ async def request_neighbour_check(
             await session.execute(
                 select(Task.assignee_user_id).where(Task.delivery_id == d.id, Task.kind == "neighbour_check")
             )
-        ).scalars().all()
+        )
+        .scalars()
+        .all()
     )
     for link, user in await neighbours_of(session, res.id):
         if user.id in tried or user.is_demo != inc.is_demo:
             continue
         now = ctx.now()
         task = Task(
-            incident_id=inc.id, delivery_id=d.id, resident_id=res.id, kind="neighbour_check",
-            status="ASSIGNED", assignee_user_id=user.id, reason=reason, distance_m=link.distance_m,
-            attempt_no=len(tried) + 1, created_at=now,
+            incident_id=inc.id,
+            delivery_id=d.id,
+            resident_id=res.id,
+            kind="neighbour_check",
+            status="ASSIGNED",
+            assignee_user_id=user.id,
+            reason=reason,
+            distance_m=link.distance_m,
+            attempt_no=len(tried) + 1,
+            created_at=now,
         )
         try:
             async with session.begin_nested():
@@ -254,22 +299,43 @@ async def request_neighbour_check(
             return (await open_tasks(session, d.id, "neighbour_check") or [None])[0]
         lang = user.language if user.language in ("en", "hi") else "en"
         await dispatcher.notify_user(
-            session, ctx, inc, user, recipient_kind="neighbour", key=f"t:{task.id}:assigned",
+            session,
+            ctx,
+            inc,
+            user,
+            recipient_kind="neighbour",
+            key=f"t:{task.id}:assigned",
             title="AapdaSaathi: please check on your neighbour",
             body=f"Please check on {_first_name(res.full_name)} only if it is safe for you. "
-                 "Then tell us: Safe, Needs help, or Cannot reach.",
+            "Then tell us: Safe, Needs help, or Cannot reach.",
             sms_body=templates.neighbour_check_sms(lang, _first_name(res.full_name), inc.hazard_type),
-            data={"type": "neighbour_check", "task_id": task.id}, delivery_id=d.id, task_id=task.id,
+            data={"type": "neighbour_check", "task_id": task.id},
+            delivery_id=d.id,
+            task_id=task.id,
         )
-        timeline(session, inc.id, "neighbour_check", f"Neighbour check requested from {user.full_name}. {reason}",
-                 actor=actor, delivery_id=d.id, resident_id=res.id, at=now, data={"task_id": task.id})
+        timeline(
+            session,
+            inc.id,
+            "neighbour_check",
+            f"Neighbour check requested from {user.full_name}. {reason}",
+            actor=actor,
+            delivery_id=d.id,
+            resident_id=res.id,
+            at=now,
+            data={"task_id": task.id},
+        )
         emit(session, "task.updated", audience=[user.id], incident_id=inc.id, task_id=task.id)
         return task
     return None
 
 
 async def cancel_open_tasks(
-    session: AsyncSession, ctx: AppContext, dc: DeliveryCtx, *, reason: str, actor: Actor,
+    session: AsyncSession,
+    ctx: AppContext,
+    dc: DeliveryCtx,
+    *,
+    reason: str,
+    actor: Actor,
     kinds: tuple[str, ...] | None = None,
 ) -> int:
     n = 0
@@ -283,15 +349,30 @@ async def cancel_open_tasks(
         if was_engaged and t.assignee_user_id:
             user = await session.get(User, t.assignee_user_id)
             await dispatcher.notify_user(
-                session, ctx, dc.incident, user, recipient_kind=t.kind.split("_")[0],
-                key=f"t:{t.id}:stand_down", title="AapdaSaathi: task closed",
-                body=f"You can stand down: {reason}.", sms_body=f"AapdaSaathi: task closed — {reason}. Thank you.",
-                data={"type": "task", "task_id": t.id}, task_id=t.id,
+                session,
+                ctx,
+                dc.incident,
+                user,
+                recipient_kind=t.kind.split("_")[0],
+                key=f"t:{t.id}:stand_down",
+                title="AapdaSaathi: task closed",
+                body=f"You can stand down: {reason}.",
+                sms_body=f"AapdaSaathi: task closed — {reason}. Thank you.",
+                data={"type": "task", "task_id": t.id},
+                task_id=t.id,
             )
         emit(session, "task.updated", audience=[t.assignee_user_id], incident_id=t.incident_id, task_id=t.id)
     if n:
-        timeline(session, dc.incident.id, "tasks_cancelled", f"{n} open task(s) closed: {reason}", actor=actor,
-                 delivery_id=dc.delivery.id, resident_id=dc.delivery.resident_id, at=ctx.now())
+        timeline(
+            session,
+            dc.incident.id,
+            "tasks_cancelled",
+            f"{n} open task(s) closed: {reason}",
+            actor=actor,
+            delivery_id=dc.delivery.id,
+            resident_id=dc.delivery.resident_id,
+            at=ctx.now(),
+        )
     return n
 
 
@@ -315,8 +396,16 @@ async def accept(session: AsyncSession, ctx: AppContext, task_id: str, actor: Ac
     task.status, task.accepted_at = "ACCEPTED", ctx.now()
     task.version += 1
     user = await session.get(User, task.assignee_user_id)
-    timeline(session, task.incident_id, "task_accepted", f"{user.full_name} accepted the task",
-             actor=actor, delivery_id=task.delivery_id, resident_id=task.resident_id, at=ctx.now())
+    timeline(
+        session,
+        task.incident_id,
+        "task_accepted",
+        f"{user.full_name} accepted the task",
+        actor=actor,
+        delivery_id=task.delivery_id,
+        resident_id=task.resident_id,
+        at=ctx.now(),
+    )
     emit(session, "task.updated", audience=[task.assignee_user_id], incident_id=task.incident_id, task_id=task.id)
     return task
 
@@ -342,16 +431,27 @@ async def cant_go(
         ward.access_note = f"Volunteer reported route blocked at {now:%H:%M} UTC" + (f": {note}" if note else "")
     user = await session.get(User, task.assignee_user_id)
     dc = await get_delivery_ctx(session, task.delivery_id)
-    timeline(session, task.incident_id, "task_cant_go",
-             f"{user.full_name} cannot go: {CANT_GO_REASONS[reason]}" + (f" — {note}" if note else ""),
-             actor=actor, delivery_id=task.delivery_id, resident_id=task.resident_id, at=now)
+    timeline(
+        session,
+        task.incident_id,
+        "task_cant_go",
+        f"{user.full_name} cannot go: {CANT_GO_REASONS[reason]}" + (f" — {note}" if note else ""),
+        actor=actor,
+        delivery_id=task.delivery_id,
+        resident_id=task.resident_id,
+        at=now,
+    )
     emit(session, "task.updated", audience=[task.assignee_user_id], incident_id=task.incident_id, task_id=task.id)
     new_task = None
     if dc.incident.status == "active" and dc.delivery.status != "SAFE":
         await session.flush()
         new_task = await request_volunteer(
-            session, ctx, dc, reason=f"Reassigned: previous helper could not go ({CANT_GO_REASONS[reason]})",
-            actor=Actor.system("dispatch"), kind=task.kind,
+            session,
+            ctx,
+            dc,
+            reason=f"Reassigned: previous helper could not go ({CANT_GO_REASONS[reason]})",
+            actor=Actor.system("dispatch"),
+            kind=task.kind,
         )
     return task, new_task
 
@@ -373,8 +473,16 @@ async def reached(
     task.status, task.outcome, task.outcome_note, task.reached_at, task.closed_at = "REACHED", outcome, note, now, now
     task.version += 1
     dc = await get_delivery_ctx(session, task.delivery_id)
-    timeline(session, task.incident_id, "task_reached", REACHED_OUTCOMES[outcome] + (f" — {note}" if note else ""),
-             actor=actor, delivery_id=task.delivery_id, resident_id=task.resident_id, at=now)
+    timeline(
+        session,
+        task.incident_id,
+        "task_reached",
+        REACHED_OUTCOMES[outcome] + (f" — {note}" if note else ""),
+        actor=actor,
+        delivery_id=task.delivery_id,
+        resident_id=task.resident_id,
+        at=now,
+    )
     if outcome in ("resident_safe", "evacuated"):
         await responses.apply_status(session, ctx, dc, "SAFE", channel="volunteer", actor=actor)
     else:
@@ -401,8 +509,16 @@ async def approve(session: AsyncSession, ctx: AppContext, task_id: str, actor: A
     task.status, task.approved_by_user_id, task.approved_at = "ASSIGNED", actor.user_id, now
     task.version += 1
     audit(session, actor, "dispatch.approve", "task", task.id)
-    timeline(session, task.incident_id, "dispatch_approved", "Operator approved volunteer dispatch",
-             actor=actor, delivery_id=task.delivery_id, resident_id=task.resident_id, at=now)
+    timeline(
+        session,
+        task.incident_id,
+        "dispatch_approved",
+        "Operator approved volunteer dispatch",
+        actor=actor,
+        delivery_id=task.delivery_id,
+        resident_id=task.resident_id,
+        at=now,
+    )
     await _notify_volunteer(session, ctx, dc, task)
     emit(session, "task.updated", audience=[task.assignee_user_id], incident_id=task.incident_id, task_id=task.id)
     return task
@@ -418,8 +534,16 @@ async def reject(session: AsyncSession, ctx: AppContext, task_id: str, reason: s
     dc.delivery.needs_operator = True
     dc.delivery.version += 1
     audit(session, actor, "dispatch.reject", "task", task.id, reason=reason)
-    timeline(session, task.incident_id, "dispatch_rejected", f"Operator rejected dispatch: {reason}",
-             actor=actor, delivery_id=task.delivery_id, resident_id=task.resident_id, at=ctx.now())
+    timeline(
+        session,
+        task.incident_id,
+        "dispatch_rejected",
+        f"Operator rejected dispatch: {reason}",
+        actor=actor,
+        delivery_id=task.delivery_id,
+        resident_id=task.resident_id,
+        at=ctx.now(),
+    )
     emit(session, "task.updated", incident_id=task.incident_id, task_id=task.id)
     return task
 
@@ -437,14 +561,26 @@ async def reassign(
     if was_engaged:
         user = await session.get(User, task.assignee_user_id)
         await dispatcher.notify_user(
-            session, ctx, dc.incident, user, recipient_kind="volunteer", key=f"t:{task.id}:reassigned",
-            title="AapdaSaathi: task reassigned", body="The control room reassigned this task. You can stand down.",
-            sms_body="AapdaSaathi: your task was reassigned by the control room. Thank you.", task_id=task.id,
+            session,
+            ctx,
+            dc.incident,
+            user,
+            recipient_kind="volunteer",
+            key=f"t:{task.id}:reassigned",
+            title="AapdaSaathi: task reassigned",
+            body="The control room reassigned this task. You can stand down.",
+            sms_body="AapdaSaathi: your task was reassigned by the control room. Thank you.",
+            task_id=task.id,
         )
     await session.flush()
     audit(session, actor, "dispatch.reassign", "task", task.id, reason=reason, after={"to": to_volunteer_id})
     emit(session, "task.updated", audience=[task.assignee_user_id], incident_id=task.incident_id, task_id=task.id)
     return await request_volunteer(
-        session, ctx, dc, reason=f"Operator reassignment: {reason}", actor=actor, kind=task.kind,
+        session,
+        ctx,
+        dc,
+        reason=f"Operator reassignment: {reason}",
+        actor=actor,
+        kind=task.kind,
         only_volunteer_id=to_volunteer_id,
     )

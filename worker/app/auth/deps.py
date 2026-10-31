@@ -60,9 +60,7 @@ ops_user = require_roles(*OPS)
 admin_user = require_roles("admin")
 
 
-async def idempotent_replay(
-    session: AsyncSession, user: User, key: str | None, endpoint: str
-) -> dict | None:
+async def idempotent_replay(session: AsyncSession, user: User, key: str | None, endpoint: str) -> dict | None:
     if not key:
         return None
     row = await session.scalar(

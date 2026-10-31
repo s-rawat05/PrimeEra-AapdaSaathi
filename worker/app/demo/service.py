@@ -38,7 +38,11 @@ async def _new_session(session: AsyncSession, actor: Actor, scenario: str) -> De
 
 
 async def simulate(
-    session: AsyncSession, ctx: AppContext, fixture: str, onset_in_minutes: int, ward_ids: list[str] | None,
+    session: AsyncSession,
+    ctx: AppContext,
+    fixture: str,
+    onset_in_minutes: int,
+    ward_ids: list[str] | None,
     actor: Actor,
 ) -> Incident:
     if fixture not in list_fixtures():
@@ -46,19 +50,32 @@ async def simulate(
     xml = (FIXTURES_DIR / "cap" / f"{fixture}.xml").read_text(encoding="utf-8")
     try:
         row, _, _ = await incidents.store_cap_message(
-            session, xml, feed_url=None, feed_guid=None, official_url=None, is_fixture=True, now=ctx.now())
+            session, xml, feed_url=None, feed_guid=None, official_url=None, is_fixture=True, now=ctx.now()
+        )
     except CapParseError as exc:
         raise DomainError("invalid_fixture", str(exc), 422) from exc
     ward_ids = await _demo_ward_ids(session, ward_ids)
     ds = await _new_session(session, actor, f"simulate:{fixture}")
-    inc = await incidents.replay_into_demo(session, ctx, row, ward_ids=ward_ids, onset_in_minutes=onset_in_minutes,
-                                           source="simulated", actor=actor, demo_session_id=ds.id)
+    inc = await incidents.replay_into_demo(
+        session,
+        ctx,
+        row,
+        ward_ids=ward_ids,
+        onset_in_minutes=onset_in_minutes,
+        source="simulated",
+        actor=actor,
+        demo_session_id=ds.id,
+    )
     audit(session, actor, "demo.simulate", "incident", inc.id, after={"fixture": fixture})
     return inc
 
 
 async def replay(
-    session: AsyncSession, ctx: AppContext, cap_message_id: str, onset_in_minutes: int, ward_ids: list[str] | None,
+    session: AsyncSession,
+    ctx: AppContext,
+    cap_message_id: str,
+    onset_in_minutes: int,
+    ward_ids: list[str] | None,
     actor: Actor,
 ) -> Incident:
     row = await session.get(CapMessage, cap_message_id)
@@ -66,8 +83,16 @@ async def replay(
         raise NotFound("CAP message")
     ward_ids = await _demo_ward_ids(session, ward_ids)
     ds = await _new_session(session, actor, f"replay:{row.identifier}")
-    inc = await incidents.replay_into_demo(session, ctx, row, ward_ids=ward_ids, onset_in_minutes=onset_in_minutes,
-                                           source="replay", actor=actor, demo_session_id=ds.id)
+    inc = await incidents.replay_into_demo(
+        session,
+        ctx,
+        row,
+        ward_ids=ward_ids,
+        onset_in_minutes=onset_in_minutes,
+        source="replay",
+        actor=actor,
+        demo_session_id=ds.id,
+    )
     audit(session, actor, "demo.replay", "incident", inc.id, after={"cap_identifier": row.identifier})
     return inc
 
@@ -78,14 +103,18 @@ async def reset(session: AsyncSession, ctx: AppContext, actor: Actor) -> dict:
     real_before = await session.scalar(select(func.count()).select_from(Incident).where(Incident.is_demo.is_(False)))
     n_inc = (await session.execute(delete(Incident).where(Incident.is_demo.is_(True)))).rowcount
     n_sms = (await session.execute(delete(SmsInbound).where(SmsInbound.is_simulated.is_(True)))).rowcount
-    n_vol = (await session.execute(
-        update(Volunteer).where(Volunteer.is_demo.is_(True)).values(is_available=True))).rowcount
-    await session.execute(
-        update(Ward).where(Ward.is_demo.is_(True)).values(access_status="open", access_note=None))
+    n_vol = (
+        await session.execute(update(Volunteer).where(Volunteer.is_demo.is_(True)).values(is_available=True))
+    ).rowcount
+    await session.execute(update(Ward).where(Ward.is_demo.is_(True)).values(access_status="open", access_note=None))
     await session.execute(update(DemoSession).where(DemoSession.reset_at.is_(None)).values(reset_at=ctx.now()))
     real_after = await session.scalar(select(func.count()).select_from(Incident).where(Incident.is_demo.is_(False)))
     if real_after != real_before:
         raise RuntimeError("Demo reset would modify real incidents — aborted")
     audit(session, actor, "demo.reset", "demo", None, after={"incidents": n_inc, "sms": n_sms})
-    return {"incidents_removed": n_inc or 0, "sms_removed": n_sms or 0, "volunteers_reset": n_vol or 0,
-            "real_data_untouched": True}
+    return {
+        "incidents_removed": n_inc or 0,
+        "sms_removed": n_sms or 0,
+        "volunteers_reset": n_vol or 0,
+        "real_data_untouched": True,
+    }

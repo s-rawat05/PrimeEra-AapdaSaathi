@@ -7,7 +7,7 @@ modified — callers store it verbatim and keep this parse result alongside it.
 from __future__ import annotations
 
 from dataclasses import asdict, dataclass, field
-from datetime import datetime
+from datetime import UTC, datetime
 
 from defusedxml import ElementTree as SafeET
 from defusedxml.common import DefusedXmlException
@@ -267,7 +267,7 @@ def parse_cap(xml: str | bytes) -> CapAlert:
     return CapAlert(
         identifier=identifier,
         sender=sender or "",
-        sent=sent or datetime.fromtimestamp(0).astimezone(),
+        sent=sent or datetime(1970, 1, 1, tzinfo=UTC),  # invalid <sent> is reported in validation_errors
         status=status or "Unknown",
         msg_type=msg_type or "Unknown",
         scope=scope or "Unknown",

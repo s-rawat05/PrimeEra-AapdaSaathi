@@ -43,8 +43,12 @@ async def _load_state(url: str) -> dict:
             st = FeedState(url=url)
             session.add(st)
             await session.commit()
-        return {"etag": st.etag, "last_modified": st.last_modified, "next_fetch_at": st.next_fetch_at,
-                "failures": st.consecutive_failures}
+        return {
+            "etag": st.etag,
+            "last_modified": st.last_modified,
+            "next_fetch_at": st.next_fetch_at,
+            "failures": st.consecutive_failures,
+        }
 
 
 async def _save_state(ctx: AppContext, url: str, **changes) -> None:
@@ -76,9 +80,16 @@ async def poll_feed(ctx: AppContext, url: str, *, force: bool = False, client: h
         except httpx.HTTPError as exc:
             return await _failure(ctx, url, state["failures"], f"{type(exc).__name__}", None)
         if resp.status_code == 304:
-            await _save_state(ctx, url, last_fetch_at=now, last_success_at=now, last_status_code=304,
-                              last_error=None, consecutive_failures=0,
-                              next_fetch_at=now + timedelta(seconds=ctx.settings.feed_poll_seconds))
+            await _save_state(
+                ctx,
+                url,
+                last_fetch_at=now,
+                last_success_at=now,
+                last_status_code=304,
+                last_error=None,
+                consecutive_failures=0,
+                next_fetch_at=now + timedelta(seconds=ctx.settings.feed_poll_seconds),
+            )
             return {"url": url, "status": 304, "new": 0}
         if resp.status_code != 200:
             return await _failure(ctx, url, state["failures"], f"HTTP {resp.status_code}", resp.status_code)
@@ -104,9 +115,16 @@ async def poll_feed(ctx: AppContext, url: str, *, force: bool = False, client: h
             except (httpx.HTTPError, CapParseError) as exc:
                 errors.append(f"{guid}: {type(exc).__name__}")
         await _save_state(
-            ctx, url, etag=resp.headers.get("ETag"), last_modified=resp.headers.get("Last-Modified"),
-            last_fetch_at=now, last_success_at=now, last_status_code=200,
-            last_error="; ".join(errors[:5]) or None, consecutive_failures=0, items_seen=len(items),
+            ctx,
+            url,
+            etag=resp.headers.get("ETag"),
+            last_modified=resp.headers.get("Last-Modified"),
+            last_fetch_at=now,
+            last_success_at=now,
+            last_status_code=200,
+            last_error="; ".join(errors[:5]) or None,
+            consecutive_failures=0,
+            items_seen=len(items),
             next_fetch_at=now + timedelta(seconds=ctx.settings.feed_poll_seconds),
         )
         return {"url": url, "status": 200, "items": len(items), "new": new, "errors": errors[:5]}
@@ -119,21 +137,39 @@ async def _failure(ctx: AppContext, url: str, failures: int, error: str, code: i
     failures += 1
     backoff = min(ctx.settings.feed_poll_seconds * (2 ** (failures - 1)), ctx.settings.feed_max_backoff_seconds)
     now = ctx.now()
-    await _save_state(ctx, url, last_fetch_at=now, last_status_code=code, last_error=error,
-                      consecutive_failures=failures, next_fetch_at=now + timedelta(seconds=backoff))
+    await _save_state(
+        ctx,
+        url,
+        last_fetch_at=now,
+        last_status_code=code,
+        last_error=error,
+        consecutive_failures=failures,
+        next_fetch_at=now + timedelta(seconds=backoff),
+    )
     log.warning("SACHET poll failed (%s), retry in %ss", error, backoff)
     return {"url": url, "error": error, "retry_in_seconds": backoff}
 
 
 async def ingest_cap_xml(
-    ctx: AppContext, xml: str, *, feed_url: str | None, feed_guid: str | None, official_url: str | None,
-    is_fixture: bool = False, apply: bool = True,
+    ctx: AppContext,
+    xml: str,
+    *,
+    feed_url: str | None,
+    feed_guid: str | None,
+    official_url: str | None,
+    is_fixture: bool = False,
+    apply: bool = True,
 ) -> tuple[str, bool]:
     """Store a CAP message (idempotent) and apply it to live incidents. Returns (cap_message_id, created)."""
     async with db.session() as session:
         row, alert, created = await incidents.store_cap_message(
-            session, xml, feed_url=feed_url, feed_guid=feed_guid, official_url=official_url,
-            is_fixture=is_fixture, now=ctx.now(),
+            session,
+            xml,
+            feed_url=feed_url,
+            feed_guid=feed_guid,
+            official_url=official_url,
+            is_fixture=is_fixture,
+            now=ctx.now(),
         )
         if created and apply and not is_fixture:
             await incidents.apply_live_cap(session, ctx, row, alert)

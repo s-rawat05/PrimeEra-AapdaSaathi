@@ -100,16 +100,20 @@ async def queue(
 
 async def _sms_consent(session: AsyncSession, resident_id: str, now) -> bool:
     rows = (
-        await session.execute(
-            select(ConsentRecord).where(
-                ConsentRecord.resident_id == resident_id,
-                ConsentRecord.consent_type.in_(["registry", "sms"]),
-                ConsentRecord.granted.is_(True),
-                ConsentRecord.withdrawn_at.is_(None),
-                ConsentRecord.expires_at > now,
+        (
+            await session.execute(
+                select(ConsentRecord).where(
+                    ConsentRecord.resident_id == resident_id,
+                    ConsentRecord.consent_type.in_(["registry", "sms"]),
+                    ConsentRecord.granted.is_(True),
+                    ConsentRecord.withdrawn_at.is_(None),
+                    ConsentRecord.expires_at > now,
+                )
             )
         )
-    ).scalars().all()
+        .scalars()
+        .all()
+    )
     return any(r.consent_type == "registry" for r in rows)
 
 
@@ -142,34 +146,66 @@ async def alert_resident(
         channels.append("in_app")
         attempts.append(
             await queue(
-                session, ctx, incident=incident, channel="in_app", recipient_kind="resident",
-                recipient_is_demo=resident.is_demo, key=f"{base}:in_app", title=title, body=body,
-                recipient_user_id=resident.user_id, data=data, delivery_id=delivery.id, round_=round_,
+                session,
+                ctx,
+                incident=incident,
+                channel="in_app",
+                recipient_kind="resident",
+                recipient_is_demo=resident.is_demo,
+                key=f"{base}:in_app",
+                title=title,
+                body=body,
+                recipient_user_id=resident.user_id,
+                data=data,
+                delivery_id=delivery.id,
+                round_=round_,
             )
         )
         tokens = (
-            await session.execute(
-                select(DeviceRegistration.fcm_token).where(DeviceRegistration.user_id == resident.user_id)
+            (
+                await session.execute(
+                    select(DeviceRegistration.fcm_token).where(DeviceRegistration.user_id == resident.user_id)
+                )
             )
-        ).scalars().all()
+            .scalars()
+            .all()
+        )
         for token in tokens:
             channels.append("push")
             attempts.append(
                 await queue(
-                    session, ctx, incident=incident, channel="push", recipient_kind="resident",
-                    recipient_is_demo=resident.is_demo, key=f"{base}:push:{_token_key(token)}",
-                    title=title, body=body, recipient_user_id=resident.user_id,
-                    data={**data, "token": token}, delivery_id=delivery.id, round_=round_,
+                    session,
+                    ctx,
+                    incident=incident,
+                    channel="push",
+                    recipient_kind="resident",
+                    recipient_is_demo=resident.is_demo,
+                    key=f"{base}:push:{_token_key(token)}",
+                    title=title,
+                    body=body,
+                    recipient_user_id=resident.user_id,
+                    data={**data, "token": token},
+                    delivery_id=delivery.id,
+                    round_=round_,
                 )
             )
     if resident.phone and await _sms_consent(session, resident.id, ctx.now()):
         channels.append("sms")
         attempts.append(
             await queue(
-                session, ctx, incident=incident, channel="sms", recipient_kind="resident",
-                recipient_is_demo=resident.is_demo, key=f"{base}:sms", body=sms_body,
-                recipient_user_id=resident.user_id, phone=resident.phone, data=data,
-                delivery_id=delivery.id, round_=round_,
+                session,
+                ctx,
+                incident=incident,
+                channel="sms",
+                recipient_kind="resident",
+                recipient_is_demo=resident.is_demo,
+                key=f"{base}:sms",
+                body=sms_body,
+                recipient_user_id=resident.user_id,
+                phone=resident.phone,
+                data=data,
+                delivery_id=delivery.id,
+                round_=round_,
             )
         )
     delivery.channels = sorted(set((delivery.channels or []) + channels))
@@ -194,29 +230,59 @@ async def notify_user(
     """Notify a caregiver / neighbour / volunteer on app + push + SMS."""
     out = [
         await queue(
-            session, ctx, incident=incident, channel="in_app", recipient_kind=recipient_kind,
-            recipient_is_demo=user.is_demo, key=f"{key}:in_app", title=title, body=body,
-            recipient_user_id=user.id, data=data, delivery_id=delivery_id, task_id=task_id,
+            session,
+            ctx,
+            incident=incident,
+            channel="in_app",
+            recipient_kind=recipient_kind,
+            recipient_is_demo=user.is_demo,
+            key=f"{key}:in_app",
+            title=title,
+            body=body,
+            recipient_user_id=user.id,
+            data=data,
+            delivery_id=delivery_id,
+            task_id=task_id,
         )
     ]
     tokens = (
-        await session.execute(select(DeviceRegistration.fcm_token).where(DeviceRegistration.user_id == user.id))
-    ).scalars().all()
+        (await session.execute(select(DeviceRegistration.fcm_token).where(DeviceRegistration.user_id == user.id)))
+        .scalars()
+        .all()
+    )
     for token in tokens:
         out.append(
             await queue(
-                session, ctx, incident=incident, channel="push", recipient_kind=recipient_kind,
-                recipient_is_demo=user.is_demo, key=f"{key}:push:{_token_key(token)}", title=title,
-                body=body, recipient_user_id=user.id, data={**(data or {}), "token": token},
-                delivery_id=delivery_id, task_id=task_id,
+                session,
+                ctx,
+                incident=incident,
+                channel="push",
+                recipient_kind=recipient_kind,
+                recipient_is_demo=user.is_demo,
+                key=f"{key}:push:{_token_key(token)}",
+                title=title,
+                body=body,
+                recipient_user_id=user.id,
+                data={**(data or {}), "token": token},
+                delivery_id=delivery_id,
+                task_id=task_id,
             )
         )
     if user.phone and sms_body:
         out.append(
             await queue(
-                session, ctx, incident=incident, channel="sms", recipient_kind=recipient_kind,
-                recipient_is_demo=user.is_demo, key=f"{key}:sms", body=sms_body,
-                recipient_user_id=user.id, phone=user.phone, data=data, delivery_id=delivery_id,
+                session,
+                ctx,
+                incident=incident,
+                channel="sms",
+                recipient_kind=recipient_kind,
+                recipient_is_demo=user.is_demo,
+                key=f"{key}:sms",
+                body=sms_body,
+                recipient_user_id=user.id,
+                phone=user.phone,
+                data=data,
+                delivery_id=delivery_id,
                 task_id=task_id,
             )
         )
@@ -280,7 +346,7 @@ async def flush_outbox(ctx: AppContext, limit: int = 100) -> int:
                 ):
                     a.status, a.next_retry_at = "failed", None
                 else:
-                    a.next_retry_at = ctx.now() + timedelta(seconds=10 * 2 ** a.retries)
+                    a.next_retry_at = ctx.now() + timedelta(seconds=10 * 2**a.retries)
             if a.delivery_id and a.recipient_kind == "resident":
                 touched_deliveries.add(a.delivery_id)
         for delivery_id in touched_deliveries:
@@ -298,13 +364,17 @@ async def refresh_reachability(session: AsyncSession, ctx: AppContext, delivery_
     if d is None or d.status != "NO_REPLY":
         return
     attempts = (
-        await session.execute(
-            select(NotificationAttempt).where(
-                NotificationAttempt.delivery_id == delivery_id,
-                NotificationAttempt.recipient_kind == "resident",
+        (
+            await session.execute(
+                select(NotificationAttempt).where(
+                    NotificationAttempt.delivery_id == delivery_id,
+                    NotificationAttempt.recipient_kind == "resident",
+                )
             )
         )
-    ).scalars().all()
+        .scalars()
+        .all()
+    )
     external = [a for a in attempts if a.channel in ("sms", "push")]
     has_app = any(a.channel == "in_app" and a.status == "sent" for a in attempts)
     if not external or any(a.status in ("queued", "sent") for a in external):
@@ -316,8 +386,13 @@ async def refresh_reachability(session: AsyncSession, ctx: AppContext, delivery_
     d.status = "UNREACHABLE"
     d.version += 1
     timeline(
-        session, d.incident_id, "unreachable",
+        session,
+        d.incident_id,
+        "unreachable",
         "All external alert channels failed (" + ", ".join(sorted({a.channel for a in external})) + ")",
-        actor=SYSTEM, delivery_id=d.id, resident_id=d.resident_id, at=ctx.now(),
+        actor=SYSTEM,
+        delivery_id=d.id,
+        resident_id=d.resident_id,
+        at=ctx.now(),
     )
     emit(session, "delivery.updated", incident_id=d.incident_id, delivery_id=d.id, status=d.status)

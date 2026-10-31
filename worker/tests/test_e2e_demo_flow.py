@@ -77,11 +77,17 @@ async def test_three_minute_demo(env):
     assert a["shelters"] and a["shelters"][0]["est_walk_minutes"] is not None
 
     # 5. Ramesh confirms SAFE in the app (idempotent on retry).
-    r = await c.post(f"{API}/alerts/{a['delivery_id']}/respond", json={"status": "SAFE"},
-                     headers={**ramesh, "Idempotency-Key": "k-1"})
+    r = await c.post(
+        f"{API}/alerts/{a['delivery_id']}/respond",
+        json={"status": "SAFE"},
+        headers={**ramesh, "Idempotency-Key": "k-1"},
+    )
     assert r.status_code == 200 and r.json()["status"] == "SAFE" and r.json()["changed"]
-    r2 = await c.post(f"{API}/alerts/{a['delivery_id']}/respond", json={"status": "SAFE"},
-                      headers={**ramesh, "Idempotency-Key": "k-1"})
+    r2 = await c.post(
+        f"{API}/alerts/{a['delivery_id']}/respond",
+        json={"status": "SAFE"},
+        headers={**ramesh, "Idempotency-Key": "k-1"},
+    )
     assert r2.json() == r.json()
 
     # 6. Govind (feature phone) replies "1" by SMS → SAFE, and gets an acknowledgement SMS.
@@ -101,14 +107,20 @@ async def test_three_minute_demo(env):
     checks = (await c.get(f"{API}/neighbour/checks", headers=vikram)).json()
     by_name = {t["resident_first_name"]: t for t in checks}
     assert {"Sunita", "Mohan"} <= set(by_name)
-    r = await c.post(f"{API}/neighbour/checks/{by_name['Mohan']['id']}/respond",
-                     json={"outcome": "CANNOT_REACH", "note": "Gate locked"}, headers=vikram)
+    r = await c.post(
+        f"{API}/neighbour/checks/{by_name['Mohan']['id']}/respond",
+        json={"outcome": "CANNOT_REACH", "note": "Gate locked"},
+        headers=vikram,
+    )
     assert r.status_code == 200 and r.json()["outcome"] == "cannot_reach"
 
     # 10. A volunteer task for Sunita is assigned → the volunteer accepts it.
     tasks = (await c.get(f"{API}/incidents/{iid}/tasks", headers=op)).json()
-    sunita_task = next(t for t in tasks if t["resident_first_name"] == "Sunita" and t["kind"] == "volunteer_assist"
-                       and t["status"] == "ASSIGNED")
+    sunita_task = next(
+        t
+        for t in tasks
+        if t["resident_first_name"] == "Sunita" and t["kind"] == "volunteer_assist" and t["status"] == "ASSIGNED"
+    )
     vol_name = sunita_task["assignee_name"].split(" ")[0]
     vol = await env.login(vol_name)
     detail = (await c.get(f"{API}/tasks/{sunita_task['id']}", headers=vol)).json()
@@ -117,8 +129,9 @@ async def test_three_minute_demo(env):
     assert r.json()["status"] == "ACCEPTED"
 
     # 11. Volunteer reaches Sunita; she is safe.
-    r = await c.post(f"{API}/volunteer/tasks/{sunita_task['id']}/reached", json={"outcome": "resident_safe"},
-                     headers=vol)
+    r = await c.post(
+        f"{API}/volunteer/tasks/{sunita_task['id']}/reached", json={"outcome": "resident_safe"}, headers=vol
+    )
     assert r.json()["status"] == "REACHED"
     after = (await c.get(f"{API}/tasks/{sunita_task['id']}", headers=vol)).json()
     assert after["exact_location"] is None  # location access ends with the task
@@ -130,10 +143,20 @@ async def test_three_minute_demo(env):
     assert sum(1 for m in mp["markers"] if m["status"] == "SAFE") == 3 and mp["wards"][0]["boundary_geojson"]
     tl = (await c.get(f"{API}/incidents/{iid}/timeline", headers=op)).json()
     types = {e["event_type"] for e in tl}
-    assert {"incident_created", "alerted", "safe", "help", "neighbour_cannot_reach", "task_accepted",
-            "task_reached"} <= types
-    mohan = next(p for p in (await c.get(f"{API}/incidents/{iid}/priority", headers=op)).json()
-                 if p["resident_name"] == "Mohan Lal Arya")
+    assert {
+        "incident_created",
+        "alerted",
+        "safe",
+        "help",
+        "neighbour_cannot_reach",
+        "task_accepted",
+        "task_reached",
+    } <= types
+    mohan = next(
+        p
+        for p in (await c.get(f"{API}/incidents/{iid}/priority", headers=op)).json()
+        if p["resident_name"] == "Mohan Lal Arya"
+    )
     assert mohan["status"] == "NO_REPLY"
     assert mohan["open_tasks"] or mohan["needs_rescue"]  # helper on the way, or flagged for rescue with reason
 

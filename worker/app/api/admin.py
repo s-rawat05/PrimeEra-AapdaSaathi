@@ -38,8 +38,9 @@ ops_or_admin = require_roles(*OPS)
 
 # ----------------------------------------------------------------------------- wards
 @router.get("/wards", response_model=list[S.WardOut])
-async def list_wards(with_geometry: bool = False, _: User = Depends(ops_or_admin),
-                     session: AsyncSession = Depends(get_session)):
+async def list_wards(
+    with_geometry: bool = False, _: User = Depends(ops_or_admin), session: AsyncSession = Depends(get_session)
+):
     rows = (await session.execute(select(Ward).order_by(Ward.is_demo.desc(), Ward.code))).scalars().all()
     return [views.ward_out(w, with_geometry) for w in rows]
 
@@ -61,14 +62,26 @@ def _validate_geometry(geom: dict) -> tuple[float, float]:
 
 
 @router.post("/wards", response_model=S.WardOut, status_code=201)
-async def create_ward(body: S.WardIn, user: User = Depends(admin_user), session: AsyncSession = Depends(get_session),
-                      ctx: AppContext = Depends(get_ctx)):
+async def create_ward(
+    body: S.WardIn,
+    user: User = Depends(admin_user),
+    session: AsyncSession = Depends(get_session),
+    ctx: AppContext = Depends(get_ctx),
+):
     lat, lng = _validate_geometry(body.boundary_geojson)
     if await session.scalar(select(Ward.id).where(Ward.code == body.code)):
         raise Conflict("duplicate", "A ward with this code exists")
-    w = Ward(code=body.code, name=body.name, district=body.district, state=body.state,
-             lgd_district_code=body.lgd_district_code, boundary_geojson=body.boundary_geojson, centroid_lat=lat,
-             centroid_lng=lng, is_demo=body.is_demo)
+    w = Ward(
+        code=body.code,
+        name=body.name,
+        district=body.district,
+        state=body.state,
+        lgd_district_code=body.lgd_district_code,
+        boundary_geojson=body.boundary_geojson,
+        centroid_lat=lat,
+        centroid_lng=lng,
+        is_demo=body.is_demo,
+    )
     session.add(w)
     await session.flush()
     audit(session, actor_of(user), "ward.create", "ward", w.id, after={"code": w.code})
@@ -76,10 +89,18 @@ async def create_ward(body: S.WardIn, user: User = Depends(admin_user), session:
     return views.ward_out(w, True)
 
 
-@router.post("/wards/geojson", response_model=S.GeoJsonUploadOut,
-             summary="Upload a GeoJSON FeatureCollection (properties: code, name, district, state, lgd_district_code)")
-async def upload_geojson(file: UploadFile = File(...), is_demo: bool = Query(False), user: User = Depends(admin_user),
-                         session: AsyncSession = Depends(get_session), ctx: AppContext = Depends(get_ctx)):
+@router.post(
+    "/wards/geojson",
+    response_model=S.GeoJsonUploadOut,
+    summary="Upload a GeoJSON FeatureCollection (properties: code, name, district, state, lgd_district_code)",
+)
+async def upload_geojson(
+    file: UploadFile = File(...),
+    is_demo: bool = Query(False),
+    user: User = Depends(admin_user),
+    session: AsyncSession = Depends(get_session),
+    ctx: AppContext = Depends(get_ctx),
+):
     raw = await file.read()
     if len(raw) > 10 * 1024 * 1024:
         raise DomainError("too_large", "GeoJSON must be under 10 MB", 413)
@@ -104,9 +125,19 @@ async def upload_geojson(file: UploadFile = File(...), is_demo: bool = Query(Fal
             continue
         w = await session.scalar(select(Ward).where(Ward.code == code))
         if w is None:
-            session.add(Ward(code=code, name=name, district=p.get("district") or "Unknown",
-                             state=p.get("state") or "Uttarakhand", lgd_district_code=p.get("lgd_district_code"),
-                             boundary_geojson=f["geometry"], centroid_lat=lat, centroid_lng=lng, is_demo=is_demo))
+            session.add(
+                Ward(
+                    code=code,
+                    name=name,
+                    district=p.get("district") or "Unknown",
+                    state=p.get("state") or "Uttarakhand",
+                    lgd_district_code=p.get("lgd_district_code"),
+                    boundary_geojson=f["geometry"],
+                    centroid_lat=lat,
+                    centroid_lng=lng,
+                    is_demo=is_demo,
+                )
+            )
             created += 1
         else:
             if w.is_demo != is_demo:
@@ -115,30 +146,56 @@ async def upload_geojson(file: UploadFile = File(...), is_demo: bool = Query(Fal
             w.name, w.boundary_geojson, w.centroid_lat, w.centroid_lng = name, f["geometry"], lat, lng
             w.lgd_district_code = p.get("lgd_district_code") or w.lgd_district_code
             updated += 1
-    audit(session, actor_of(user), "ward.geojson_upload", "ward", None,
-          after={"created": created, "updated": updated, "errors": len(errors)})
+    audit(
+        session,
+        actor_of(user),
+        "ward.geojson_upload",
+        "ward",
+        None,
+        after={"created": created, "updated": updated, "errors": len(errors)},
+    )
     await finalize(session, ctx)
     return S.GeoJsonUploadOut(created=created, updated=updated, errors=errors[:50])
 
 
-@router.put("/wards/{ward_id}/access", response_model=S.WardOut,
-            summary="Mark a ward open / restricted (dispatch needs approval) / blocked (no automatic dispatch)")
-async def ward_access(ward_id: str, body: S.WardAccessIn, user: User = Depends(ops_or_admin),
-                      session: AsyncSession = Depends(get_session), ctx: AppContext = Depends(get_ctx)):
+@router.put(
+    "/wards/{ward_id}/access",
+    response_model=S.WardOut,
+    summary="Mark a ward open / restricted (dispatch needs approval) / blocked (no automatic dispatch)",
+)
+async def ward_access(
+    ward_id: str,
+    body: S.WardAccessIn,
+    user: User = Depends(ops_or_admin),
+    session: AsyncSession = Depends(get_session),
+    ctx: AppContext = Depends(get_ctx),
+):
     w = await session.get(Ward, ward_id)
     if w is None:
         raise NotFound("Ward")
     before = {"access": w.access_status}
     w.access_status, w.access_note = body.access_status, body.note
-    audit(session, actor_of(user), "ward.access", "ward", w.id, reason=body.note, before=before,
-          after={"access": w.access_status})
+    audit(
+        session,
+        actor_of(user),
+        "ward.access",
+        "ward",
+        w.id,
+        reason=body.note,
+        before=before,
+        after={"access": w.access_status},
+    )
     await finalize(session, ctx)
     return views.ward_out(w)
 
 
 @router.delete("/wards/{ward_id}", status_code=204)
-async def delete_ward(ward_id: str, user: User = Depends(admin_user), session: AsyncSession = Depends(get_session),
-                      ctx: AppContext = Depends(get_ctx)):
+async def delete_ward(
+    ward_id: str,
+    user: User = Depends(admin_user),
+    session: AsyncSession = Depends(get_session),
+    ctx: AppContext = Depends(get_ctx),
+):
     w = await session.get(Ward, ward_id)
     if w is None:
         raise NotFound("Ward")
@@ -155,10 +212,18 @@ async def list_shelters(_: User = Depends(ops_or_admin), session: AsyncSession =
     return [S.ShelterOut.model_validate(s) for s in (await session.execute(select(Shelter))).scalars().all()]
 
 
-@router.post("/shelters", response_model=S.ShelterOut, status_code=201,
-             summary="Register an OFFICIALLY designated relief post (source required)")
-async def create_shelter(body: S.ShelterIn, user: User = Depends(admin_user),
-                         session: AsyncSession = Depends(get_session), ctx: AppContext = Depends(get_ctx)):
+@router.post(
+    "/shelters",
+    response_model=S.ShelterOut,
+    status_code=201,
+    summary="Register an OFFICIALLY designated relief post (source required)",
+)
+async def create_shelter(
+    body: S.ShelterIn,
+    user: User = Depends(admin_user),
+    session: AsyncSession = Depends(get_session),
+    ctx: AppContext = Depends(get_ctx),
+):
     w = await session.get(Ward, body.ward_id)
     if w is None:
         raise NotFound("Ward")
@@ -171,8 +236,12 @@ async def create_shelter(body: S.ShelterIn, user: User = Depends(admin_user),
 
 
 @router.delete("/shelters/{shelter_id}", status_code=204)
-async def delete_shelter(shelter_id: str, user: User = Depends(admin_user),
-                         session: AsyncSession = Depends(get_session), ctx: AppContext = Depends(get_ctx)):
+async def delete_shelter(
+    shelter_id: str,
+    user: User = Depends(admin_user),
+    session: AsyncSession = Depends(get_session),
+    ctx: AppContext = Depends(get_ctx),
+):
     s = await session.get(Shelter, shelter_id)
     if s is None:
         raise NotFound("Shelter")
@@ -183,9 +252,15 @@ async def delete_shelter(shelter_id: str, user: User = Depends(admin_user),
 
 # ----------------------------------------------------------------------------- residents
 @router.get("/residents", response_model=S.Page[S.ResidentOut])
-async def list_residents(q: str | None = Query(None, max_length=60), ward_id: str | None = None,
-                         status: str | None = None, need: str | None = None, page: PageParams = Depends(),
-                         user: User = Depends(admin_user), session: AsyncSession = Depends(get_session)):
+async def list_residents(
+    q: str | None = Query(None, max_length=60),
+    ward_id: str | None = None,
+    status: str | None = None,
+    need: str | None = None,
+    page: PageParams = Depends(),
+    user: User = Depends(admin_user),
+    session: AsyncSession = Depends(get_session),
+):
     query = select(Resident).order_by(Resident.full_name)
     if q:
         query = query.where(Resident.full_name.ilike(f"%{q}%"))
@@ -202,22 +277,39 @@ async def list_residents(q: str | None = Query(None, max_length=60), ward_id: st
     return S.Page(items=items, total=total, limit=page.limit, offset=page.offset)
 
 
-@router.post("/residents", response_model=S.ResidentOut, status_code=201,
-             summary="Assisted registration (e.g. by an ASHA worker or ward officer)")
-async def assisted_registration(body: S.AssistedRegistrationIn, user: User = Depends(admin_user),
-                                session: AsyncSession = Depends(get_session), ctx: AppContext = Depends(get_ctx)):
+@router.post(
+    "/residents",
+    response_model=S.ResidentOut,
+    status_code=201,
+    summary="Assisted registration (e.g. by an ASHA worker or ward officer)",
+)
+async def assisted_registration(
+    body: S.AssistedRegistrationIn,
+    user: User = Depends(admin_user),
+    session: AsyncSession = Depends(get_session),
+    ctx: AppContext = Depends(get_ctx),
+):
     resident_user = None
     if body.phone and body.has_smartphone and "feature_phone" not in body.needs:
         phone = normalize_phone(body.phone)
         resident_user = await session.scalar(select(User).where(User.phone == phone))
         if resident_user is None:
-            resident_user = User(full_name=body.full_name, phone=phone, role="resident", language=body.language,
-                                 is_demo=body.is_demo)
+            resident_user = User(
+                full_name=body.full_name, phone=phone, role="resident", language=body.language, is_demo=body.is_demo
+            )
             session.add(resident_user)
             await session.flush()
     try:
-        r = await residents_svc.register(session, ctx, body, user=resident_user, phone=body.phone,
-                                         registered_via="assisted", actor=actor_of(user), is_demo=body.is_demo)
+        r = await residents_svc.register(
+            session,
+            ctx,
+            body,
+            user=resident_user,
+            phone=body.phone,
+            registered_via="assisted",
+            actor=actor_of(user),
+            is_demo=body.is_demo,
+        )
         await finalize(session, ctx)
     except IntegrityError as exc:
         raise Conflict("duplicate", "A resident or contact with this phone already exists") from exc
@@ -225,8 +317,12 @@ async def assisted_registration(body: S.AssistedRegistrationIn, user: User = Dep
 
 
 @router.post("/residents/{resident_id}/reverify", response_model=S.ResidentOut)
-async def admin_reverify(resident_id: str, user: User = Depends(admin_user),
-                         session: AsyncSession = Depends(get_session), ctx: AppContext = Depends(get_ctx)):
+async def admin_reverify(
+    resident_id: str,
+    user: User = Depends(admin_user),
+    session: AsyncSession = Depends(get_session),
+    ctx: AppContext = Depends(get_ctx),
+):
     r = await session.get(Resident, resident_id)
     if r is None:
         raise NotFound("Resident")
@@ -236,8 +332,13 @@ async def admin_reverify(resident_id: str, user: User = Depends(admin_user),
 
 
 @router.post("/residents/{resident_id}/withdraw", response_model=S.ResidentOut)
-async def admin_withdraw(resident_id: str, body: S.RejectIn, user: User = Depends(admin_user),
-                         session: AsyncSession = Depends(get_session), ctx: AppContext = Depends(get_ctx)):
+async def admin_withdraw(
+    resident_id: str,
+    body: S.RejectIn,
+    user: User = Depends(admin_user),
+    session: AsyncSession = Depends(get_session),
+    ctx: AppContext = Depends(get_ctx),
+):
     r = await session.get(Resident, resident_id)
     if r is None:
         raise NotFound("Resident")
@@ -246,11 +347,18 @@ async def admin_withdraw(resident_id: str, body: S.RejectIn, user: User = Depend
     return await views.resident_out(session, r)
 
 
-@router.delete("/residents/{resident_id}", status_code=204,
-               summary="Erase a resident's registry record (deletion request). Reason is audited.")
-async def delete_resident(resident_id: str, reason: str = Query(min_length=5, max_length=300),
-                          user: User = Depends(admin_user), session: AsyncSession = Depends(get_session),
-                          ctx: AppContext = Depends(get_ctx)):
+@router.delete(
+    "/residents/{resident_id}",
+    status_code=204,
+    summary="Erase a resident's registry record (deletion request). Reason is audited.",
+)
+async def delete_resident(
+    resident_id: str,
+    reason: str = Query(min_length=5, max_length=300),
+    user: User = Depends(admin_user),
+    session: AsyncSession = Depends(get_session),
+    ctx: AppContext = Depends(get_ctx),
+):
     r = await session.get(Resident, resident_id)
     if r is None:
         raise NotFound("Resident")
@@ -267,8 +375,12 @@ async def list_volunteers(_: User = Depends(ops_or_admin), session: AsyncSession
 
 
 @router.post("/volunteers", response_model=S.VolunteerOut, status_code=201)
-async def create_volunteer(body: S.VolunteerIn, user: User = Depends(admin_user),
-                           session: AsyncSession = Depends(get_session), ctx: AppContext = Depends(get_ctx)):
+async def create_volunteer(
+    body: S.VolunteerIn,
+    user: User = Depends(admin_user),
+    session: AsyncSession = Depends(get_session),
+    ctx: AppContext = Depends(get_ctx),
+):
     phone = normalize_phone(body.phone)
     u = await session.scalar(select(User).where(User.phone == phone))
     if u is None:
@@ -280,8 +392,15 @@ async def create_volunteer(body: S.VolunteerIn, user: User = Depends(admin_user)
     u.role = "volunteer"
     if await session.scalar(select(Volunteer.id).where(Volunteer.user_id == u.id)):
         raise Conflict("duplicate", "Already a volunteer")
-    v = Volunteer(user_id=u.id, ward_id=body.ward_id, base_lat=body.base_lat, base_lng=body.base_lng,
-                  max_radius_m=body.max_radius_m, skills=body.skills, is_demo=body.is_demo)
+    v = Volunteer(
+        user_id=u.id,
+        ward_id=body.ward_id,
+        base_lat=body.base_lat,
+        base_lng=body.base_lng,
+        max_radius_m=body.max_radius_m,
+        skills=body.skills,
+        is_demo=body.is_demo,
+    )
     session.add(v)
     await session.flush()
     audit(session, actor_of(user), "volunteer.create", "volunteer", v.id)
@@ -290,8 +409,13 @@ async def create_volunteer(body: S.VolunteerIn, user: User = Depends(admin_user)
 
 
 @router.put("/volunteers/{volunteer_id}/availability", response_model=S.VolunteerOut)
-async def admin_availability(volunteer_id: str, body: S.AvailabilityIn, user: User = Depends(ops_or_admin),
-                             session: AsyncSession = Depends(get_session), ctx: AppContext = Depends(get_ctx)):
+async def admin_availability(
+    volunteer_id: str,
+    body: S.AvailabilityIn,
+    user: User = Depends(ops_or_admin),
+    session: AsyncSession = Depends(get_session),
+    ctx: AppContext = Depends(get_ctx),
+):
     v = await session.get(Volunteer, volunteer_id)
     if v is None:
         raise NotFound("Volunteer")
@@ -302,8 +426,13 @@ async def admin_availability(volunteer_id: str, body: S.AvailabilityIn, user: Us
 
 
 @router.put("/volunteers/{volunteer_id}/verified", response_model=S.VolunteerOut)
-async def admin_verify_volunteer(volunteer_id: str, verified: bool = Query(...), user: User = Depends(admin_user),
-                                 session: AsyncSession = Depends(get_session), ctx: AppContext = Depends(get_ctx)):
+async def admin_verify_volunteer(
+    volunteer_id: str,
+    verified: bool = Query(...),
+    user: User = Depends(admin_user),
+    session: AsyncSession = Depends(get_session),
+    ctx: AppContext = Depends(get_ctx),
+):
     v = await session.get(Volunteer, volunteer_id)
     if v is None:
         raise NotFound("Volunteer")
@@ -316,19 +445,35 @@ async def admin_verify_volunteer(volunteer_id: str, verified: bool = Query(...),
 # ----------------------------------------------------------------------------- neighbour links / helpers
 @router.get("/neighbour-links", response_model=list[S.NeighbourLinkOut])
 async def list_links(_: User = Depends(admin_user), session: AsyncSession = Depends(get_session)):
-    rows = (await session.execute(
-        select(NeighbourLink, Resident.full_name, User.full_name)
-        .join(Resident, Resident.id == NeighbourLink.resident_id)
-        .join(User, User.id == NeighbourLink.neighbour_user_id)
-        .order_by(Resident.full_name, NeighbourLink.priority))).all()
-    return [S.NeighbourLinkOut(id=link.id, resident_id=link.resident_id, resident_name=rn,
-                               neighbour_user_id=link.neighbour_user_id, neighbour_name=nn, priority=link.priority,
-                               distance_m=link.distance_m) for link, rn, nn in rows]
+    rows = (
+        await session.execute(
+            select(NeighbourLink, Resident.full_name, User.full_name)
+            .join(Resident, Resident.id == NeighbourLink.resident_id)
+            .join(User, User.id == NeighbourLink.neighbour_user_id)
+            .order_by(Resident.full_name, NeighbourLink.priority)
+        )
+    ).all()
+    return [
+        S.NeighbourLinkOut(
+            id=link.id,
+            resident_id=link.resident_id,
+            resident_name=rn,
+            neighbour_user_id=link.neighbour_user_id,
+            neighbour_name=nn,
+            priority=link.priority,
+            distance_m=link.distance_m,
+        )
+        for link, rn, nn in rows
+    ]
 
 
 @router.post("/neighbour-links", response_model=S.NeighbourLinkOut, status_code=201)
-async def create_link(body: S.NeighbourLinkIn, user: User = Depends(admin_user),
-                      session: AsyncSession = Depends(get_session), ctx: AppContext = Depends(get_ctx)):
+async def create_link(
+    body: S.NeighbourLinkIn,
+    user: User = Depends(admin_user),
+    session: AsyncSession = Depends(get_session),
+    ctx: AppContext = Depends(get_ctx),
+):
     r = await session.get(Resident, body.resident_id)
     n = await session.get(User, body.neighbour_user_id)
     if r is None or n is None:
@@ -345,13 +490,25 @@ async def create_link(body: S.NeighbourLinkIn, user: User = Depends(admin_user),
         raise Conflict("duplicate", "Link already exists") from exc
     audit(session, actor_of(user), "neighbour_link.create", "neighbour_link", link.id)
     await finalize(session, ctx)
-    return S.NeighbourLinkOut(id=link.id, resident_id=r.id, resident_name=r.full_name, neighbour_user_id=n.id,
-                              neighbour_name=n.full_name, priority=link.priority, distance_m=link.distance_m)
+    return S.NeighbourLinkOut(
+        id=link.id,
+        resident_id=r.id,
+        resident_name=r.full_name,
+        neighbour_user_id=n.id,
+        neighbour_name=n.full_name,
+        priority=link.priority,
+        distance_m=link.distance_m,
+    )
 
 
 @router.patch("/neighbour-links/{link_id}", response_model=S.NeighbourLinkOut)
-async def reorder_link(link_id: str, priority: int = Query(ge=1, le=10), user: User = Depends(admin_user),
-                       session: AsyncSession = Depends(get_session), ctx: AppContext = Depends(get_ctx)):
+async def reorder_link(
+    link_id: str,
+    priority: int = Query(ge=1, le=10),
+    user: User = Depends(admin_user),
+    session: AsyncSession = Depends(get_session),
+    ctx: AppContext = Depends(get_ctx),
+):
     link = await session.get(NeighbourLink, link_id)
     if link is None:
         raise NotFound("Neighbour link")
@@ -360,13 +517,24 @@ async def reorder_link(link_id: str, priority: int = Query(ge=1, le=10), user: U
     await finalize(session, ctx)
     r = await session.get(Resident, link.resident_id)
     n = await session.get(User, link.neighbour_user_id)
-    return S.NeighbourLinkOut(id=link.id, resident_id=r.id, resident_name=r.full_name, neighbour_user_id=n.id,
-                              neighbour_name=n.full_name, priority=link.priority, distance_m=link.distance_m)
+    return S.NeighbourLinkOut(
+        id=link.id,
+        resident_id=r.id,
+        resident_name=r.full_name,
+        neighbour_user_id=n.id,
+        neighbour_name=n.full_name,
+        priority=link.priority,
+        distance_m=link.distance_m,
+    )
 
 
 @router.delete("/neighbour-links/{link_id}", status_code=204)
-async def delete_link(link_id: str, user: User = Depends(admin_user), session: AsyncSession = Depends(get_session),
-                      ctx: AppContext = Depends(get_ctx)):
+async def delete_link(
+    link_id: str,
+    user: User = Depends(admin_user),
+    session: AsyncSession = Depends(get_session),
+    ctx: AppContext = Depends(get_ctx),
+):
     link = await session.get(NeighbourLink, link_id)
     if link is None:
         raise NotFound("Neighbour link")
@@ -377,18 +545,34 @@ async def delete_link(link_id: str, user: User = Depends(admin_user), session: A
 
 @router.get("/pre-assigned", response_model=list[S.PreAssignedOut])
 async def list_pre_assigned(_: User = Depends(admin_user), session: AsyncSession = Depends(get_session)):
-    rows = (await session.execute(
-        select(PreAssignedHelper, Resident.full_name, User.full_name)
-        .join(Resident, Resident.id == PreAssignedHelper.resident_id)
-        .join(Volunteer, Volunteer.id == PreAssignedHelper.volunteer_id)
-        .join(User, User.id == Volunteer.user_id))).all()
-    return [S.PreAssignedOut(id=p.id, resident_id=p.resident_id, resident_name=rn, volunteer_id=p.volunteer_id,
-                             volunteer_name=vn, priority=p.priority) for p, rn, vn in rows]
+    rows = (
+        await session.execute(
+            select(PreAssignedHelper, Resident.full_name, User.full_name)
+            .join(Resident, Resident.id == PreAssignedHelper.resident_id)
+            .join(Volunteer, Volunteer.id == PreAssignedHelper.volunteer_id)
+            .join(User, User.id == Volunteer.user_id)
+        )
+    ).all()
+    return [
+        S.PreAssignedOut(
+            id=p.id,
+            resident_id=p.resident_id,
+            resident_name=rn,
+            volunteer_id=p.volunteer_id,
+            volunteer_name=vn,
+            priority=p.priority,
+        )
+        for p, rn, vn in rows
+    ]
 
 
 @router.post("/pre-assigned", response_model=S.PreAssignedOut, status_code=201)
-async def create_pre_assigned(body: S.PreAssignedIn, user: User = Depends(admin_user),
-                              session: AsyncSession = Depends(get_session), ctx: AppContext = Depends(get_ctx)):
+async def create_pre_assigned(
+    body: S.PreAssignedIn,
+    user: User = Depends(admin_user),
+    session: AsyncSession = Depends(get_session),
+    ctx: AppContext = Depends(get_ctx),
+):
     r = await session.get(Resident, body.resident_id)
     v = await session.get(Volunteer, body.volunteer_id)
     if r is None or v is None:
@@ -402,13 +586,23 @@ async def create_pre_assigned(body: S.PreAssignedIn, user: User = Depends(admin_
     audit(session, actor_of(user), "pre_assigned.create", "pre_assigned_helper", p.id)
     await finalize(session, ctx)
     vu = await session.get(User, v.user_id)
-    return S.PreAssignedOut(id=p.id, resident_id=r.id, resident_name=r.full_name, volunteer_id=v.id,
-                            volunteer_name=vu.full_name, priority=p.priority)
+    return S.PreAssignedOut(
+        id=p.id,
+        resident_id=r.id,
+        resident_name=r.full_name,
+        volunteer_id=v.id,
+        volunteer_name=vu.full_name,
+        priority=p.priority,
+    )
 
 
 @router.delete("/pre-assigned/{pid}", status_code=204)
-async def delete_pre_assigned(pid: str, user: User = Depends(admin_user), session: AsyncSession = Depends(get_session),
-                              ctx: AppContext = Depends(get_ctx)):
+async def delete_pre_assigned(
+    pid: str,
+    user: User = Depends(admin_user),
+    session: AsyncSession = Depends(get_session),
+    ctx: AppContext = Depends(get_ctx),
+):
     p = await session.get(PreAssignedHelper, pid)
     if p is None:
         raise NotFound("Pre-assigned helper")
@@ -420,17 +614,32 @@ async def delete_pre_assigned(pid: str, user: User = Depends(admin_user), sessio
 # ----------------------------------------------------------------------------- templates
 @router.get("/templates", response_model=list[S.TemplateOut])
 async def list_templates(_: User = Depends(admin_user), session: AsyncSession = Depends(get_session)):
-    rows = (await session.execute(select(AlertTemplate).order_by(AlertTemplate.hazard_type, AlertTemplate.language,
-                                                                 AlertTemplate.style))).scalars().all()
+    rows = (
+        (
+            await session.execute(
+                select(AlertTemplate).order_by(AlertTemplate.hazard_type, AlertTemplate.language, AlertTemplate.style)
+            )
+        )
+        .scalars()
+        .all()
+    )
     return [S.TemplateOut.model_validate(t) for t in rows]
 
 
 @router.post("/templates", response_model=S.TemplateOut, status_code=201)
-async def upsert_template(body: S.TemplateIn, user: User = Depends(admin_user),
-                          session: AsyncSession = Depends(get_session), ctx: AppContext = Depends(get_ctx)):
-    t = await session.scalar(select(AlertTemplate).where(
-        AlertTemplate.hazard_type == body.hazard_type, AlertTemplate.language == body.language,
-        AlertTemplate.style == body.style))
+async def upsert_template(
+    body: S.TemplateIn,
+    user: User = Depends(admin_user),
+    session: AsyncSession = Depends(get_session),
+    ctx: AppContext = Depends(get_ctx),
+):
+    t = await session.scalar(
+        select(AlertTemplate).where(
+            AlertTemplate.hazard_type == body.hazard_type,
+            AlertTemplate.language == body.language,
+            AlertTemplate.style == body.style,
+        )
+    )
     before = None
     if t is None:
         t = AlertTemplate(**body.model_dump())
@@ -440,37 +649,65 @@ async def upsert_template(body: S.TemplateIn, user: User = Depends(admin_user),
         for k, v in body.model_dump().items():
             setattr(t, k, v)
     await session.flush()
-    audit(session, actor_of(user), "template.upsert", "alert_template", t.id, before=before,
-          after={"title": t.title, "body": t.body})
+    audit(
+        session,
+        actor_of(user),
+        "template.upsert",
+        "alert_template",
+        t.id,
+        before=before,
+        after={"title": t.title, "body": t.body},
+    )
     await finalize(session, ctx)
     return S.TemplateOut.model_validate(t)
 
 
 # ----------------------------------------------------------------------------- users
 @router.get("/users", response_model=S.Page[S.UserAdminOut])
-async def list_users(role: str | None = None, q: str | None = Query(None, max_length=60), page: PageParams = Depends(),
-                     _: User = Depends(admin_user), session: AsyncSession = Depends(get_session)):
+async def list_users(
+    role: str | None = None,
+    q: str | None = Query(None, max_length=60),
+    page: PageParams = Depends(),
+    _: User = Depends(admin_user),
+    session: AsyncSession = Depends(get_session),
+):
     query = select(User).order_by(User.role, User.full_name)
     if role:
         query = query.where(User.role == role)
     if q:
         query = query.where(or_(User.full_name.ilike(f"%{q}%"), User.email.ilike(f"%{q}%")))
     rows, total = await paged(session, query, page)
-    return S.Page(items=[S.UserAdminOut(**views.user_out(u).model_dump(), is_active=u.is_active,
-                                        created_at=u.created_at) for u in rows],
-                  total=total, limit=page.limit, offset=page.offset)
+    return S.Page(
+        items=[
+            S.UserAdminOut(**views.user_out(u).model_dump(), is_active=u.is_active, created_at=u.created_at)
+            for u in rows
+        ],
+        total=total,
+        limit=page.limit,
+        offset=page.offset,
+    )
 
 
 @router.post("/users", response_model=S.UserAdminOut, status_code=201)
-async def create_user(body: S.UserCreateIn, user: User = Depends(admin_user),
-                      session: AsyncSession = Depends(get_session), ctx: AppContext = Depends(get_ctx)):
+async def create_user(
+    body: S.UserCreateIn,
+    user: User = Depends(admin_user),
+    session: AsyncSession = Depends(get_session),
+    ctx: AppContext = Depends(get_ctx),
+):
     if body.role in OPS and not (body.email and body.password):
         raise DomainError("password_required", "Admin/operator accounts need an email and a password (10+ chars)", 422)
     if not body.phone and not body.email:
         raise DomainError("contact_required", "Phone or email required", 422)
-    u = User(full_name=body.full_name, role=body.role, phone=normalize_phone(body.phone) if body.phone else None,
-             email=body.email.lower() if body.email else None, language=body.language, is_demo=body.is_demo,
-             password_hash=hash_password(body.password) if body.password else None)
+    u = User(
+        full_name=body.full_name,
+        role=body.role,
+        phone=normalize_phone(body.phone) if body.phone else None,
+        email=body.email.lower() if body.email else None,
+        language=body.language,
+        is_demo=body.is_demo,
+        password_hash=hash_password(body.password) if body.password else None,
+    )
     session.add(u)
     try:
         await session.flush()
@@ -482,8 +719,13 @@ async def create_user(body: S.UserCreateIn, user: User = Depends(admin_user),
 
 
 @router.patch("/users/{user_id}", response_model=S.UserAdminOut)
-async def patch_user(user_id: str, body: S.UserPatchIn, user: User = Depends(admin_user),
-                     session: AsyncSession = Depends(get_session), ctx: AppContext = Depends(get_ctx)):
+async def patch_user(
+    user_id: str,
+    body: S.UserPatchIn,
+    user: User = Depends(admin_user),
+    session: AsyncSession = Depends(get_session),
+    ctx: AppContext = Depends(get_ctx),
+):
     u = await session.get(User, user_id)
     if u is None:
         raise NotFound("User")
@@ -494,7 +736,14 @@ async def patch_user(user_id: str, body: S.UserPatchIn, user: User = Depends(adm
         u.role = body.role
     if body.is_active is not None:
         u.is_active = body.is_active
-    audit(session, actor_of(user), "user.update", "user", u.id, before=before,
-          after={"role": u.role, "is_active": u.is_active, "phone": mask_phone(u.phone)})
+    audit(
+        session,
+        actor_of(user),
+        "user.update",
+        "user",
+        u.id,
+        before=before,
+        after={"role": u.role, "is_active": u.is_active, "phone": mask_phone(u.phone)},
+    )
     await finalize(session, ctx)
     return S.UserAdminOut(**views.user_out(u).model_dump(), is_active=u.is_active, created_at=u.created_at)

@@ -37,8 +37,9 @@ async def build_report(session: AsyncSession, ctx: AppContext, incident_id: str)
     inc = await views.get_incident_or_404(session, incident_id)
     rows = (
         await session.execute(
-            select(Delivery, Resident).join(Resident, Resident.id == Delivery.resident_id).where(
-                Delivery.incident_id == incident_id)
+            select(Delivery, Resident)
+            .join(Resident, Resident.id == Delivery.resident_id)
+            .where(Delivery.incident_id == incident_id)
         )
     ).all()
     safe_times, by_channel = [], {}
@@ -51,12 +52,18 @@ async def build_report(session: AsyncSession, ctx: AppContext, incident_id: str)
             by_channel.setdefault(d.resolved_by or "unknown", []).append(secs)
         elif d.status != "SAFE":
             p = priority.get(d.id)
-            unresolved.append({
-                "delivery_id": d.id, "resident_name": r.full_name, "status": d.status,
-                "needs": list(r.needs or []), "priority": p.priority_total if p else None,
-                "needs_rescue": d.needs_rescue, "rescue_reason": d.rescue_reason,
-                "escalation_step": d.escalation_step,
-            })
+            unresolved.append(
+                {
+                    "delivery_id": d.id,
+                    "resident_name": r.full_name,
+                    "status": d.status,
+                    "needs": list(r.needs or []),
+                    "priority": p.priority_total if p else None,
+                    "needs_rescue": d.needs_rescue,
+                    "rescue_reason": d.rescue_reason,
+                    "escalation_step": d.escalation_step,
+                }
+            )
     unresolved.sort(key=lambda u: -(u["priority"] or 0))
 
     tasks = (await session.execute(select(Task).where(Task.incident_id == incident_id))).scalars().all()
@@ -64,8 +71,10 @@ async def build_report(session: AsyncSession, ctx: AppContext, incident_id: str)
     reach_times = [(t.reached_at - t.accepted_at).total_seconds() for t in tasks if t.reached_at and t.accepted_at]
     names = dict((await session.execute(select(User.id, User.full_name))).all())
     attempts = (
-        await session.execute(select(NotificationAttempt).where(NotificationAttempt.incident_id == incident_id))
-    ).scalars().all()
+        (await session.execute(select(NotificationAttempt).where(NotificationAttempt.incident_id == incident_id)))
+        .scalars()
+        .all()
+    )
 
     counts = await views.counts_for(session, incident_id)
     return {
@@ -84,8 +93,15 @@ async def build_report(session: AsyncSession, ctx: AppContext, incident_id: str)
             "time_to_accept": _stats(accept_times),
             "time_to_reach": _stats(reach_times),
             "items": [
-                {"id": t.id, "kind": t.kind, "status": t.status, "assignee": names.get(t.assignee_user_id),
-                 "outcome": t.outcome, "cant_go_reason": t.cant_go_reason, "attempt_no": t.attempt_no}
+                {
+                    "id": t.id,
+                    "kind": t.kind,
+                    "status": t.status,
+                    "assignee": names.get(t.assignee_user_id),
+                    "outcome": t.outcome,
+                    "cant_go_reason": t.cant_go_reason,
+                    "attempt_no": t.attempt_no,
+                }
                 for t in sorted(tasks, key=lambda t: t.created_at)
             ],
         },
@@ -97,7 +113,8 @@ async def build_report(session: AsyncSession, ctx: AppContext, incident_id: str)
             "Times are measured from the first alert to the moment the resident was confirmed safe "
             "(by the resident, caregiver, neighbour, volunteer or operator).",
             "Walking-time estimates are approximations and were not validated against hazard data.",
-        ] + (["This is a DEMO/DRILL incident using fictional residents."] if inc.is_demo else []),
+        ]
+        + (["This is a DEMO/DRILL incident using fictional residents."] if inc.is_demo else []),
     }
 
 
@@ -120,6 +137,14 @@ def report_csv(report: dict) -> str:
     w.writerow([])
     w.writerow(["Unresolved", "status", "priority", "needs", "needs_rescue", "reason"])
     for u in report["unresolved"]:
-        w.writerow([u["resident_name"], u["status"], u["priority"], " ".join(u["needs"]), u["needs_rescue"],
-                    u["rescue_reason"] or ""])
+        w.writerow(
+            [
+                u["resident_name"],
+                u["status"],
+                u["priority"],
+                " ".join(u["needs"]),
+                u["needs_rescue"],
+                u["rescue_reason"] or "",
+            ]
+        )
     return buf.getvalue()

@@ -54,15 +54,29 @@ async def _notify_caregivers(session: AsyncSession, ctx: AppContext, dc: Deliver
         if cg.is_demo != inc.is_demo:
             continue
         await dispatcher.notify_user(
-            session, ctx, inc, cg, recipient_kind="caregiver", key=f"d:{d.id}:caregiver:{cg.id}",
+            session,
+            ctx,
+            inc,
+            cg,
+            recipient_kind="caregiver",
+            key=f"d:{d.id}:caregiver:{cg.id}",
             title=f"AapdaSaathi: {inc.hazard_type} alert for {res.full_name.split(' ')[0]}",
             body=f"{res.full_name.split(' ')[0]} has been alerted. Please help them respond or confirm they are safe.",
             sms_body=f"AapdaSaathi: {inc.hazard_type} alert for {res.full_name.split(' ')[0]}. Please check on them.",
-            data={"type": "caregiver", "delivery_id": d.id}, delivery_id=d.id,
+            data={"type": "caregiver", "delivery_id": d.id},
+            delivery_id=d.id,
         )
     if await caregivers_of(session, res.id):
-        timeline(session, inc.id, "caregiver_alerted", "Caregiver alerted in parallel", actor=SYSTEM,
-                 delivery_id=d.id, resident_id=res.id, at=ctx.now())
+        timeline(
+            session,
+            inc.id,
+            "caregiver_alerted",
+            "Caregiver alerted in parallel",
+            actor=SYSTEM,
+            delivery_id=d.id,
+            resident_id=res.id,
+            at=ctx.now(),
+        )
 
 
 async def activate_delivery(session: AsyncSession, ctx: AppContext, dc: DeliveryCtx) -> None:
@@ -78,10 +92,17 @@ async def activate_delivery(session: AsyncSession, ctx: AppContext, dc: Delivery
     mode = inc.escalation_mode
     d.next_action_at = now + interval_for(ctx, inc, res)
     channels = ", ".join(d.channels) or "none"
-    timeline(session, inc.id, "alerted",
-             f"Alert sent via {channels}" + ("" if attempts else " — no registered channel, marked UNREACHABLE"),
-             actor=SYSTEM, delivery_id=d.id, resident_id=res.id, at=now,
-             data={"channels": d.channels, "modes": d.accessibility_modes})
+    timeline(
+        session,
+        inc.id,
+        "alerted",
+        f"Alert sent via {channels}" + ("" if attempts else " — no registered channel, marked UNREACHABLE"),
+        actor=SYSTEM,
+        delivery_id=d.id,
+        resident_id=res.id,
+        at=now,
+        data={"channels": d.channels, "modes": d.accessibility_modes},
+    )
     await session.flush()
 
     if rules.caregiver_in_parallel(res.needs or [], mode):
@@ -92,14 +113,22 @@ async def activate_delivery(session: AsyncSession, ctx: AppContext, dc: Delivery
         )
         if rules.needs_assisted_evacuation(res.needs or []):
             await dispatch.request_volunteer(
-                session, ctx, dc, reason=f"Mode {mode}: minute-zero alert to pre-assigned helper", actor=SYSTEM,
+                session,
+                ctx,
+                dc,
+                reason=f"Mode {mode}: minute-zero alert to pre-assigned helper",
+                actor=SYSTEM,
                 pre_assigned_only=True,
             )
         d.escalation_level = 1
         d.escalation_step = "parallel"
     elif mode == "A" and rules.needs_assisted_evacuation(res.needs or []):
         await dispatch.request_volunteer(
-            session, ctx, dc, reason="Mode A: arrange assisted evacuation before onset", actor=SYSTEM,
+            session,
+            ctx,
+            dc,
+            reason="Mode A: arrange assisted evacuation before onset",
+            actor=SYSTEM,
             kind="preevac_assist",
         )
     d.version += 1
@@ -114,9 +143,14 @@ async def _maybe_update_mode(session: AsyncSession, ctx: AppContext, inc: Incide
         inc.requires_dispatch_approval = inc.requires_dispatch_approval or rules.requires_dispatch_approval(
             inc.severity, mode_now
         )
-        timeline(session, inc.id, "mode_changed",
-                 f"Escalation mode {old} → {mode_now} ({rules.mode_label(mode_now)}) as onset approaches",
-                 actor=SYSTEM, at=ctx.now())
+        timeline(
+            session,
+            inc.id,
+            "mode_changed",
+            f"Escalation mode {old} → {mode_now} ({rules.mode_label(mode_now)}) as onset approaches",
+            actor=SYSTEM,
+            at=ctx.now(),
+        )
         emit(session, "incident.updated", incident_id=inc.id)
 
 
@@ -133,12 +167,21 @@ async def _expire_unaccepted(session: AsyncSession, ctx: AppContext, dc: Deliver
             t.status, t.outcome, t.closed_at = "CANCELLED", "timeout", now
             t.outcome_note = f"No response within {int((2 * interval).total_seconds() // 60) or 1} min"
             t.version += 1
-            timeline(session, t.incident_id, "task_timeout", f"Volunteer did not respond — reassigning ({t.outcome_note})",
-                     actor=SYSTEM, delivery_id=t.delivery_id, resident_id=t.resident_id, at=now)
+            timeline(
+                session,
+                t.incident_id,
+                "task_timeout",
+                f"Volunteer did not respond — reassigning ({t.outcome_note})",
+                actor=SYSTEM,
+                delivery_id=t.delivery_id,
+                resident_id=t.resident_id,
+                at=now,
+            )
             emit(session, "task.updated", audience=[t.assignee_user_id], incident_id=t.incident_id, task_id=t.id)
             await session.flush()
-            await dispatch.request_volunteer(session, ctx, dc, reason="Previous volunteer did not respond",
-                                             actor=SYSTEM, kind=t.kind)
+            await dispatch.request_volunteer(
+                session, ctx, dc, reason="Previous volunteer did not respond", actor=SYSTEM, kind=t.kind
+            )
 
 
 async def advance(session: AsyncSession, ctx: AppContext, dc: DeliveryCtx) -> str:
@@ -165,8 +208,16 @@ async def advance(session: AsyncSession, ctx: AppContext, dc: DeliveryCtx) -> st
         accepted = any(t.status == "ACCEPTED" for t in vol_tasks)
         if not accepted and not d.needs_operator:
             d.needs_operator = True
-            timeline(session, inc.id, "escalated_command_centre", "Help request not yet accepted by a helper",
-                     actor=SYSTEM, delivery_id=d.id, resident_id=res.id, at=now)
+            timeline(
+                session,
+                inc.id,
+                "escalated_command_centre",
+                "Help request not yet accepted by a helper",
+                actor=SYSTEM,
+                delivery_id=d.id,
+                resident_id=res.id,
+                at=now,
+            )
         d.next_action_at = None if accepted or d.needs_rescue else now + interval
         d.version += 1
         emit(session, "delivery.updated", incident_id=inc.id, delivery_id=d.id, status=d.status)
@@ -178,14 +229,26 @@ async def advance(session: AsyncSession, ctx: AppContext, dc: DeliveryCtx) -> st
         await dispatcher.alert_resident(session, ctx, inc, d, res, f"reminder-{d.reminders_sent + 1}")
         d.reminders_sent += 1
         task = await dispatch.request_neighbour_check(
-            session, ctx, dc, reason=f"No reply {int((now - d.alerted_at).total_seconds() // 60)} min after alert",
+            session,
+            ctx,
+            dc,
+            reason=f"No reply {int((now - d.alerted_at).total_seconds() // 60)} min after alert",
             actor=SYSTEM,
         )
         if task is None:
-            timeline(session, inc.id, "no_neighbour", "No linked neighbour available — escalating to volunteer",
-                     actor=SYSTEM, delivery_id=d.id, resident_id=res.id, at=now)
-            await dispatch.request_volunteer(session, ctx, dc, reason="No reply and no neighbour available",
-                                             actor=SYSTEM)
+            timeline(
+                session,
+                inc.id,
+                "no_neighbour",
+                "No linked neighbour available — escalating to volunteer",
+                actor=SYSTEM,
+                delivery_id=d.id,
+                resident_id=res.id,
+                at=now,
+            )
+            await dispatch.request_volunteer(
+                session, ctx, dc, reason="No reply and no neighbour available", actor=SYSTEM
+            )
             d.escalation_level = 2
         else:
             d.escalation_level = 1
@@ -197,15 +260,30 @@ async def advance(session: AsyncSession, ctx: AppContext, dc: DeliveryCtx) -> st
     elif level == 2:
         d.needs_operator = True
         d.escalation_level = 3
-        timeline(session, inc.id, "escalated_command_centre",
-                 f"Still {d.status.replace('_', ' ').lower()} — command centre must act",
-                 actor=SYSTEM, delivery_id=d.id, resident_id=res.id, at=now)
+        timeline(
+            session,
+            inc.id,
+            "escalated_command_centre",
+            f"Still {d.status.replace('_', ' ').lower()} — command centre must act",
+            actor=SYSTEM,
+            delivery_id=d.id,
+            resident_id=res.id,
+            at=now,
+        )
         result = "command_centre"
     else:
         await dispatcher.alert_resident(session, ctx, inc, d, res, f"reminder-{d.reminders_sent + 1}")
         d.reminders_sent += 1
-        timeline(session, inc.id, "reminder", f"Repeat reminder #{d.reminders_sent} (elderly, lives alone)",
-                 actor=SYSTEM, delivery_id=d.id, resident_id=res.id, at=now)
+        timeline(
+            session,
+            inc.id,
+            "reminder",
+            f"Repeat reminder #{d.reminders_sent} (elderly, lives alone)",
+            actor=SYSTEM,
+            delivery_id=d.id,
+            resident_id=res.id,
+            at=now,
+        )
         result = "reminder"
 
     repeat = "repeat_reminders" in (d.accessibility_modes or []) and d.reminders_sent < MAX_REPEAT_REMINDERS
@@ -216,45 +294,71 @@ async def advance(session: AsyncSession, ctx: AppContext, dc: DeliveryCtx) -> st
     return result
 
 
-async def _due_ids(session: AsyncSession, now, limit: int) -> list[str]:
-    q = (
-        select(Delivery.id)
-        .join(Incident, Incident.id == Delivery.incident_id)
-        .where(
-            Delivery.next_action_at.is_not(None),
-            Delivery.next_action_at <= now,
-            Delivery.status.in_(("NO_REPLY", "UNREACHABLE", "HELP", "PENDING", "SAFE")),
-            Incident.status == "active",
+_DUE_STATUSES = ("NO_REPLY", "UNREACHABLE", "HELP", "PENDING", "SAFE")
+
+
+async def _due_snapshot(ctx: AppContext, limit: int) -> list[str]:
+    """Due delivery ids ordered by priority (highest first), so scarce helpers go to those most at risk.
+    Read without locks; each row is locked and re-checked individually before acting."""
+    now = ctx.now()
+    async with db.session() as session:
+        rows = (
+            await session.execute(
+                select(Delivery.id, Delivery.status, Delivery.alerted_at, Resident.needs, Resident.lives_alone)
+                .join(Incident, Incident.id == Delivery.incident_id)
+                .join(Resident, Resident.id == Delivery.resident_id)
+                .where(
+                    Delivery.next_action_at.is_not(None),
+                    Delivery.next_action_at <= now,
+                    Delivery.status.in_(_DUE_STATUSES),
+                    Incident.status == "active",
+                )
+                .order_by(Delivery.next_action_at)
+                .limit(limit)
+            )
+        ).all()
+    scored = [
+        (
+            -rules.priority_score(
+                needs=needs or [], lives_alone=alone, status=status, alerted_at=alerted, now=now
+            ).total,
+            i,
+            did,
         )
-        .order_by(Delivery.next_action_at)
-        .limit(limit)
+        for i, (did, status, alerted, needs, alone) in enumerate(rows)
+    ]
+    return [did for _, _, did in sorted(scored)]
+
+
+async def _lock_if_due(session: AsyncSession, delivery_id: str, now) -> bool:
+    q = select(Delivery.id).where(
+        Delivery.id == delivery_id,
+        Delivery.next_action_at.is_not(None),
+        Delivery.next_action_at <= now,
+        Delivery.status.in_(_DUE_STATUSES),
     )
     if db.is_postgres:
-        q = q.with_for_update(skip_locked=True, of=Delivery)
-    return list((await session.execute(q)).scalars().all())
+        q = q.with_for_update(skip_locked=True)  # another worker holds it → skip, it is being handled
+    return (await session.execute(q)).scalar_one_or_none() is not None
 
 
-async def tick(ctx: AppContext, max_steps: int = 200) -> int:
-    """Process every due delivery, one short transaction each. Returns steps performed."""
+async def tick(ctx: AppContext, max_steps: int = 500) -> int:
+    """Process every due delivery once, highest priority first, one short transaction each."""
     steps = 0
-    failed: set[str] = set()
-    while steps < max_steps:
+    for delivery_id in await _due_snapshot(ctx, max_steps):
         async with db.session() as session:
-            ids = [i for i in await _due_ids(session, ctx.now(), 1 + len(failed)) if i not in failed]
-            if not ids:
-                await session.rollback()
-                break
-            delivery_id = ids[0]
             try:
+                if not await _lock_if_due(session, delivery_id, ctx.now()):
+                    await session.rollback()
+                    continue
                 dc = await get_delivery_ctx(session, delivery_id, lock=True)
-                await advance(session, ctx, dc)
+                if await advance(session, ctx, dc) != "not_due":
+                    steps += 1
                 await commit(session, ctx.bus)
             except Exception:  # noqa: BLE001 - one bad row must not stall the engine
                 log.exception("escalation step failed for delivery %s", delivery_id)
                 await session.rollback()
-                failed.add(delivery_id)
                 await _defer(ctx, delivery_id)
-        steps += 1
     await _heartbeat(ctx, f"steps={steps}")
     if steps:
         await dispatcher.flush_outbox(ctx)
@@ -266,9 +370,16 @@ async def _defer(ctx: AppContext, delivery_id: str) -> None:
         d = await session.get(Delivery, delivery_id)
         if d is not None and d.next_action_at is not None:
             d.next_action_at = ctx.now() + timedelta(seconds=60)
-            timeline(session, d.incident_id, "escalation_error",
-                     "Escalation step failed; retrying in 60 s (see worker logs)", actor=SYSTEM,
-                     delivery_id=d.id, resident_id=d.resident_id, at=ctx.now())
+            timeline(
+                session,
+                d.incident_id,
+                "escalation_error",
+                "Escalation step failed; retrying in 60 s (see worker logs)",
+                actor=SYSTEM,
+                delivery_id=d.id,
+                resident_id=d.resident_id,
+                at=ctx.now(),
+            )
         await session.commit()
 
 
@@ -276,8 +387,11 @@ async def _heartbeat(ctx: AppContext, result: str) -> None:
     async with db.session() as session:
         hb = await session.get(WorkerHeartbeat, f"{WORKER_ID}:escalation")
         if hb is None:
-            session.add(WorkerHeartbeat(worker_id=f"{WORKER_ID}:escalation", job="escalation",
-                                        last_beat_at=ctx.now(), last_result=result))
+            session.add(
+                WorkerHeartbeat(
+                    worker_id=f"{WORKER_ID}:escalation", job="escalation", last_beat_at=ctx.now(), last_result=result
+                )
+            )
         else:
             hb.last_beat_at, hb.last_result = ctx.now(), result
         await session.commit()

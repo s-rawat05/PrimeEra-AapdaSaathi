@@ -37,9 +37,18 @@ SOURCE_LABEL = {
 }
 
 HAZARD_KEYWORDS = [
-    ("flood", "Flood"), ("cloudburst", "Cloudburst"), ("landslide", "Landslide"), ("thunder", "Thunderstorm"),
-    ("lightning", "Thunderstorm"), ("rain", "Heavy Rain"), ("earthquake", "Earthquake"), ("fire", "Fire"),
-    ("snow", "Snowfall"), ("avalanche", "Avalanche"), ("cyclone", "Cyclone"), ("heat", "Heat Wave"),
+    ("flood", "Flood"),
+    ("cloudburst", "Cloudburst"),
+    ("landslide", "Landslide"),
+    ("thunder", "Thunderstorm"),
+    ("lightning", "Thunderstorm"),
+    ("rain", "Heavy Rain"),
+    ("earthquake", "Earthquake"),
+    ("fire", "Fire"),
+    ("snow", "Snowfall"),
+    ("avalanche", "Avalanche"),
+    ("cyclone", "Cyclone"),
+    ("heat", "Heat Wave"),
     ("cold", "Cold Wave"),
 ]
 
@@ -54,24 +63,30 @@ def hazard_from_event(event: str | None) -> str:
 
 async def _consented_residents(session: AsyncSession, ward_ids: list[str], is_demo: bool, now) -> tuple[list, int]:
     residents = (
-        await session.execute(
-            select(Resident).where(
-                Resident.ward_id.in_(ward_ids),
-                Resident.is_demo.is_(is_demo),
-                Resident.registration_status == "active",
+        (
+            await session.execute(
+                select(Resident).where(
+                    Resident.ward_id.in_(ward_ids),
+                    Resident.is_demo.is_(is_demo),
+                    Resident.registration_status == "active",
+                )
             )
         )
-    ).scalars().all()
+        .scalars()
+        .all()
+    )
     ok, skipped = [], 0
     for r in residents:
         consent = await session.scalar(
-            select(ConsentRecord.id).where(
+            select(ConsentRecord.id)
+            .where(
                 ConsentRecord.resident_id == r.id,
                 ConsentRecord.consent_type == "registry",
                 ConsentRecord.granted.is_(True),
                 ConsentRecord.withdrawn_at.is_(None),
                 ConsentRecord.expires_at > now,
-            ).limit(1)
+            )
+            .limit(1)
         )
         if consent:
             ok.append(r)
@@ -84,18 +99,32 @@ async def create_deliveries(session: AsyncSession, ctx: AppContext, inc: Inciden
     now = ctx.now()
     residents, skipped = await _consented_residents(session, ward_ids, inc.is_demo, now)
     if not inc.is_demo and not ctx.settings.notify_real_residents:
-        timeline(session, inc.id, "delivery_suppressed",
-                 f"Resident notifications disabled (NOTIFY_REAL_RESIDENTS=false). {len(residents)} registered "
-                 "resident(s) in matched wards were NOT notified.", actor=SYSTEM, at=now)
+        timeline(
+            session,
+            inc.id,
+            "delivery_suppressed",
+            f"Resident notifications disabled (NOTIFY_REAL_RESIDENTS=false). {len(residents)} registered "
+            "resident(s) in matched wards were NOT notified.",
+            actor=SYSTEM,
+            at=now,
+        )
         return 0
     if skipped:
-        timeline(session, inc.id, "consent_skipped",
-                 f"{skipped} resident(s) skipped: consent missing, withdrawn or expired (re-verification due)",
-                 actor=SYSTEM, at=now)
+        timeline(
+            session,
+            inc.id,
+            "consent_skipped",
+            f"{skipped} resident(s) skipped: consent missing, withdrawn or expired (re-verification due)",
+            actor=SYSTEM,
+            at=now,
+        )
     created = 0
     # Highest static priority first, so scarce helpers are allocated to those who need them most.
-    residents.sort(key=lambda r: -rules.priority_score(needs=r.needs or [], lives_alone=r.lives_alone,
-                                                       status="NO_REPLY", alerted_at=None, now=now).total)
+    residents.sort(
+        key=lambda r: -rules.priority_score(
+            needs=r.needs or [], lives_alone=r.lives_alone, status="NO_REPLY", alerted_at=None, now=now
+        ).total
+    )
     for r in residents:
         exists = await session.scalar(
             select(Delivery.id).where(Delivery.incident_id == inc.id, Delivery.resident_id == r.id)
@@ -179,11 +208,14 @@ async def create_incident(
         session.add(IncidentWard(incident_id=inc.id, ward_id=m.ward.id, match_method=m.method, match_note=m.note))
     window = int((resolved.onset - now).total_seconds() // 60)
     timeline(
-        session, inc.id, "incident_created",
+        session,
+        inc.id,
+        "incident_created",
         f"{SOURCE_LABEL[source]}: {hazard_type}. Mode {mode} — {rules.mode_label(mode)}; "
         f"{'onset in ' + str(window) + ' min' if window > 0 else 'hazard ongoing'}; "
         f"{len(ward_matches)} ward(s) matched ({', '.join(sorted({m.method for m in ward_matches}))}).",
-        actor=actor, at=now,
+        actor=actor,
+        at=now,
         data={"mode": mode, "onset_fallback": inc.onset_fallback_used, "approval": inc.requires_dispatch_approval},
     )
     if actor.user_id:
@@ -271,11 +303,9 @@ async def _incidents_referenced(session: AsyncSession, alert: cap_parser.CapAler
     if not ids:
         return []
     return list(
-        (
-            await session.execute(
-                select(Incident).where(Incident.cap_identifier.in_(ids), Incident.status == "active")
-            )
-        ).scalars().all()
+        (await session.execute(select(Incident).where(Incident.cap_identifier.in_(ids), Incident.status == "active")))
+        .scalars()
+        .all()
     )
 
 
@@ -297,8 +327,17 @@ async def apply_live_cap(
         if prior:
             for inc in prior:
                 before = {"severity": inc.severity, "onset": str(inc.onset), "expires": str(inc.expires)}
-                for k in ("severity", "urgency", "certainty", "expires", "headline", "description", "instruction",
-                          "area_desc", "effective"):
+                for k in (
+                    "severity",
+                    "urgency",
+                    "certainty",
+                    "expires",
+                    "headline",
+                    "description",
+                    "instruction",
+                    "area_desc",
+                    "effective",
+                ):
                     if fields.get(k) is not None:
                         setattr(inc, k, fields[k])
                 if fields.get("onset"):
@@ -306,9 +345,17 @@ async def apply_live_cap(
                 inc.cap_identifier, inc.cap_message_id = alert.identifier, row.id
                 inc.escalation_mode = rules.select_mode(inc.onset, now)
                 inc.requires_dispatch_approval = inc.requires_dispatch_approval or rules.requires_dispatch_approval(
-                    inc.severity, inc.escalation_mode)
-                timeline(session, inc.id, "official_update", f"Official update from {alert.sender} applied",
-                         actor=SYSTEM, at=now, data={"before": before})
+                    inc.severity, inc.escalation_mode
+                )
+                timeline(
+                    session,
+                    inc.id,
+                    "official_update",
+                    f"Official update from {alert.sender} applied",
+                    actor=SYSTEM,
+                    at=now,
+                    data={"before": before},
+                )
                 emit(session, "incident.updated", incident_id=inc.id)
             return prior[0]
     if alert.msg_type not in ("Alert", "Update"):
@@ -323,9 +370,16 @@ async def apply_live_cap(
     if not matches:
         return None
     return await create_incident(
-        session, ctx, title=fields.get("headline") or fields.get("hazard_type") or "Official alert",
-        source="exercise" if alert.status == "Exercise" else "live", is_demo=False, ward_matches=matches,
-        actor=SYSTEM, sent=alert.sent, cap_message=row, cap_sender=alert.sender,
+        session,
+        ctx,
+        title=fields.get("headline") or fields.get("hazard_type") or "Official alert",
+        source="exercise" if alert.status == "Exercise" else "live",
+        is_demo=False,
+        ward_matches=matches,
+        actor=SYSTEM,
+        sent=alert.sent,
+        cap_message=row,
+        cap_sender=alert.sender,
         official_url=fields.pop("official_url", None) or row.official_url,
         **{k: v for k, v in fields.items() if k != "official_url"},
     )
@@ -360,14 +414,29 @@ async def replay_into_demo(
     )
     matches = [WardMatch(w, "manual", f"{source.title()} into fictional demo ward") for w in wards]
     return await create_incident(
-        session, ctx, title=f"[{source.upper()}] " + (fields.get("headline") or fields.get("hazard_type") or "Alert"),
-        source=source, is_demo=True, ward_matches=matches, actor=actor, sent=alert.sent, cap_message=row,
-        cap_sender=alert.sender, onset_note=note, demo_session_id=demo_session_id,
-        hazard_type=fields.get("hazard_type", "Hazard"), severity=fields.get("severity", "Unknown"),
-        urgency=fields.get("urgency", "Unknown"), certainty=fields.get("certainty", "Unknown"),
-        effective=fields.get("effective"), onset=onset, expires=now + timedelta(hours=6),
-        headline=fields.get("headline"), description=fields.get("description"),
-        instruction=fields.get("instruction"), area_desc=fields.get("area_desc"),
+        session,
+        ctx,
+        title=f"[{source.upper()}] " + (fields.get("headline") or fields.get("hazard_type") or "Alert"),
+        source=source,
+        is_demo=True,
+        ward_matches=matches,
+        actor=actor,
+        sent=alert.sent,
+        cap_message=row,
+        cap_sender=alert.sender,
+        onset_note=note,
+        demo_session_id=demo_session_id,
+        hazard_type=fields.get("hazard_type", "Hazard"),
+        severity=fields.get("severity", "Unknown"),
+        urgency=fields.get("urgency", "Unknown"),
+        certainty=fields.get("certainty", "Unknown"),
+        effective=fields.get("effective"),
+        onset=onset,
+        expires=now + timedelta(hours=6),
+        headline=fields.get("headline"),
+        description=fields.get("description"),
+        instruction=fields.get("instruction"),
+        area_desc=fields.get("area_desc"),
         official_url=row.official_url,
     )
 
@@ -383,8 +452,9 @@ async def finish_incident(
     deliveries = (await session.execute(select(Delivery).where(Delivery.incident_id == inc.id))).scalars().all()
     for d in deliveries:
         res = await session.get(Resident, d.resident_id)
-        await dispatch.cancel_open_tasks(session, ctx, DeliveryCtx(d, inc, res), reason=f"incident {status}",
-                                         actor=actor)
+        await dispatch.cancel_open_tasks(
+            session, ctx, DeliveryCtx(d, inc, res), reason=f"incident {status}", actor=actor
+        )
         d.next_action_at = None
     inc.status, inc.closed_at, inc.closed_by_user_id, inc.close_note = status, now, actor.user_id, note
     timeline(session, inc.id, f"incident_{status}", f"Incident {status}: {note}", actor=actor, at=now)
@@ -407,10 +477,19 @@ async def resend(session: AsyncSession, ctx: AppContext, delivery_id: str, actor
         dc.delivery.status = "NO_REPLY"
     dc.delivery.version += 1
     audit(session, actor, "delivery.resend", "delivery", delivery_id)
-    timeline(session, dc.incident.id, "resend", f"Operator re-sent the alert (#{n})", actor=actor,
-             delivery_id=delivery_id, resident_id=dc.resident.id, at=ctx.now())
-    emit(session, "delivery.updated", audience=[dc.resident.user_id], incident_id=dc.incident.id,
-         delivery_id=delivery_id)
+    timeline(
+        session,
+        dc.incident.id,
+        "resend",
+        f"Operator re-sent the alert (#{n})",
+        actor=actor,
+        delivery_id=delivery_id,
+        resident_id=dc.resident.id,
+        at=ctx.now(),
+    )
+    emit(
+        session, "delivery.updated", audience=[dc.resident.user_id], incident_id=dc.incident.id, delivery_id=delivery_id
+    )
     return dc.delivery
 
 
@@ -434,12 +513,28 @@ async def override_status(
         dc.delivery.resolved_at = dc.delivery.resolved_by = None
         dc.delivery.needs_operator = True
         dc.delivery.version += 1
-        timeline(session, dc.incident.id, "override", f"Operator set status to {status}: {reason}", actor=actor,
-                 delivery_id=delivery_id, resident_id=dc.resident.id, at=ctx.now())
+        timeline(
+            session,
+            dc.incident.id,
+            "override",
+            f"Operator set status to {status}: {reason}",
+            actor=actor,
+            delivery_id=delivery_id,
+            resident_id=dc.resident.id,
+            at=ctx.now(),
+        )
         emit(session, "delivery.updated", incident_id=dc.incident.id, delivery_id=delivery_id)
     dc.delivery.override_reason = reason
-    audit(session, actor, "delivery.override", "delivery", delivery_id, reason=reason, before=before,
-          after={"status": status})
+    audit(
+        session,
+        actor,
+        "delivery.override",
+        "delivery",
+        delivery_id,
+        reason=reason,
+        before=before,
+        after={"status": status},
+    )
     return dc.delivery
 
 

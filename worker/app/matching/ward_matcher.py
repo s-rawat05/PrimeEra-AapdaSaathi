@@ -35,8 +35,7 @@ async def _geometry_matches_postgres(
         gj = json.dumps({"type": "Polygon", "coordinates": [ring]})
         rows = await session.execute(
             text(
-                "SELECT id FROM wards WHERE ST_Intersects(geom, ST_SetSRID(ST_GeomFromGeoJSON(:g), 4326))"
-                + demo_clause
+                "SELECT id FROM wards WHERE ST_Intersects(geom, ST_SetSRID(ST_GeomFromGeoJSON(:g), 4326))" + demo_clause
             ),
             {"g": gj, "demo": ward_filter_demo},
         )
@@ -84,7 +83,9 @@ async def match_wards(
             ids = await _geometry_matches_postgres(session, polygons, circles, is_demo)
         else:
             ids = _geometry_matches_shapely(wards, polygons, circles)
-        matches = [WardMatch(by_id[i], "geometry", "Official alert area intersects ward boundary") for i in ids if i in by_id]
+        matches = [
+            WardMatch(by_id[i], "geometry", "Official alert area intersects ward boundary") for i in ids if i in by_id
+        ]
         if matches:
             return matches
 

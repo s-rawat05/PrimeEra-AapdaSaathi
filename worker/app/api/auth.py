@@ -47,8 +47,9 @@ async def login(body: S.LoginIn, session: AsyncSession = Depends(get_session), c
 
 
 @router.post("/otp/request", response_model=S.OtpRequestOut, summary="Send a 6-digit verification code by SMS")
-async def otp_request(body: S.OtpRequestIn, session: AsyncSession = Depends(get_session),
-                      ctx: AppContext = Depends(get_ctx)):
+async def otp_request(
+    body: S.OtpRequestIn, session: AsyncSession = Depends(get_session), ctx: AppContext = Depends(get_ctx)
+):
     if ctx.settings.auth_mode != "local":
         raise DomainError("use_supabase", "OTP is handled by Supabase Auth in this deployment", 400)
     try:
@@ -56,40 +57,66 @@ async def otp_request(body: S.OtpRequestIn, session: AsyncSession = Depends(get_
     except ValueError as exc:
         raise DomainError("invalid_phone", "Enter a valid mobile number", 422) from exc
     now = ctx.now()
-    recent = (await session.execute(select(OtpChallenge).where(
-        OtpChallenge.phone == phone, OtpChallenge.created_at > now - timedelta(minutes=10)))).scalars().all()
+    recent = (
+        (
+            await session.execute(
+                select(OtpChallenge).where(
+                    OtpChallenge.phone == phone, OtpChallenge.created_at > now - timedelta(minutes=10)
+                )
+            )
+        )
+        .scalars()
+        .all()
+    )
     if len(recent) >= 5:
         raise DomainError("rate_limited", "Too many codes requested. Try again in 10 minutes.", 429)
     code = generate_otp()
-    session.add(OtpChallenge(phone=phone, code_hash=hash_otp(phone, code, ctx.settings.jwt_secret),
-                             expires_at=now + timedelta(seconds=ctx.settings.otp_ttl_seconds), created_at=now))
+    session.add(
+        OtpChallenge(
+            phone=phone,
+            code_hash=hash_otp(phone, code, ctx.settings.jwt_secret),
+            expires_at=now + timedelta(seconds=ctx.settings.otp_ttl_seconds),
+            created_at=now,
+        )
+    )
     user = await session.scalar(select(User).where(User.phone == phone))
     is_demo_number = user is not None and user.is_demo
     gateway = ctx.extras["sim_sms"] if (is_demo_number or ctx.settings.sms_provider == "simulator") else ctx.sms
     result = await gateway.send(phone, f"AapdaSaathi verification code: {code}. Valid 5 minutes. Do not share it.")
     if result.simulated:
         # Simulator only: keep the code retrievable from the demo SMS inbox (never in production).
-        ctx.extras.setdefault("sim_inbox", []).append({"to": phone, "body": f"AapdaSaathi code: {code}",
-                                                       "at": now.isoformat()})
+        ctx.extras.setdefault("sim_inbox", []).append(
+            {"to": phone, "body": f"AapdaSaathi code: {code}", "at": now.isoformat()}
+        )
         ctx.extras["sim_inbox"] = ctx.extras["sim_inbox"][-200:]
     await session.commit()
     return S.OtpRequestOut(
-        sent=result.ok, expires_in=ctx.settings.otp_ttl_seconds, channel=gateway.name,
+        sent=result.ok,
+        expires_in=ctx.settings.otp_ttl_seconds,
+        channel=gateway.name,
         note="Code delivered to the SMS simulator inbox (demo)." if result.simulated else "Code sent by SMS.",
     )
 
 
 @router.post("/otp/verify", response_model=S.TokenOut, summary="Verify code; creates a resident account if new")
-async def otp_verify(body: S.OtpVerifyIn, session: AsyncSession = Depends(get_session),
-                     ctx: AppContext = Depends(get_ctx)):
+async def otp_verify(
+    body: S.OtpVerifyIn, session: AsyncSession = Depends(get_session), ctx: AppContext = Depends(get_ctx)
+):
     try:
         phone = normalize_phone(body.phone)
     except ValueError as exc:
         raise DomainError("invalid_phone", "Enter a valid mobile number", 422) from exc
     now = ctx.now()
-    ch = await session.scalar(select(OtpChallenge).where(
-        OtpChallenge.phone == phone, OtpChallenge.consumed_at.is_(None), OtpChallenge.expires_at > now,
-    ).order_by(OtpChallenge.created_at.desc()).limit(1))
+    ch = await session.scalar(
+        select(OtpChallenge)
+        .where(
+            OtpChallenge.phone == phone,
+            OtpChallenge.consumed_at.is_(None),
+            OtpChallenge.expires_at > now,
+        )
+        .order_by(OtpChallenge.created_at.desc())
+        .limit(1)
+    )
     if ch is None:
         raise DomainError("otp_invalid", "Code expired or not requested", 401)
     ch.attempts += 1
@@ -100,13 +127,13 @@ async def otp_verify(body: S.OtpVerifyIn, session: AsyncSession = Depends(get_se
     if ch.code_hash != hash_otp(phone, body.code, ctx.settings.jwt_secret):
         await session.commit()
         raise DomainError("otp_invalid", "Incorrect code", 401)
-    ch.consumed_at = now
     user = await session.scalar(select(User).where(User.phone == phone))
+    if user is None and not body.full_name:
+        await session.commit()  # code stays valid so the user can add their name and resubmit
+        raise DomainError("name_required", "Enter your name to create an account", 422)
+    ch.consumed_at = now
     new = False
     if user is None:
-        if not body.full_name:
-            await session.commit()
-            raise DomainError("name_required", "Enter your name to create an account", 422)
         user = User(full_name=body.full_name.strip(), phone=phone, role="resident", language="hi", created_at=now)
         session.add(user)
         await session.flush()
@@ -124,15 +151,25 @@ async def demo_personas(session: AsyncSession = Depends(get_session), ctx: AppCo
     if not ctx.settings.demo_mode_enabled:
         return []
     desc = persona_descriptions()
-    users = (await session.execute(select(User).where(User.is_demo.is_(True), User.is_active.is_(True))
-                                   .order_by(User.role, User.full_name))).scalars().all()
-    return [S.DemoPersona(user_id=u.id, full_name=u.full_name, role=u.role, description=desc.get(u.phone, ""))
-            for u in users]
+    users = (
+        (
+            await session.execute(
+                select(User).where(User.is_demo.is_(True), User.is_active.is_(True)).order_by(User.role, User.full_name)
+            )
+        )
+        .scalars()
+        .all()
+    )
+    return [
+        S.DemoPersona(user_id=u.id, full_name=u.full_name, role=u.role, description=desc.get(u.phone, ""))
+        for u in users
+    ]
 
 
 @router.post("/demo-login", response_model=S.TokenOut, summary="Sign in as a fictional demo persona (demo mode only)")
-async def demo_login(body: S.DemoLoginIn, session: AsyncSession = Depends(get_session),
-                     ctx: AppContext = Depends(get_ctx)):
+async def demo_login(
+    body: S.DemoLoginIn, session: AsyncSession = Depends(get_session), ctx: AppContext = Depends(get_ctx)
+):
     if not ctx.settings.demo_mode_enabled:
         raise Forbidden("Demo mode is disabled")
     user = await session.get(User, body.user_id)
@@ -144,15 +181,17 @@ async def demo_login(body: S.DemoLoginIn, session: AsyncSession = Depends(get_se
 
 
 @me_router.get("/me", response_model=S.MeOut)
-async def me(user: User = Depends(current_user), session: AsyncSession = Depends(get_session),
-             ctx: AppContext = Depends(get_ctx)):
+async def me(
+    user: User = Depends(current_user), session: AsyncSession = Depends(get_session), ctx: AppContext = Depends(get_ctx)
+):
     r = await session.scalar(select(Resident).where(Resident.user_id == user.id))
     v = await session.scalar(select(Volunteer).where(Volunteer.user_id == user.id))
     return S.MeOut(
         user=views.user_out(user),
         resident=await views.resident_out(session, r) if r else None,
         volunteer=await views.volunteer_out(session, v) if v else None,
-        demo_mode=ctx.settings.demo_mode_enabled, notify_real_residents=ctx.settings.notify_real_residents,
+        demo_mode=ctx.settings.demo_mode_enabled,
+        notify_real_residents=ctx.settings.notify_real_residents,
     )
 
 
@@ -170,10 +209,17 @@ async def patch_me(body: S.MePatch, user: User = Depends(current_user), session:
 
 
 @me_router.post("/me/devices", status_code=204, summary="Register an FCM token for push alerts")
-async def register_device(body: S.DeviceIn, user: User = Depends(current_user),
-                          session: AsyncSession = Depends(get_session), ctx: AppContext = Depends(get_ctx)):
-    existing = await session.scalar(select(DeviceRegistration).where(
-        DeviceRegistration.user_id == user.id, DeviceRegistration.fcm_token == body.fcm_token))
+async def register_device(
+    body: S.DeviceIn,
+    user: User = Depends(current_user),
+    session: AsyncSession = Depends(get_session),
+    ctx: AppContext = Depends(get_ctx),
+):
+    existing = await session.scalar(
+        select(DeviceRegistration).where(
+            DeviceRegistration.user_id == user.id, DeviceRegistration.fcm_token == body.fcm_token
+        )
+    )
     if existing:
         existing.last_seen_at = ctx.now()
     else:

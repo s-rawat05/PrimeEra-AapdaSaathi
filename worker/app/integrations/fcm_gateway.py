@@ -41,9 +41,7 @@ class FcmGateway:
             import firebase_admin
             from firebase_admin import credentials
 
-            self._app = firebase_admin.initialize_app(
-                credentials.Certificate(self._cred_path), name="aapdasaathi"
-            )
+            self._app = firebase_admin.initialize_app(credentials.Certificate(self._cred_path), name="aapdasaathi")
         except Exception as exc:  # noqa: BLE001 - surface any init failure as a delivery error
             self._init_error = f"firebase init failed: {type(exc).__name__}"
             log.error(self._init_error)

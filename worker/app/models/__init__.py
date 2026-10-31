@@ -95,9 +95,7 @@ class OtpChallenge(Base):
 
 class Ward(Base):
     __tablename__ = "wards"
-    __table_args__ = (
-        CheckConstraint("access_status IN ('open', 'restricted', 'blocked')", name="ck_wards_access"),
-    )
+    __table_args__ = (CheckConstraint("access_status IN ('open', 'restricted', 'blocked')", name="ck_wards_access"),)
 
     id: Mapped[str] = _id()
     code: Mapped[str] = mapped_column(String(40), unique=True, nullable=False)
@@ -154,9 +152,7 @@ class Resident(Base):
     updated_at: Mapped[datetime] = mapped_column(UTCDateTime(), default=utcnow, onupdate=utcnow)
 
     __table_args__ = (
-        CheckConstraint(
-            "registration_status IN ('active', 'expired', 'withdrawn')", name="ck_residents_reg_status"
-        ),
+        CheckConstraint("registration_status IN ('active', 'expired', 'withdrawn')", name="ck_residents_reg_status"),
     )
 
 
@@ -193,9 +189,7 @@ class ConsentRecord(Base):
     withdrawn_at: Mapped[datetime | None] = mapped_column(UTCDateTime())
 
     __table_args__ = (
-        CheckConstraint(
-            "consent_type IN ('registry', 'location', 'caregiver_share', 'sms')", name="ck_consent_type"
-        ),
+        CheckConstraint("consent_type IN ('registry', 'location', 'caregiver_share', 'sms')", name="ck_consent_type"),
         CheckConstraint("granted_by IN ('self', 'guardian', 'assisted')", name="ck_consent_by"),
     )
 
@@ -437,9 +431,7 @@ class Task(Base):
     __table_args__ = (
         CheckConstraint(_in("kind", TASK_KINDS), name="ck_tasks_kind"),
         CheckConstraint(_in("status", TASK_STATUSES), name="ck_tasks_status"),
-        CheckConstraint(
-            "status <> 'CANT_GO' OR cant_go_reason IS NOT NULL", name="ck_tasks_cant_go_reason"
-        ),
+        CheckConstraint("status <> 'CANT_GO' OR cant_go_reason IS NOT NULL", name="ck_tasks_cant_go_reason"),
         # At most one open task of each kind per delivery — prevents duplicate assignment.
         Index(
             "uq_tasks_open_per_delivery_kind",
