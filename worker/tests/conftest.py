@@ -60,7 +60,8 @@ async def _reset_postgres() -> None:
         await conn.execute(
             text(
                 "DO $$ DECLARE r record; BEGIN FOR r IN SELECT tablename FROM pg_tables WHERE schemaname='public' "
-                "AND tablename NOT IN ('spatial_ref_sys') LOOP EXECUTE 'TRUNCATE TABLE ' || quote_ident(r.tablename) "
+                "AND tablename NOT IN ('spatial_ref_sys', 'schema_migrations') LOOP "
+                "EXECUTE 'TRUNCATE TABLE ' || quote_ident(r.tablename) "
                 "|| ' CASCADE'; END LOOP; END $$;"
             )
         )

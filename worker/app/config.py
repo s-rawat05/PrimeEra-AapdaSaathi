@@ -60,7 +60,7 @@ class Settings(BaseSettings):
     def demo_sms_allowed(self) -> set[str]:
         return {p.strip() for p in self.demo_sms_allowlist.split(",") if p.strip()}
 
-    cors_origins: str = "http://localhost:8080,http://localhost:5000,http://127.0.0.1:8080"
+    cors_origins: str = "http://localhost:8080,http://localhost:8081,http://127.0.0.1:8080,http://127.0.0.1:8081"
 
     otp_ttl_seconds: int = 300
     consent_validity_days: int = 90

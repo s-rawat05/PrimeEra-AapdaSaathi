@@ -1,0 +1,37 @@
+# Local production-like stack: PostGIS + migrations + API/worker.
+#   docker compose up --build        → API on http://localhost:8000/docs
+# Secrets come from .env (copy .env.example). Nothing here is suitable for production as-is.
+services:
+  db:
+    image: postgis/postgis:17-3.5
+    environment:
+      POSTGRES_DB: aapdasaathi
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-change-me-local-only}
+    ports: ["5432:5432"]
+    volumes: [pgdata:/var/lib/postgresql/data]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d aapdasaathi"]
+      interval: 5s
+      retries: 20
+
+  migrate:
+    build: { context: ., dockerfile: worker/Dockerfile }
+    depends_on: { db: { condition: service_healthy } }
+    command: >
+      python /srv/scripts/apply_migrations.py
+      postgresql://postgres:${POSTGRES_PASSWORD:-change-me-local-only}@db:5432/aapdasaathi --local-shim --seed
+    restart: "no"
+
+  api:
+    build: { context: ., dockerfile: worker/Dockerfile }
+    depends_on:
+      db: { condition: service_healthy }
+      migrate: { condition: service_completed_successfully }
+    env_file: [.env]
+    environment:
+      DATABASE_URL: postgresql+asyncpg://postgres:${POSTGRES_PASSWORD:-change-me-local-only}@db:5432/aapdasaathi
+    ports: ["8000:8000"]
+
+volumes:
+  pgdata:

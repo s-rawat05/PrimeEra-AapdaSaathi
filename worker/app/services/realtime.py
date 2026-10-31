@@ -20,7 +20,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 OPS_ROLES = {"admin", "operator"}
 
 
-@dataclass
+@dataclass(eq=False)  # identity equality/hash: each connection is a distinct set member
 class Subscriber:
     user_id: str
     role: str
@@ -31,9 +31,6 @@ class EventBus:
     def __init__(self) -> None:
         self._subs: set[Subscriber] = set()
         self._tickets: dict[str, tuple[str, str, float]] = {}
-
-    def __hash__(self):  # pragma: no cover
-        return id(self)
 
     def subscribe(self, user_id: str, role: str) -> Subscriber:
         sub = Subscriber(user_id, role, asyncio.Queue(maxsize=500))

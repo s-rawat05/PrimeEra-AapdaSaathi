@@ -1,0 +1,38 @@
+# Render blueprint (https://render.com/docs/blueprint-spec). Database = Supabase (set DATABASE_URL secret).
+# Prepared, NOT deployed. Secrets are set in the Render dashboard, never here.
+services:
+  - type: web
+    name: aapdasaathi-api
+    runtime: docker
+    dockerfilePath: worker/Dockerfile
+    dockerContext: .
+    healthCheckPath: /api/v1/health
+    plan: starter
+    numInstances: 1   # in-process realtime bus + background jobs → keep one instance (see docs/deployment.md)
+    envVars:
+      - key: APP_ENV
+        value: production
+      - key: NOTIFY_REAL_RESIDENTS
+        value: "false"
+      - key: DEMO_MODE_ENABLED
+        value: "false"
+      - key: AUTH_MODE
+        value: supabase
+      - key: DATABASE_URL
+        sync: false
+      - key: SUPABASE_JWT_SECRET
+        sync: false
+      - key: JWT_SECRET
+        generateValue: true
+      - key: SMS_PROVIDER
+        value: httpsms
+      - key: HTTPSMS_API_KEY
+        sync: false
+      - key: HTTPSMS_FROM_NUMBER
+        sync: false
+      - key: SMS_WEBHOOK_SECRET
+        sync: false
+      - key: FEED_POLL_ENABLED
+        value: "true"
+      - key: CORS_ORIGINS
+        sync: false
