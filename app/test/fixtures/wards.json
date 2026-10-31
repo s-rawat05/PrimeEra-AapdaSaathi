@@ -1,0 +1,30 @@
+[
+ {
+  "id": "7b61fd51-7b7d-4837-ab6b-d756a41c5d59",
+  "code": "DW-02",
+  "name": "Pahadi Tola (DEMO ward DW-02)",
+  "district": "Demo District",
+  "state": "Uttarakhand (demo)",
+  "lgd_district_code": null,
+  "centroid_lat": 29.351,
+  "centroid_lng": 79.572,
+  "access_status": "open",
+  "access_note": null,
+  "is_demo": true,
+  "boundary_geojson": null
+ },
+ {
+  "id": "f0c925c4-036b-4428-9564-980cbd2ee037",
+  "code": "DW-01",
+  "name": "Sarovar Nagar (DEMO ward DW-01)",
+  "district": "Demo District",
+  "state": "Uttarakhand (demo)",
+  "lgd_district_code": null,
+  "centroid_lat": 29.351,
+  "centroid_lng": 79.559,
+  "access_status": "open",
+  "access_note": null,
+  "is_demo": true,
+  "boundary_geojson": null
+ }
+]

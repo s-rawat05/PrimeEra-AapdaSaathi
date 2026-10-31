@@ -131,7 +131,44 @@ uniform errors, `Idempotency-Key` on responses. ✅
 
 ## Frontend (§5, §17)
 
-_To be completed with file paths after the Flutter apps are integrated._
+### Resident mobile app (`app/lib/`)
+
+| Requirement / Screen | Implementation | Test / evidence | Status |
+|---|---|---|---|
+| Splash & Intro onboarding | `features/splash/intro_screen.dart`, `features/onboarding/resident_onboarding_screen.dart` | `app_flow_test.dart` ("first launch shows intro") | ✅ |
+| Role-based authentication & demo persona selection | `features/auth/login_screen.dart`, `routing/root_gate.dart`, `routing/role_shell.dart` | `app_flow_test.dart` ("auth states logged out shows login; demo personas listed") | ✅ |
+| Language switching (Hindi / English) | `features/onboarding/language_screen.dart`, `l10n/strings.dart` | `app_flow_test.dart` ("language switching changes strings instantly") | ✅ |
+| Need categories & Accessibility profiles | `accessibility/modes.dart`, `accessibility/alert_effects.dart`, `widgets/flash_overlay.dart` | `app_flow_test.dart` ("flash_screen shows overlay", "vibrate starts") | ✅ |
+| Resident home dashboard (Reference Design Screen 1) | `features/resident/resident_home_screen.dart` (`_Header`, `_WeatherDisasterCard`, `AlertStatusCard`, `_CommunityStats`, `_CommunityActions`) | `app_flow_test.dart` ("no active alerts", "active alert card") | ✅ |
+| Weather & flood disaster info card with illustration | `features/resident/resident_home_screen.dart` (`_WeatherDisasterCard`, `_FloodIllustrationPainter`) | UI reference parity; widget tests pass | ✅ |
+| Disaster threat meter (Speedometer Arc Gauge) | `features/resident/resident_home_screen.dart` (`_SpeedometerGaugePainter`) | UI reference parity (Green→Yellow→Orange→Red arc with needle) | ✅ |
+| Active disaster alert & official text viewer | `features/alerts/alert_detail_screen.dart`, `features/alerts/easy_read_screen.dart` | `app_flow_test.dart` ("official-section", "officialText") | ✅ |
+| Full-screen emergency response (SAFE / HELP / SOS) | `features/alerts/emergency_response_screen.dart` | `app_flow_test.dart` ("SAFE/HELP/SOS have semantics labels") | ✅ |
+| Evacuation route & shelter map (Reference Design Screen 2 & 3) | `features/evacuation/evacuation_screen.dart` (`_Map`, `_Sheet`, `_InstructionList`) | `app_flow_test.dart` ("evacuation shows relief post, direction-only line") | ✅ |
+| SAFE confirmation workflow | `features/alerts/safe_confirmation_screen.dart` | `app_flow_test.dart` ("SAFE needs confirmation, calls API") | ✅ |
+| HELP request workflow & status tracking | `features/alerts/help_status_screen.dart` | `app_flow_test.dart` ("HELP confirmation calls API, shows status") | ✅ |
+| Offline / SMS fallback mechanism | `features/alerts/sms_reply.dart`, `services/offline_queue.dart`, `widgets/connection_banner.dart` | `app_flow_test.dart` ("reply queued when offline; Reply by SMS opens sms:") | ✅ |
+| Persistent round red SOS button (`SosFab` / `SosPillButton`) | `widgets/sos_button.dart` | `app_flow_test.dart` ("sos-pill", "sos-fab", 112 fallback) | ✅ |
+| Alert history & stats | `features/alerts/alert_history_screen.dart` | `app_flow_test.dart` | ✅ |
+| Caregiver dashboard & behalf actions | `features/caregiver/caregiver_screen.dart` | `app_flow_test.dart` ("caregiver responds on behalf") | ✅ |
+| Neighbour check requests & response | `features/neighbour/neighbour_checks_screen.dart` | `app_flow_test.dart` ("neighbour answers a check") | ✅ |
+| Volunteer task dashboard, accept, cant-go & outcome | `features/volunteer/volunteer_tasks_screen.dart`, `features/volunteer/task_detail_screen.dart`, `features/volunteer/task_actions.dart` | `app_flow_test.dart` ("volunteer accept, cant go, toggle availability, reached") | ✅ |
+| Profile & preferences management | `features/profile/profile_screen.dart` | `app_flow_test.dart` | ✅ |
+
+### Command centre & Admin portal (`dashboard/lib/`)
+
+| Requirement / Section | Implementation | Test / evidence | Status |
+|---|---|---|---|
+| Ops Authentication & Demo persona switcher | `features/authentication/login_page.dart` | `widget_test.dart` ("demo persona login opens command centre") | ✅ |
+| Live incident summary & SACHET feed health | `features/overview/incident_summary.dart`, `features/incidents/feed_panel.dart` | `widget_test.dart`, `test_feed_ingestion.py` | ✅ |
+| Interactive ward map with PostGIS boundaries & markers | `features/live_map/incident_map.dart`, `features/live_map/geo.dart` | `models_live_test.dart`, manual browser verification | ✅ |
+| Status counters (Safe, Help, No Reply, Unreachable) | `features/overview/command_centre_page.dart` | `widget_test.dart` ("command centre renders counters") | ✅ |
+| Ranked priority list with transparent score breakdown | `features/overview/priority_list.dart` | `widget_test.dart` ("priority list and score breakdown") | ✅ |
+| Dispatch approval for severe incidents | `features/dispatch/tasks_panel.dart`, `features/dispatch/case_panel.dart` | `widget_test.dart` ("approve and reject buttons call API") | ✅ |
+| Manual status override with mandatory reason & audit | `features/dispatch/case_panel.dart` | `case_panel_test.dart` ("override button opens reason dialog") | ✅ |
+| Realtime updates (WebSocket) | `core/realtime.dart` (`/api/v1/realtime`) | `test_realtime.py` | ✅ |
+| Closing report with alert-to-safe statistics | `features/reports/report_page.dart` | `widget_test.dart` ("closing report renders") | ✅ |
+| Demo drill panel & SMS simulator | `features/demo_controls/demo_panel.dart`, `features/demo_controls/sms_simulator.dart` | `models_live_test.dart`, `scripts/demo_smoke.py` | ✅ |
 
 ## Verification status (summary)
 

@@ -1,0 +1,33 @@
+{
+ "user": {
+  "id": "63b0ca07-bea0-4910-bf8e-40827588e25a",
+  "full_name": "Aman Verma (NSS)",
+  "role": "volunteer",
+  "phone_masked": "+91••••••0301",
+  "email": null,
+  "language": "en",
+  "is_demo": true
+ },
+ "resident": null,
+ "volunteer": {
+  "id": "8a509536-5ac6-467b-9929-1963063bf584",
+  "user_id": "63b0ca07-bea0-4910-bf8e-40827588e25a",
+  "full_name": "Aman Verma (NSS)",
+  "phone_masked": "+91••••••0301",
+  "ward_id": "f0c925c4-036b-4428-9564-980cbd2ee037",
+  "ward_name": "Sarovar Nagar (DEMO ward DW-01)",
+  "is_available": true,
+  "base_lat": 29.348,
+  "base_lng": 79.5575,
+  "max_radius_m": 3000.0,
+  "skills": [
+   "first_aid",
+   "evacuation_support"
+  ],
+  "verified": true,
+  "is_demo": true,
+  "active_task_id": "a72f60db-f726-4b0b-a971-e9ea282a2bff"
+ },
+ "demo_mode": true,
+ "notify_real_residents": false
+}

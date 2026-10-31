@@ -1,0 +1,15 @@
+{
+ "user": {
+  "id": "4caef4b5-e238-42da-af01-8d8dfce27475",
+  "full_name": "Vikram Rawat",
+  "role": "neighbour",
+  "phone_masked": "+91••••••0202",
+  "email": null,
+  "language": "hi",
+  "is_demo": true
+ },
+ "resident": null,
+ "volunteer": null,
+ "demo_mode": true,
+ "notify_real_residents": false
+}

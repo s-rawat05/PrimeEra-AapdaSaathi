@@ -1,0 +1,65 @@
+[
+ {
+  "delivery_id": "907a3ab0-2727-4057-a644-3c4516f1af41",
+  "incident_id": "65f7cf48-e305-4ffa-8d7e-afc8c6de086b",
+  "incident_status": "active",
+  "is_demo": true,
+  "status": "NO_REPLY",
+  "alerted_at": "2026-10-31T16:59:03.521077Z",
+  "replied_at": null,
+  "reply_channel": null,
+  "accessibility_modes": [
+   "vibrate",
+   "flash_screen",
+   "torch_blink",
+   "large_text",
+   "pictograms"
+  ],
+  "presentation": {
+   "label": "AapdaSaathi presentation of an official alert",
+   "title": "AapdaSaathi: Flood alert",
+   "body": "Official alert from demo-control-room@aapdasaathi.invalid: DEMO EXERCISE: Flash flood likely along the stream in Demo Ward DW-01 within 20 minutes.\nInstruction: DEMO EXERCISE: Move away from the stream bed to Demo Relief Post A. Help elderly and disabled neighbours. Do not cross flowing water.",
+   "style": "standard",
+   "pictogram": "flood",
+   "easy_read_steps": []
+  },
+  "official": {
+   "sender": "demo-control-room@aapdasaathi.invalid",
+   "event": "Flood",
+   "headline": "DEMO EXERCISE: Flash flood likely along the stream in Demo Ward DW-01 within 20 minutes.",
+   "description": "DEMO EXERCISE ONLY. Heavy rainfall upstream may cause a sudden rise in water level along the stream bed in the fictional demo ward.",
+   "instruction": "DEMO EXERCISE: Move away from the stream bed to Demo Relief Post A. Help elderly and disabled neighbours. Do not cross flowing water.",
+   "severity": "Severe",
+   "urgency": "Immediate",
+   "certainty": "Likely",
+   "onset": "2026-10-31T17:19:03.272773Z",
+   "expires": "2026-10-31T22:59:03.272773Z",
+   "area_desc": "Demo Ward DW-01 Sarovar Nagar (fictional)",
+   "official_url": null,
+   "source": "simulated",
+   "source_label": "SIMULATED alert (drill)",
+   "onset_note": "DRILL TIMING: onset set to now + 20 min for this simulated. Official onset was 2026-07-14T16:20:00+05:30."
+  },
+  "shelters": [
+   {
+    "id": "949bc9cd-22e0-4a5e-a604-567052e4a8c1",
+    "ward_id": "f0c925c4-036b-4428-9564-980cbd2ee037",
+    "name": "Demo Relief Post A — Community Hall (fictional)",
+    "address": "Upper lane, Sarovar Nagar (fictional)",
+    "lat": 29.3545,
+    "lng": 79.556,
+    "source": "Fictional designation for the demo",
+    "is_demo": true,
+    "distance_m": 294.0,
+    "est_walk_minutes": 5.5
+   }
+  ],
+  "assistance": {
+   "summary": "Please tell us if you are safe.",
+   "neighbour_asked": false,
+   "volunteer_status": null,
+   "volunteer_eta_minutes": null
+  },
+  "sms_reply_hint": "SMS 1 = SAFE, 2 = HELP"
+ }
+]

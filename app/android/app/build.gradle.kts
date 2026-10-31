@@ -6,12 +6,16 @@ plugins {
 
 android {
     namespace = "in.primeera.aapda_saathi"
-    compileSdk = flutter.compileSdkVersion
+    // permission_handler_android 14.1.1 requires apps to compile against API 37, which the SDK ships as
+    // platform "android-37.0" (see the root build.gradle.kts). targetSdk stays at Flutter's default.
+    compileSdkVersion("android-37.0")
     ndkVersion = flutter.ndkVersion
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
+        // flutter_local_notifications needs java.time APIs on older Android versions.
+        isCoreLibraryDesugaringEnabled = true
     }
 
     defaultConfig {
@@ -27,6 +31,7 @@ android {
         // flag during build.
         versionCode = flutter.versionCode
         versionName = flutter.versionName
+        multiDexEnabled = true
     }
 
     buildTypes {
@@ -46,4 +51,8 @@ kotlin {
 
 flutter {
     source = "../.."
+}
+
+dependencies {
+    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.5")
 }

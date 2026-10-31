@@ -1,0 +1,65 @@
+{
+ "user": {
+  "id": "be262f12-865c-45a8-9d1b-3531138ddfae",
+  "full_name": "Ramesh Joshi",
+  "role": "resident",
+  "phone_masked": "+91••••••0002",
+  "email": null,
+  "language": "en",
+  "is_demo": true
+ },
+ "resident": {
+  "id": "7571e38b-e9e7-4280-977d-ee785a50f140",
+  "user_id": "be262f12-865c-45a8-9d1b-3531138ddfae",
+  "full_name": "Ramesh Joshi",
+  "phone_masked": "+91••••••0002",
+  "ward_id": "f0c925c4-036b-4428-9564-980cbd2ee037",
+  "ward_name": "Sarovar Nagar (DEMO ward DW-01)",
+  "language": "en",
+  "needs": [
+   "hearing"
+  ],
+  "lives_alone": false,
+  "has_smartphone": true,
+  "registration_status": "active",
+  "registered_via": "self",
+  "reverify_due_at": "2027-01-29T16:58:24.503518Z",
+  "is_demo": true,
+  "consents": [
+   {
+    "id": "bbb44a4e-dbe7-4fdf-a1dc-c20e7e7f1ff2",
+    "consent_type": "registry",
+    "granted": true,
+    "granted_by": "self",
+    "guardian_name": null,
+    "granted_at": "2026-10-31T16:58:24.503518Z",
+    "expires_at": "2027-01-29T16:58:24.503518Z",
+    "withdrawn_at": null
+   },
+   {
+    "id": "3eaa7155-8e74-4134-98c3-3b661a28f093",
+    "consent_type": "location",
+    "granted": true,
+    "granted_by": "self",
+    "guardian_name": null,
+    "granted_at": "2026-10-31T16:58:24.503518Z",
+    "expires_at": "2027-01-29T16:58:24.503518Z",
+    "withdrawn_at": null
+   },
+   {
+    "id": "71004a47-03b6-4893-b7e1-6cdd37c4f5ec",
+    "consent_type": "caregiver_share",
+    "granted": true,
+    "granted_by": "self",
+    "guardian_name": null,
+    "granted_at": "2026-10-31T16:58:24.503518Z",
+    "expires_at": "2027-01-29T16:58:24.503518Z",
+    "withdrawn_at": null
+   }
+  ],
+  "has_exact_location": true
+ },
+ "volunteer": null,
+ "demo_mode": true,
+ "notify_real_residents": false
+}

@@ -1,0 +1,177 @@
+[
+ {
+  "resident": {
+   "id": "efd8a72c-0946-40a2-95d9-da00aa69f354",
+   "user_id": "92f388aa-923d-4d25-950e-ee3d33cff29c",
+   "full_name": "Kamla Devi Bisht",
+   "phone_masked": "+91••••••0001",
+   "ward_id": "f0c925c4-036b-4428-9564-980cbd2ee037",
+   "ward_name": "Sarovar Nagar (DEMO ward DW-01)",
+   "language": "hi",
+   "needs": [
+    "elderly_alone",
+    "mobility"
+   ],
+   "lives_alone": true,
+   "has_smartphone": true,
+   "registration_status": "active",
+   "registered_via": "self",
+   "reverify_due_at": "2027-01-29T16:58:24.503518Z",
+   "is_demo": true,
+   "consents": [],
+   "has_exact_location": true
+  },
+  "active_alerts": [
+   {
+    "delivery_id": "1ecc6a25-9d2e-47f0-b96f-f366d9a9cf0a",
+    "resident_id": "efd8a72c-0946-40a2-95d9-da00aa69f354",
+    "resident_name": "Kamla Devi Bisht",
+    "phone_masked": "+91••••••0001",
+    "ward_name": "Sarovar Nagar (DEMO ward DW-01)",
+    "needs": [
+     "elderly_alone",
+     "mobility"
+    ],
+    "lives_alone": true,
+    "status": "NO_REPLY",
+    "priority_total": 75,
+    "priority_components": [
+     {
+      "factor": "Mobility limitation / bedridden",
+      "points": 40
+     },
+     {
+      "factor": "Lives alone",
+      "points": 20
+     },
+     {
+      "factor": "No reply",
+      "points": 15
+     },
+     {
+      "factor": "0 min since alert (1/min, max 60)",
+      "points": 0
+     }
+    ],
+    "alerted_at": "2026-10-31T16:59:03.304163Z",
+    "seen_at": null,
+    "replied_at": null,
+    "reply_channel": null,
+    "resolved_by": null,
+    "escalation_level": 2,
+    "escalation_step": "volunteer",
+    "next_action_at": "2026-10-31T16:59:34.923810Z",
+    "needs_operator": false,
+    "needs_rescue": false,
+    "rescue_reason": null,
+    "channels": [
+     "in_app",
+     "sms"
+    ],
+    "lat": 29.348,
+    "lng": 79.555,
+    "open_tasks": [
+     {
+      "id": "8bbebd60-6f64-49ca-afac-a2824513b42a",
+      "kind": "neighbour_check",
+      "status": "ASSIGNED",
+      "assignee_name": "Vikram Rawat",
+      "est_walk_minutes": null
+     },
+     {
+      "id": "a72f60db-f726-4b0b-a971-e9ea282a2bff",
+      "kind": "volunteer_assist",
+      "status": "PENDING_APPROVAL",
+      "assignee_name": "Aman Verma (NSS)",
+      "est_walk_minutes": 4.2
+     }
+    ]
+   }
+  ],
+  "exact_location": {
+   "lat": 29.3481,
+   "lng": 79.5552,
+   "address_text": "House 11, Sarovar Nagar (DEMO ward DW-01)",
+   "landmark": "Fictional landmark",
+   "source": "registration"
+  }
+ },
+ {
+  "resident": {
+   "id": "a336a08f-e876-4821-9cb8-e2b616f76dc9",
+   "user_id": "c9e18572-fa03-4b2c-8eb4-7978d51416ba",
+   "full_name": "Saroj Pandey",
+   "phone_masked": "+91••••••0016",
+   "ward_id": "f0c925c4-036b-4428-9564-980cbd2ee037",
+   "ward_name": "Sarovar Nagar (DEMO ward DW-01)",
+   "language": "hi",
+   "needs": [
+    "bedridden",
+    "cognitive"
+   ],
+   "lives_alone": false,
+   "has_smartphone": true,
+   "registration_status": "active",
+   "registered_via": "self",
+   "reverify_due_at": "2027-01-29T16:58:24.503518Z",
+   "is_demo": true,
+   "consents": [],
+   "has_exact_location": true
+  },
+  "active_alerts": [
+   {
+    "delivery_id": "5685190b-1a9c-4b3d-b675-cb362071f659",
+    "resident_id": "a336a08f-e876-4821-9cb8-e2b616f76dc9",
+    "resident_name": "Saroj Pandey",
+    "phone_masked": "+91••••••0016",
+    "ward_name": "Sarovar Nagar (DEMO ward DW-01)",
+    "needs": [
+     "bedridden",
+     "cognitive"
+    ],
+    "lives_alone": false,
+    "status": "NO_REPLY",
+    "priority_total": 55,
+    "priority_components": [
+     {
+      "factor": "Mobility limitation / bedridden",
+      "points": 40
+     },
+     {
+      "factor": "No reply",
+      "points": 15
+     },
+     {
+      "factor": "0 min since alert (1/min, max 60)",
+      "points": 0
+     }
+    ],
+    "alerted_at": "2026-10-31T16:59:03.440635Z",
+    "seen_at": null,
+    "replied_at": null,
+    "reply_channel": null,
+    "resolved_by": null,
+    "escalation_level": 1,
+    "escalation_step": "parallel",
+    "next_action_at": "2026-10-31T16:59:33.440635Z",
+    "needs_operator": false,
+    "needs_rescue": false,
+    "rescue_reason": null,
+    "channels": [
+     "in_app",
+     "sms"
+    ],
+    "lat": 29.353,
+    "lng": 79.555,
+    "open_tasks": []
+   }
+  ],
+  "exact_location": {
+   "lat": 29.353,
+   "lng": 79.5545,
+   "address_text": "House 116, Sarovar Nagar (DEMO ward DW-01)",
+   "landmark": "Fictional landmark",
+   "source": "registration"
+  }
+ }
+]

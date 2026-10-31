@@ -1,0 +1,15 @@
+{
+ "user": {
+  "id": "d5854fbd-9a4f-48ea-a7a2-7fa4e7f59350",
+  "full_name": "Neha Bisht",
+  "role": "caregiver",
+  "phone_masked": "+91••••••0201",
+  "email": null,
+  "language": "hi",
+  "is_demo": true
+ },
+ "resident": null,
+ "volunteer": null,
+ "demo_mode": true,
+ "notify_real_residents": false
+}
