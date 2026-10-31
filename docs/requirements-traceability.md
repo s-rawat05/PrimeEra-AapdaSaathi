@@ -139,8 +139,8 @@ uniform errors, `Idempotency-Key` on responses. ✅
 | Role-based authentication & demo persona selection | `features/auth/login_screen.dart`, `routing/root_gate.dart`, `routing/role_shell.dart` | `app_flow_test.dart` ("auth states logged out shows login; demo personas listed") | ✅ |
 | Language switching (Hindi / English) | `features/onboarding/language_screen.dart`, `l10n/strings.dart` | `app_flow_test.dart` ("language switching changes strings instantly") | ✅ |
 | Need categories & Accessibility profiles | `accessibility/modes.dart`, `accessibility/alert_effects.dart`, `widgets/flash_overlay.dart` | `app_flow_test.dart` ("flash_screen shows overlay", "vibrate starts") | ✅ |
-| Resident home dashboard (Reference Design Screen 1) | `features/resident/resident_home_screen.dart` (`_Header`, `_WeatherDisasterCard`, `AlertStatusCard`, `_CommunityStats`, `_CommunityActions`) | `app_flow_test.dart` ("no active alerts", "active alert card") | ✅ |
-| Weather & flood disaster info card with illustration | `features/resident/resident_home_screen.dart` (`_WeatherDisasterCard`, `_FloodIllustrationPainter`) | UI reference parity; widget tests pass | ✅ |
+| Resident home dashboard (Reference Design Screen 1) | `features/resident/resident_home_screen.dart` (`_Header`, `_WeatherDisasterCard`, `AlertStatusCard`, `_ReliefPosts`, `_CommunityActions`) | `app_flow_test.dart` ("no active alerts", "active alert card") | ✅ |
+| Hazard card (layout of the reference weather card) | `features/resident/resident_home_screen.dart` (`_WeatherDisasterCard`) | Shows the official event, sender and severity only; no weather feed is connected, so no temperature or conditions are displayed | ✅ |
 | Disaster threat meter (Speedometer Arc Gauge) | `features/resident/resident_home_screen.dart` (`_SpeedometerGaugePainter`) | UI reference parity (Green→Yellow→Orange→Red arc with needle) | ✅ |
 | Active disaster alert & official text viewer | `features/alerts/alert_detail_screen.dart`, `features/alerts/easy_read_screen.dart` | `app_flow_test.dart` ("official-section", "officialText") | ✅ |
 | Full-screen emergency response (SAFE / HELP / SOS) | `features/alerts/emergency_response_screen.dart` | `app_flow_test.dart` ("SAFE/HELP/SOS have semantics labels") | ✅ |
@@ -172,7 +172,8 @@ uniform errors, `Idempotency-Key` on responses. ✅
 
 ## Verification status (summary)
 
-* **Implemented and tested:** everything marked ✅ above (backend test suite).
+* **Implemented and tested:** everything marked ✅ above (backend: 100 tests on PostGIS, 96 on SQLite; app: 36
+  Flutter tests; dashboard: 21 Flutter tests).
 * **Verified against the real external service:** SACHET RSS + CAP fetch, ETag 304 (🔵).
 * **Implemented, not verified against the real service:** FCM push, httpSMS sending/webhook, Supabase Auth JWT
   mode, Supabase-hosted deployment (🟡) — no credentials were available.

@@ -3,6 +3,8 @@
 | Symptom | Cause | Fix |
 |---|---|---|
 | `'C:\Users\Sahil' is not recognized…` when running `flutter` or `sdkmanager` | Flutter/Android tools break on paths with spaces | Install them under `C:\dev\…` (no spaces). |
+| `flutter build apk` fails with `java.io.IOException: Unable to establish loopback connection` | JDK's Windows NIO selector cannot create its socket in the current `%TEMP%` | `set TEMP=C:\dev\tmp`, `set TMP=C:\dev\tmp` (and optionally `JAVA_TOOL_OPTIONS=-Djdk.net.unixdomain.tmpdir=C:\dev\tmp`) before building. |
+| App on a physical phone cannot reach the laptop | The app's default API URL is `http://127.0.0.1:8000` | Either `adb reverse tcp:8000 tcp:8000` (USB), or build with `--dart-define=API_BASE_URL=http://<laptop-LAN-IP>:8000`. |
 | `GET /api/v1/...` returns `{"detail":"Not Found"}` from a different "AapdaSaathi API" | Another server already listens on port 8000 | `netstat -ano | findstr :8000`, stop it or run this backend with `--port 8010` and pass `--dart-define=API_BASE_URL=http://localhost:8010`. |
 | Browser shows CORS errors | Web origin not allowed | Add the origin to `CORS_ORIGINS` (comma separated). For local experiments `CORS_ORIGINS=*`. |
 | Android emulator cannot reach the API | `localhost` is the emulator itself | Use `http://10.0.2.2:<port>`; on a phone use the laptop's LAN IP and allow the port in the firewall. |

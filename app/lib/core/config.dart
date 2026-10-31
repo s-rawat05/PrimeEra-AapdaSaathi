@@ -1,5 +1,3 @@
-import 'package:flutter/foundation.dart';
-
 /// Build-time configuration, supplied with `--dart-define=KEY=value`.
 ///
 /// Nothing here is a secret: API keys for Firebase/Supabase are public client identifiers.
@@ -31,11 +29,8 @@ class AppConfig {
 
   static String _defaultBaseUrl() {
     if (_envBaseUrl.isNotEmpty) return _envBaseUrl;
-    // The Android emulator reaches the host machine through 10.0.2.2.
-    if (!kIsWeb && defaultTargetPlatform == TargetPlatform.android) {
-      return 'http://10.0.2.2:8000';
-    }
-    return 'http://localhost:8000';
+    // On physical Android devices with `adb reverse tcp:8000 tcp:8000`, 127.0.0.1 reaches the host IPv4 reverse tunnel.
+    return 'http://127.0.0.1:8000';
   }
 
   static String _trimSlash(String s) => s.endsWith('/') ? s.substring(0, s.length - 1) : s;

@@ -1,4 +1,5 @@
 import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 
 import '../../models/models.dart';
@@ -35,7 +36,9 @@ class _ResidentHomeScreenState extends State<ResidentHomeScreen> {
     try {
       final h = await context.appRead.call((api) => api.alertHistory(limit: 100));
       if (mounted) setState(() => _history = h);
-    } catch (_) {/* stats are optional; shown as — when unavailable */}
+    } catch (_) {
+      /* stats are optional; shown as — when unavailable */
+    }
   }
 
   Future<void> _refresh() async {
@@ -53,57 +56,55 @@ class _ResidentHomeScreenState extends State<ResidentHomeScreen> {
 
     return RefreshIndicator(
       onRefresh: _refresh,
-      child: ListView(padding: EdgeInsets.zero, children: [
-        _Header(
-          name: me?.user.firstName ?? '',
-          ward: resident?.wardName ?? '',
-          demo: me?.user.isDemo ?? false,
-        ),
-        const ConnectionBanner(),
-        Padding(
-          padding: const EdgeInsets.fromLTRB(16, 16, 16, 120),
-          child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-            if (app.alertsError != null && !app.alertsFromCache) ...[
-              ErrorPanel(message: app.alertsError!, onRetry: app.refresh, s: s),
-              const SizedBox(height: 12),
-            ],
-            if (resident != null && !resident.isActive) ...[
-              SectionCard(
-                color: AppColors.amberSoft,
-                child: Text(s.registrationInactive, style: const TextStyle(fontWeight: FontWeight.w700)),
-              ),
-              const SizedBox(height: 12),
-            ],
-            // Weather & disaster info card (Reference Design Screen 1)
-            _WeatherDisasterCard(alert: alert),
-            const SizedBox(height: 14),
-            // Disaster Risk / Severity with Speedometer Gauge (Reference Design Screen 1)
-            AlertStatusCard(alert: alert),
-            if (alert != null) ...[
-              const SizedBox(height: 12),
-              _AssistanceCard(alert: alert),
-            ],
-            const SizedBox(height: 16),
-            const SosPillButton(),
-            const SizedBox(height: 16),
-            // Community Points & Tasks Completed (Reference Design Screen 1)
-            _CommunityStats(history: _history, alert: alert),
-            const SizedBox(height: 18),
-            // Community Safety Actions / Aksi Peduli (Reference Design Screen 1)
-            _CommunityActions(alert: alert),
-            const SizedBox(height: 18),
-            _Stats(history: _history),
-            if (resident?.reverifyDueAt != null) ...[
-              const SizedBox(height: 12),
-              Text(
-                s.reverifyDue(fmtTime(resident!.reverifyDueAt)),
-                textAlign: TextAlign.center,
-                style: const TextStyle(color: AppColors.gray),
-              ),
-            ],
-          ]),
-        ),
-      ]),
+      child: ListView(
+        padding: EdgeInsets.zero,
+        children: [
+          _Header(name: me?.user.firstName ?? '', ward: resident?.wardName ?? '', demo: me?.user.isDemo ?? false),
+          const ConnectionBanner(),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 16, 16, 120),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                if (app.alertsError != null && !app.alertsFromCache) ...[
+                  ErrorPanel(message: app.alertsError!, onRetry: app.refresh, s: s),
+                  const SizedBox(height: 12),
+                ],
+                if (resident != null && !resident.isActive) ...[
+                  SectionCard(
+                    color: AppColors.amberSoft,
+                    child: Text(s.registrationInactive, style: const TextStyle(fontWeight: FontWeight.w700)),
+                  ),
+                  const SizedBox(height: 12),
+                ],
+                // Weather & disaster info card (Reference Design Screen 1)
+                _WeatherDisasterCard(alert: alert),
+                const SizedBox(height: 14),
+                // Disaster Risk / Severity with Speedometer Gauge (Reference Design Screen 1)
+                AlertStatusCard(alert: alert),
+                if (alert != null) ...[const SizedBox(height: 12), _AssistanceCard(alert: alert)],
+                const SizedBox(height: 16),
+                const SosPillButton(),
+                const SizedBox(height: 16),
+                // Relief posts row (layout of "Aksi Peduli" in Reference Design Screen 1), official data only.
+                if (alert != null && alert.shelters.isNotEmpty) ...[
+                  _ReliefPosts(alert: alert),
+                  const SizedBox(height: 18),
+                ],
+                _Stats(history: _history),
+                if (resident?.reverifyDueAt != null) ...[
+                  const SizedBox(height: 12),
+                  Text(
+                    s.reverifyDue(fmtTime(resident!.reverifyDueAt)),
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(color: AppColors.gray),
+                  ),
+                ],
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
@@ -128,92 +129,86 @@ class _Header extends StatelessWidget {
         borderRadius: BorderRadius.vertical(bottom: Radius.circular(28)),
       ),
       padding: EdgeInsets.fromLTRB(20, MediaQuery.paddingOf(context).top + 12, 16, 24),
-      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Row(children: [
-          const Icon(Icons.waves, color: Colors.white, size: 28),
-          const SizedBox(width: 8),
-          Expanded(
-            child: Text(
-              s.appName,
-              style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w800),
-            ),
-          ),
-          if (demo) const DemoBadge(),
-          IconButton(
-            tooltip: 'Search',
-            onPressed: () {},
-            icon: const Icon(Icons.search, color: Colors.white, size: 22),
-          ),
-          Stack(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
             children: [
+              const Icon(Icons.waves, color: Colors.white, size: 28),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  s.appName,
+                  style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w800),
+                ),
+              ),
+              if (demo) const DemoBadge(),
               IconButton(
                 tooltip: s.navAlerts,
-                onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const AlertHistoryScreen())),
+                onPressed: () =>
+                    Navigator.of(context).push(MaterialPageRoute(builder: (_) => const AlertHistoryScreen())),
                 icon: const Icon(Icons.notifications_none, color: Colors.white, size: 24),
               ),
-              Positioned(
-                right: 8,
-                top: 8,
-                child: Container(
-                  width: 8,
-                  height: 8,
-                  decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle),
-                ),
+              IconButton(
+                tooltip: s.refresh,
+                onPressed: app.refresh,
+                icon: const Icon(Icons.refresh, color: Colors.white),
               ),
             ],
           ),
-          IconButton(
-            tooltip: s.refresh,
-            onPressed: app.refresh,
-            icon: const Icon(Icons.refresh, color: Colors.white),
-          ),
-        ]),
-        const SizedBox(height: 16),
-        Semantics(
-          header: true,
-          child: Text(
-            s.greeting(name),
-            key: const Key('greeting'),
-            style: const TextStyle(color: Colors.white, fontSize: 26, fontWeight: FontWeight.w900),
-          ),
-        ),
-        const SizedBox(height: 6),
-        Row(children: [
-          const Icon(Icons.location_on, color: Colors.white, size: 18),
-          const SizedBox(width: 4),
-          Expanded(
+          const SizedBox(height: 16),
+          Semantics(
+            header: true,
             child: Text(
-              ward.isNotEmpty ? ward : 'Bhimtal Ward 1, Nainital',
-              style: const TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w500),
-              overflow: TextOverflow.ellipsis,
+              s.greeting(name),
+              key: const Key('greeting'),
+              style: const TextStyle(color: Colors.white, fontSize: 26, fontWeight: FontWeight.w900),
             ),
           ),
-          const SizedBox(width: 4),
-          const Icon(Icons.keyboard_arrow_down, color: Colors.white, size: 18),
-        ]),
-      ]),
+          const SizedBox(height: 6),
+          Row(
+            children: [
+              const Icon(Icons.location_on, color: Colors.white, size: 18),
+              const SizedBox(width: 4),
+              Expanded(
+                child: Text(
+                  ward.isNotEmpty ? ward : 'Bhimtal Ward 1, Nainital',
+                  style: const TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w500),
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+              const SizedBox(width: 4),
+              const Icon(Icons.keyboard_arrow_down, color: Colors.white, size: 18),
+            ],
+          ),
+        ],
+      ),
     );
   }
 }
 
-/// Weather and flood disaster information card (Reference Design Screen 1).
+/// Hazard information card (layout from Reference Design Screen 1).
+/// Shows only official alert data — no weather source is connected, so no temperature or
+/// conditions are displayed (the reference image's weather values were sample data).
 class _WeatherDisasterCard extends StatelessWidget {
   const _WeatherDisasterCard({required this.alert});
   final AlertOut? alert;
 
   @override
   Widget build(BuildContext context) {
-    final isRainOrFlood = alert?.official.event.toLowerCase().contains('flood') ?? true;
-    final temp = alert != null ? '24°C' : '22°C';
+    final event = alert?.official.event.toLowerCase() ?? '';
+    final isRainOrFlood = ['flood', 'rain', 'storm', 'cloudburst'].any(event.contains);
+    final headline = alert != null ? alert!.official.event : 'No active alert';
+    final source = alert != null
+        ? 'Official alert · ${alert!.official.sender ?? 'authority'}'
+        : 'Live weather is not connected';
 
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(20),
         border: Border.all(color: AppColors.outline),
-        boxShadow: const [
-          BoxShadow(color: Color(0x0A000000), blurRadius: 10, offset: Offset(0, 4)),
-        ],
+        boxShadow: const [BoxShadow(color: Color(0x0A000000), blurRadius: 10, offset: Offset(0, 4))],
       ),
       padding: const EdgeInsets.all(16),
       child: Row(
@@ -226,7 +221,14 @@ class _WeatherDisasterCard extends StatelessWidget {
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(temp, style: const TextStyle(fontSize: 34, fontWeight: FontWeight.w900, color: AppColors.ink)),
+                    Flexible(
+                      child: Text(
+                        headline,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w900, color: AppColors.ink),
+                      ),
+                    ),
                     const SizedBox(width: 8),
                     Padding(
                       padding: const EdgeInsets.only(top: 6),
@@ -243,18 +245,17 @@ class _WeatherDisasterCard extends StatelessWidget {
                   children: [
                     Flexible(
                       child: Text(
-                        isRainOrFlood ? 'Hujan Deras / Heavy Rain' : 'Cuaca Normal / Normal',
-                        style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: AppColors.ink),
+                        source,
+                        style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: AppColors.gray),
                       ),
                     ),
-                    const Icon(Icons.chevron_right, size: 18, color: AppColors.gray),
                   ],
                 ),
                 if (alert != null)
                   Padding(
                     padding: const EdgeInsets.only(top: 4),
                     child: Text(
-                      alert!.official.event,
+                      'Severity: ${alert!.official.severity}',
                       style: const TextStyle(fontSize: 12, color: AppColors.red, fontWeight: FontWeight.w700),
                     ),
                   ),
@@ -265,15 +266,9 @@ class _WeatherDisasterCard extends StatelessWidget {
           Container(
             width: 120,
             height: 80,
-            decoration: BoxDecoration(
-              color: const Color(0xFFE3F2FD),
-              borderRadius: BorderRadius.circular(16),
-            ),
+            decoration: BoxDecoration(color: const Color(0xFFE3F2FD), borderRadius: BorderRadius.circular(16)),
             clipBehavior: Clip.antiAlias,
-            child: CustomPaint(
-              size: const Size(120, 80),
-              painter: _FloodIllustrationPainter(),
-            ),
+            child: CustomPaint(size: const Size(120, 80), painter: _FloodIllustrationPainter()),
           ),
         ],
       ),
@@ -305,11 +300,17 @@ class _FloodIllustrationPainter extends CustomPainter {
 
     // Window
     final windowPaint = Paint()..color = const Color(0xFF90CAF9);
-    canvas.drawRect(Rect.fromLTWH(size.width * 0.28, size.height * 0.38, size.width * 0.12, size.height * 0.15), windowPaint);
+    canvas.drawRect(
+      Rect.fromLTWH(size.width * 0.28, size.height * 0.38, size.width * 0.12, size.height * 0.15),
+      windowPaint,
+    );
 
     // Tree trunk & foliage
     final trunkPaint = Paint()..color = const Color(0xFF795548);
-    canvas.drawRect(Rect.fromLTWH(size.width * 0.74, size.height * 0.35, size.width * 0.08, size.height * 0.35), trunkPaint);
+    canvas.drawRect(
+      Rect.fromLTWH(size.width * 0.74, size.height * 0.35, size.width * 0.08, size.height * 0.35),
+      trunkPaint,
+    );
     final leavesPaint = Paint()..color = const Color(0xFF43A047);
     canvas.drawCircle(Offset(size.width * 0.78, size.height * 0.30), size.width * 0.16, leavesPaint);
 
@@ -363,112 +364,142 @@ class AlertStatusCard extends StatelessWidget {
     if (a == null) {
       return SectionCard(
         key: const Key('no-alerts-card'),
-        child: Row(children: [
-          const Pictogram(Icons.verified_user, color: AppColors.green),
-          const SizedBox(width: 14),
-          Expanded(
-            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text(s.officialAlertStatus, style: const TextStyle(color: AppColors.gray, fontSize: 13)),
-              Text(s.noActiveAlerts, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w800)),
-              const SizedBox(height: 4),
-              Text(s.noActiveAlertsBody),
-              if (app.alertsFromCache)
-                Padding(
-                  padding: const EdgeInsets.only(top: 6),
-                  child: Text(s.cachedData, style: const TextStyle(color: AppColors.amber)),
-                ),
-            ]),
-          ),
-        ]),
+        child: Row(
+          children: [
+            const Pictogram(Icons.verified_user, color: AppColors.green),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(s.officialAlertStatus, style: const TextStyle(color: AppColors.gray, fontSize: 13)),
+                  Text(s.noActiveAlerts, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w800)),
+                  const SizedBox(height: 4),
+                  Text(s.noActiveAlertsBody),
+                  if (app.alertsFromCache)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 6),
+                      child: Text(s.cachedData, style: const TextStyle(color: AppColors.amber)),
+                    ),
+                ],
+              ),
+            ),
+          ],
+        ),
       );
     }
     final pending = app.pendingReplyFor(a.deliveryId);
     final status = pending?.status ?? a.status;
     return SectionCard(
       key: const Key('active-alert-card'),
-      onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => AlertDetailScreen(deliveryId: a.deliveryId))),
-      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Row(children: [
-          Expanded(
-            child: Text(
-              'Potensi Bencana • ${s.officialAlertStatus}',
-              style: const TextStyle(color: AppColors.gray, fontSize: 13, fontWeight: FontWeight.w600),
-            ),
-          ),
-          if (a.isDemo) const DemoBadge(),
-        ]),
-        const SizedBox(height: 8),
-        Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Expanded(
-            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Row(children: [
-                Flexible(
-                  child: Text(
-                    '${a.official.severity.toUpperCase()} • ${a.official.event}',
-                    style: const TextStyle(color: AppColors.red, fontWeight: FontWeight.w800, letterSpacing: 0.5),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
+      onTap: () =>
+          Navigator.of(context).push(MaterialPageRoute(builder: (_) => AlertDetailScreen(deliveryId: a.deliveryId))),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  'Potensi Bencana • ${s.officialAlertStatus}',
+                  style: const TextStyle(color: AppColors.gray, fontSize: 13, fontWeight: FontWeight.w600),
                 ),
-                const SizedBox(width: 4),
-                const Icon(Icons.chevron_right, size: 18, color: AppColors.red),
-              ]),
-              const SizedBox(height: 4),
-              Text(a.presentation.title, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w800)),
-              const SizedBox(height: 6),
-              if (a.official.headline != null)
-                Text(
-                  a.official.headline!,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(fontSize: 13, color: AppColors.gray),
+              ),
+              if (a.isDemo) const DemoBadge(),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Flexible(
+                          child: Text(
+                            '${a.official.severity.toUpperCase()} • ${a.official.event}',
+                            style: const TextStyle(
+                              color: AppColors.red,
+                              fontWeight: FontWeight.w800,
+                              letterSpacing: 0.5,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                        const SizedBox(width: 4),
+                        const Icon(Icons.chevron_right, size: 18, color: AppColors.red),
+                      ],
+                    ),
+                    const SizedBox(height: 4),
+                    Text(a.presentation.title, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w800)),
+                    const SizedBox(height: 6),
+                    if (a.official.headline != null)
+                      Text(
+                        a.official.headline!,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(fontSize: 13, color: AppColors.gray),
+                      ),
+                  ],
                 ),
-            ]),
+              ),
+              const SizedBox(width: 8),
+              // Speedometer gauge meter
+              SizedBox(
+                width: 105,
+                height: 68,
+                child: CustomPaint(
+                  size: const Size(105, 68),
+                  painter: _SpeedometerGaugePainter(severity: a.official.severity),
+                ),
+              ),
+            ],
           ),
-          const SizedBox(width: 8),
-          // Speedometer gauge meter
-          SizedBox(
-            width: 105,
-            height: 68,
-            child: CustomPaint(
-              size: const Size(105, 68),
-              painter: _SpeedometerGaugePainter(severity: a.official.severity),
+          const SizedBox(height: 10),
+          Wrap(
+            spacing: 8,
+            runSpacing: 6,
+            children: [
+              StatusChip(
+                label: pending != null ? s.queuedNotDelivered : '${s.yourStatus}: ${s.statusName(status)}',
+                color: pending != null ? AppColors.amber : AppColors.forStatus(status),
+              ),
+              if (a.official.onset != null)
+                StatusChip(label: '${s.onset}: ${fmtTime(a.official.onset)}', color: AppColors.gray),
+            ],
+          ),
+          if (app.alertsFromCache)
+            Padding(
+              padding: const EdgeInsets.only(top: 6),
+              child: Text(s.cachedData, style: const TextStyle(color: AppColors.amber)),
             ),
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              Expanded(
+                child: FilledButton(
+                  key: const Key('respond-now'),
+                  onPressed: () =>
+                      Navigator.of(context)
+                          .push(MaterialPageRoute(builder: (_) => EmergencyResponseScreen(deliveryId: a.deliveryId))),
+                  child: Text(s.respondNow),
+                ),
+              ),
+              const SizedBox(width: 8),
+              OutlinedButton(
+                onPressed: () =>
+                    Navigator.of(context)
+                        .push(MaterialPageRoute(builder: (_) => AlertDetailScreen(deliveryId: a.deliveryId))),
+                child: Text(s.viewAlert),
+              ),
+            ],
           ),
-        ]),
-        const SizedBox(height: 10),
-        Wrap(spacing: 8, runSpacing: 6, children: [
-          StatusChip(
-            label: pending != null ? s.queuedNotDelivered : '${s.yourStatus}: ${s.statusName(status)}',
-            color: pending != null ? AppColors.amber : AppColors.forStatus(status),
-          ),
-          if (a.official.onset != null) StatusChip(label: '${s.onset}: ${fmtTime(a.official.onset)}', color: AppColors.gray),
-        ]),
-        if (app.alertsFromCache)
-          Padding(
-            padding: const EdgeInsets.only(top: 6),
-            child: Text(s.cachedData, style: const TextStyle(color: AppColors.amber)),
-          ),
-        const SizedBox(height: 12),
-        Row(children: [
-          Expanded(
-            child: FilledButton(
-              key: const Key('respond-now'),
-              onPressed: () => Navigator.of(context).push(MaterialPageRoute(
-                builder: (_) => EmergencyResponseScreen(deliveryId: a.deliveryId),
-              )),
-              child: Text(s.respondNow),
-            ),
-          ),
-          const SizedBox(width: 8),
-          OutlinedButton(
-            onPressed: () => Navigator.of(context).push(MaterialPageRoute(
-              builder: (_) => AlertDetailScreen(deliveryId: a.deliveryId),
-            )),
-            child: Text(s.viewAlert),
-          ),
-        ]),
-      ]),
+        ],
+      ),
     );
   }
 }
@@ -501,13 +532,7 @@ class _SpeedometerGaugePainter extends CustomPainter {
         ..strokeWidth = strokeWidth
         ..strokeCap = StrokeCap.butt;
       final startAngle = math.pi + (i * arcAngle);
-      canvas.drawArc(
-        Rect.fromCircle(center: center, radius: radius),
-        startAngle,
-        arcAngle - 0.04,
-        false,
-        paint,
-      );
+      canvas.drawArc(Rect.fromCircle(center: center, radius: radius), startAngle, arcAngle - 0.04, false, paint);
     }
 
     double needleRatio = switch (severity.toLowerCase()) {
@@ -549,115 +574,46 @@ class _AssistanceCard extends StatelessWidget {
     final asst = alert.assistance;
     return SectionCard(
       onTap: alert.isHelp
-          ? () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => HelpStatusScreen(deliveryId: alert.deliveryId)))
+          ? () =>
+                Navigator.of(context)
+                    .push(MaterialPageRoute(builder: (_) => HelpStatusScreen(deliveryId: alert.deliveryId)))
           : null,
-      child: Row(children: [
-        Pictogram(alert.isSafe ? Icons.check_circle : Icons.support_agent,
-            color: alert.isSafe ? AppColors.green : AppColors.official, size: 48),
-        const SizedBox(width: 12),
-        Expanded(
-          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Text(s.assistance, style: const TextStyle(color: AppColors.gray, fontSize: 13)),
-            Text(asst.summary, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
-            if (asst.neighbourAsked) Text(s.neighbourAsked),
-            if (asst.volunteerStatus != null) Text(s.volunteerStatus(asst.volunteerStatus!)),
-            if (asst.volunteerEtaMinutes != null) Text(s.etaMinutes(fmtMinutes(asst.volunteerEtaMinutes))),
-          ]),
-        ),
-      ]),
+      child: Row(
+        children: [
+          Pictogram(
+            alert.isSafe ? Icons.check_circle : Icons.support_agent,
+            color: alert.isSafe ? AppColors.green : AppColors.official,
+            size: 48,
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(s.assistance, style: const TextStyle(color: AppColors.gray, fontSize: 13)),
+                Text(asst.summary, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
+                if (asst.neighbourAsked) Text(s.neighbourAsked),
+                if (asst.volunteerStatus != null) Text(s.volunteerStatus(asst.volunteerStatus!)),
+                if (asst.volunteerEtaMinutes != null) Text(s.etaMinutes(fmtMinutes(asst.volunteerEtaMinutes))),
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
 
-/// Community Reward & Task Stats (Reference Design Screen 1).
-class _CommunityStats extends StatelessWidget {
-  const _CommunityStats({required this.history, required this.alert});
-  final PageOut<AlertOut>? history;
-  final AlertOut? alert;
+/// Officially registered relief posts for the resident's ward (from the API — never invented).
+/// Distances are straight-line walking ESTIMATES, as labelled on the evacuation screen.
+class _ReliefPosts extends StatelessWidget {
+  const _ReliefPosts({required this.alert});
+  final AlertOut alert;
 
   @override
   Widget build(BuildContext context) {
-    final totalPoints = 500;
-
-    return Row(
-      children: [
-        Expanded(
-          child: Container(
-            padding: const EdgeInsets.all(14),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: AppColors.outline),
-            ),
-            child: Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: const BoxDecoration(
-                    color: Color(0xFFE3F2FD),
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(Icons.verified, color: Color(0xFF1E88E5), size: 22),
-                ),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text('Total Poinmu', style: TextStyle(fontSize: 11, color: AppColors.gray)),
-                      Text('$totalPoints Poin', style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w800)),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-        const SizedBox(width: 12),
-        Expanded(
-          child: Container(
-            padding: const EdgeInsets.all(14),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: AppColors.outline),
-            ),
-            child: Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: const BoxDecoration(
-                    color: Color(0xFFE8F5E9),
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(Icons.task_alt, color: Color(0xFF2E7D32), size: 22),
-                ),
-                const SizedBox(width: 10),
-                const Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text('Diselesaikan hari ini', style: TextStyle(fontSize: 11, color: AppColors.gray)),
-                      Text('48 Tugas', style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w800)),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-/// Community Safety Actions ("Aksi Peduli" - Reference Design Screen 1).
-class _CommunityActions extends StatelessWidget {
-  const _CommunityActions({required this.alert});
-  final AlertOut? alert;
-
-  @override
-  Widget build(BuildContext context) {
+    void openEvacuation() =>
+        Navigator.of(context).push(MaterialPageRoute(builder: (_) => const EvacuationScreen(standalone: true)));
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -665,18 +621,19 @@ class _CommunityActions extends StatelessWidget {
           children: [
             const Expanded(
               child: Text(
-                'Aksi Peduli',
+                'Relief posts / राहत केंद्र',
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: AppColors.ink),
               ),
             ),
             InkWell(
-              onTap: () {
-                Navigator.of(context).push(MaterialPageRoute(builder: (_) => const EvacuationScreen(standalone: true)));
-              },
+              onTap: openEvacuation,
               child: const Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text('Lihat Semua', style: TextStyle(fontSize: 13, color: AppColors.gray, fontWeight: FontWeight.w600)),
+                  Text(
+                    'Evacuation',
+                    style: TextStyle(fontSize: 13, color: AppColors.gray, fontWeight: FontWeight.w600),
+                  ),
                   SizedBox(width: 2),
                   Icon(Icons.chevron_right, size: 16, color: AppColors.gray),
                 ],
@@ -687,36 +644,22 @@ class _CommunityActions extends StatelessWidget {
         const SizedBox(height: 10),
         SizedBox(
           height: 108,
-          child: ListView(
+          child: ListView.separated(
             scrollDirection: Axis.horizontal,
-            children: [
-              _ActionCard(
-                title: 'Evakuasi ke Posko',
-                subtitle: 'Posko Kebangsaan Komp. Mas',
-                tag: '200 m',
+            itemCount: alert.shelters.length,
+            separatorBuilder: (_, _) => const SizedBox(width: 12),
+            itemBuilder: (_, i) {
+              final s = alert.shelters[i];
+              final d = s.distanceM;
+              return _ActionCard(
+                title: s.name,
+                subtitle: s.address,
+                tag: d == null ? 'Official' : (d < 1000 ? '~${d.round()} m' : '~${(d / 1000).toStringAsFixed(1)} km'),
                 icon: Icons.night_shelter,
                 color: const Color(0xFFE53935),
-                onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const EvacuationScreen(standalone: true))),
-              ),
-              const SizedBox(width: 12),
-              _ActionCard(
-                title: 'Dapur Umum & Logistik',
-                subtitle: 'Bhimtal Central Hall Ward 1',
-                tag: 'Bantuan',
-                icon: Icons.soup_kitchen,
-                color: const Color(0xFF1E88E5),
-                onTap: () {},
-              ),
-              const SizedBox(width: 12),
-              _ActionCard(
-                title: 'Pos Medis Darurat',
-                subtitle: 'Klinik Kesehatan Utama',
-                tag: 'Medis',
-                icon: Icons.medical_services,
-                color: const Color(0xFF43A047),
-                onTap: () {},
-              ),
-            ],
+                onTap: openEvacuation,
+              );
+            },
           ),
         ),
       ],
@@ -762,10 +705,7 @@ class _ActionCard extends StatelessWidget {
               children: [
                 Container(
                   padding: const EdgeInsets.all(6),
-                  decoration: BoxDecoration(
-                    color: color.withValues(alpha: 0.12),
-                    shape: BoxShape.circle,
-                  ),
+                  decoration: BoxDecoration(color: color.withValues(alpha: 0.12), shape: BoxShape.circle),
                   child: Icon(icon, color: color, size: 20),
                 ),
                 const Spacer(),
@@ -806,26 +746,31 @@ class _Stats extends StatelessWidget {
     final safe = items?.where((a) => a.isSafe).length;
     final help = items?.where((a) => a.isHelp).length;
     Widget tile(IconData icon, Color c, String label, String value) => Expanded(
-          child: Semantics(
-            label: '$label: $value',
-            excludeSemantics: true,
-            child: SectionCard(
-              padding: const EdgeInsets.all(12),
-              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Icon(icon, color: c),
-                const SizedBox(height: 6),
-                Text(value, style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w900)),
-                Text(label, style: const TextStyle(fontSize: 12, color: AppColors.gray)),
-              ]),
-            ),
+      child: Semantics(
+        label: '$label: $value',
+        excludeSemantics: true,
+        child: SectionCard(
+          padding: const EdgeInsets.all(12),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Icon(icon, color: c),
+              const SizedBox(height: 6),
+              Text(value, style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w900)),
+              Text(label, style: const TextStyle(fontSize: 12, color: AppColors.gray)),
+            ],
           ),
-        );
-    return Row(children: [
-      tile(Icons.notifications_active, AppColors.red, s.statAlertsReceived, n(total)),
-      const SizedBox(width: 8),
-      tile(Icons.check_circle, AppColors.green, s.statMarkedSafe, n(safe)),
-      const SizedBox(width: 8),
-      tile(Icons.sos, AppColors.red, s.statHelpRequests, n(help)),
-    ]);
+        ),
+      ),
+    );
+    return Row(
+      children: [
+        tile(Icons.notifications_active, AppColors.red, s.statAlertsReceived, n(total)),
+        const SizedBox(width: 8),
+        tile(Icons.check_circle, AppColors.green, s.statMarkedSafe, n(safe)),
+        const SizedBox(width: 8),
+        tile(Icons.sos, AppColors.red, s.statHelpRequests, n(help)),
+      ],
+    );
   }
 }
