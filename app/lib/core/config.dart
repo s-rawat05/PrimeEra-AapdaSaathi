@@ -28,6 +28,8 @@ class AppConfig {
   final Duration pollInterval;
 
   static String _defaultBaseUrl() {
+    // `same-origin` (web builds served by the backend itself): call the address the page came from.
+    if (_envBaseUrl == 'same-origin') return Uri.base.origin;
     if (_envBaseUrl.isNotEmpty) return _envBaseUrl;
     // On physical Android devices with `adb reverse tcp:8000 tcp:8000`, 127.0.0.1 reaches the host IPv4 reverse tunnel.
     return 'http://127.0.0.1:8000';

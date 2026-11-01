@@ -3,8 +3,12 @@
 class AppConfig {
   const AppConfig({required this.apiBaseUrl, this.mapTilesEnabled = true});
 
-  factory AppConfig.fromEnvironment() =>
-      AppConfig(apiBaseUrl: _trim(const String.fromEnvironment('API_BASE_URL', defaultValue: 'http://localhost:8000')));
+  /// `API_BASE_URL=same-origin` uses the address the page was loaded from — for deployments where the
+  /// backend serves this web app itself (one public link, no CORS).
+  factory AppConfig.fromEnvironment() {
+    const env = String.fromEnvironment('API_BASE_URL', defaultValue: 'http://localhost:8000');
+    return AppConfig(apiBaseUrl: _trim(env == 'same-origin' ? Uri.base.origin : env));
+  }
 
   /// Origin of the backend, without `/api/v1` (e.g. `http://localhost:8000`).
   final String apiBaseUrl;

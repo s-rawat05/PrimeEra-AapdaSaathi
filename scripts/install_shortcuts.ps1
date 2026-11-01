@@ -19,4 +19,5 @@ function New-Shortcut($name, $script, $extraArgs, $style) {
 }
 
 New-Shortcut "Start AapdaSaathi" "run_demo.ps1" "-Open -Phone" 1
+New-Shortcut "Start AapdaSaathi (public link)" "run_demo.ps1" "-Open -Phone -Public" 1
 New-Shortcut "Stop AapdaSaathi" "stop_demo.ps1" "" 7

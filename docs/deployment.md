@@ -101,7 +101,27 @@ Release APK signing: create a keystore outside the repo and reference it from `a
 (git-ignored). Host `dashboard/build/web` on any static host (Netlify, Vercel, Firebase Hosting, Supabase
 Storage); add its origin to `CORS_ORIGINS`.
 
-## 8. Docker Compose (production-like local stack)
+## 8. Temporary public link from the laptop (Cloudflare quick tunnel)
+
+For judging/demo days without a hosted backend:
+
+```bash
+powershell -ExecutionPolicy Bypass -File scripts\run_demo.ps1 -Public -Open -Phone
+```
+
+or double-click **Start AapdaSaathi (public link)** (created by `scripts\install_shortcuts.ps1`). The API server also
+serves the command centre at `/` and the resident web app at `/app/` (built with
+`--dart-define=API_BASE_URL=same-origin`), and `cloudflared` publishes it as `https://<random>.trycloudflare.com`
+(printed in the window and saved to `worker/data/public_url.txt`).
+
+* Requires `C:\dev\cloudflared\cloudflared.exe` (official release from github.com/cloudflare/cloudflared); no account.
+* The link changes on every start and works only while the laptop and the launcher window are running.
+* Anyone with the link can use the **fictional demo accounts** — never run this with real data. Real-resident
+  notifications stay off and SMS stays in the simulator.
+* Uvicorn trusts `X-Forwarded-For` only from `127.0.0.1` (the tunnel), so rate limits apply per visitor.
+* For a permanent link use the Render + Supabase setup above (sections 3 and 6).
+
+## 9. Docker Compose (production-like local stack)
 
 ```bash
 copy .env.example .env

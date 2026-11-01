@@ -19,7 +19,9 @@ param(
   [switch]$Rebuild,   # rebuild both Flutter web apps for this API port
   [switch]$LiveFeed,  # poll SACHET in the background (needs internet)
   [switch]$Open,      # open the command centre and resident app in the default browser
-  [switch]$Phone      # USB phone: tunnel phone:8000 -> laptop API (adb reverse) and launch the app
+  [switch]$Phone,     # USB phone: tunnel phone:8000 -> laptop API (adb reverse) and launch the app
+  [switch]$Public     # publish via a Cloudflare quick tunnel: one https://*.trycloudflare.com link
+                      # (command centre at /, resident app at /app/). Fictional demo data only.
 )
 $ErrorActionPreference = "Stop"
 $root = Split-Path -Parent $PSScriptRoot
@@ -34,20 +36,29 @@ $db = Join-Path $root "worker\data\demo.db"
 if ($Fresh -and (Test-Path $db)) { Remove-Item "$db*" -Force; Write-Host "Fresh demo database." }
 
 $api = "http://localhost:$ApiPort"
-foreach ($proj in @("dashboard", "app")) {
-  $web = Join-Path $root "$proj\build\web\index.html"
-  # Each web build records the API address it was compiled for; a mismatch forces a rebuild.
-  $marker = Join-Path $root "$proj\build\web\.api_base"
+
+# Each web build records the API address it was compiled for; a mismatch forces a rebuild.
+function Build-Web($proj, $outDir, $apiBase, $baseHref) {
+  $out = Join-Path $root "$proj\$outDir"
+  $marker = Join-Path $out ".api_base"
   $builtFor = if (Test-Path $marker) { (Get-Content $marker -Raw).Trim() } else { "" }
-  if ($Rebuild -or -not (Test-Path $web) -or $builtFor -ne $api) {
-    Write-Host "Building $proj for $api ..."
+  if ($Rebuild -or -not (Test-Path (Join-Path $out "index.html")) -or $builtFor -ne $apiBase) {
+    Write-Host "Building $proj ($outDir) for $apiBase ..."
     Push-Location (Join-Path $root $proj)
-    flutter build web --release --no-wasm-dry-run --dart-define=API_BASE_URL=$api | Out-Host
+    flutter build web --release --no-wasm-dry-run --base-href $baseHref "--dart-define=API_BASE_URL=$apiBase" -o $outDir | Out-Host
     $ok = $LASTEXITCODE -eq 0
     Pop-Location
     if (-not $ok) { throw "Flutter web build failed for $proj" }
-    Set-Content -Path $marker -Value $api -Encoding ascii
+    Set-Content -Path $marker -Value $apiBase -Encoding ascii
   }
+  return $out
+}
+Build-Web "dashboard" "build\web" $api "/" | Out-Null
+Build-Web "app" "build\web" $api "/" | Out-Null
+if ($Public) {
+  # Served by the API itself, so they call the address they were opened from.
+  $env:WEB_DASHBOARD_DIR = Build-Web "dashboard" "build\web_public" "same-origin" "/"
+  $env:WEB_APP_DIR = Build-Web "app" "build\web_public" "same-origin" "/app/"
 }
 
 $env:DATABASE_URL = "sqlite+aiosqlite:///./data/demo.db"
@@ -56,9 +67,12 @@ $env:DEMO_ESCALATION_INTERVAL_SECONDS = "$EscalationSeconds"
 $env:FEED_POLL_ENABLED = if ($LiveFeed) { "true" } else { "false" }
 $env:NOTIFY_REAL_RESIDENTS = "false"
 
+$uvicornArgs = @("-m", "uvicorn", "app.main:app", "--port", "$ApiPort")
+# Behind the local tunnel, trust X-Forwarded-For from 127.0.0.1 only, so rate limits apply per visitor.
+if ($Public) { $uvicornArgs += @("--proxy-headers", "--forwarded-allow-ips", "127.0.0.1") }
 $jobs = @()
 $jobs += Start-Process -PassThru -WindowStyle Minimized -WorkingDirectory (Join-Path $root "worker") $py `
-  -ArgumentList "-m", "uvicorn", "app.main:app", "--port", "$ApiPort"
+  -ArgumentList $uvicornArgs
 $jobs += Start-Process -PassThru -WindowStyle Minimized -WorkingDirectory (Join-Path $root "dashboard\build\web") $py `
   -ArgumentList "-m", "http.server", "$DashboardPort", "--bind", "127.0.0.1"
 $jobs += Start-Process -PassThru -WindowStyle Minimized -WorkingDirectory (Join-Path $root "app\build\web") $py `
@@ -82,8 +96,33 @@ if ($Phone) {
   & $adb shell monkey -p in.primeera.aapda_saathi -c android.intent.category.LAUNCHER 1 2>&1 | Out-Null
   Write-Host "  Phone           USB tunnel phone:8000 -> laptop:$ApiPort, app launched"
 }
+$publicUrl = $null
+if ($Public) {
+  $cf = "C:\dev\cloudflared\cloudflared.exe"
+  if (-not (Test-Path $cf)) { $cf = "cloudflared" }
+  $cfLog = Join-Path $root "worker\data\cloudflared.log"
+  if (Test-Path $cfLog) { Remove-Item $cfLog -Force }
+  $jobs += Start-Process -PassThru -WindowStyle Minimized $cf `
+    -ArgumentList "tunnel", "--no-autoupdate", "--url", "http://localhost:$ApiPort", "--logfile", "`"$cfLog`""
+  for ($i = 0; $i -lt 60 -and -not $publicUrl; $i++) {
+    Start-Sleep -Seconds 1
+    if (Test-Path $cfLog) {
+      $m = Select-String -Path $cfLog -Pattern "https://[a-z0-9-]+\.trycloudflare\.com" | Select-Object -First 1
+      if ($m) { $publicUrl = $m.Matches[0].Value }
+    }
+  }
+  if ($publicUrl) {
+    Set-Content -Path (Join-Path $root "worker\data\public_url.txt") -Value $publicUrl -Encoding ascii
+    Write-Host ""
+    Write-Host "  PUBLIC LINK     $publicUrl            (command centre)"
+    Write-Host "                  $publicUrl/app/       (resident app)"
+    Write-Host "                  Works while this window stays open. Fictional demo data only."
+  } else {
+    Write-Host "  PUBLIC LINK     tunnel did not start - see $cfLog" -ForegroundColor Yellow
+  }
+}
 if ($Open) {
-  Start-Process "http://localhost:$DashboardPort"
+  if ($publicUrl) { Start-Process $publicUrl } else { Start-Process "http://localhost:$DashboardPort" }
   Start-Process "http://localhost:$AppPort"
 }
 try { while ($true) { Start-Sleep -Seconds 2 } }

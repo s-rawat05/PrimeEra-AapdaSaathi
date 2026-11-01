@@ -192,7 +192,21 @@ def create_app(settings: Settings | None = None, ctx: AppContext | None = None, 
 
     for r in (auth.router, auth.me_router, people.router, ops.router, admin.router, misc.router):
         app.include_router(r, prefix="/api/v1")
+    _mount_web_apps(app, settings)
     return app
+
+
+def _mount_web_apps(app: FastAPI, settings: Settings) -> None:
+    """Optionally serve the built Flutter web apps from this server (one public address, same origin).
+    Mounted after the API routers, so /api/v1/* always wins."""
+    from pathlib import Path
+
+    from fastapi.staticfiles import StaticFiles
+
+    for prefix, folder in (("/app", settings.web_app_dir), ("/", settings.web_dashboard_dir)):
+        if folder and (Path(folder) / "index.html").is_file():
+            app.mount(prefix, StaticFiles(directory=folder, html=True), name=f"web{prefix.strip('/') or 'root'}")
+            log.info("serving web app %s from %s", prefix, folder)
 
 
 app = create_app()

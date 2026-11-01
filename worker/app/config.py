@@ -62,6 +62,10 @@ class Settings(BaseSettings):
 
     cors_origins: str = "http://localhost:8080,http://localhost:8081,http://127.0.0.1:8080,http://127.0.0.1:8081"
 
+    # Optional: built Flutter web apps to serve from this server (command centre at /, resident app at /app/).
+    web_dashboard_dir: str = ""
+    web_app_dir: str = ""
+
     otp_ttl_seconds: int = 300
     consent_validity_days: int = 90
     rate_limit_per_minute: int = 240
