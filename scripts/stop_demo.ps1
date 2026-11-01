@@ -8,7 +8,7 @@ $py = Join-Path $root "worker\.venv\Scripts\python.exe"
 $procs = Get-CimInstance Win32_Process | Where-Object {
   ($_.CommandLine -like "*$py*" -and ($_.CommandLine -like "*uvicorn app.main:app*" -or $_.CommandLine -like "*http.server*")) -or
   ($_.CommandLine -like "*run_demo.ps1*" -and $_.ProcessId -ne $PID) -or
-  ($_.Name -like "cloudflared*" -and $_.CommandLine -like "*tunnel*--url http://localhost*")
+  ($_.Name -like "cloudflared*" -and $_.CommandLine -like "*tunnel*--url http://*")
 }
 if (-not $procs) { Write-Host "AapdaSaathi is not running."; return }
 foreach ($p in $procs) {

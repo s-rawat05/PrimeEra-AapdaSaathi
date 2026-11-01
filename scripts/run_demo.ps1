@@ -30,7 +30,14 @@ if (-not (Test-Path $py)) { throw "Python venv missing. Run: python -m venv work
 if (Test-Path "C:\dev\flutter\bin") { $env:Path = "C:\dev\flutter\bin;" + $env:Path }
 
 $inUse = Get-NetTCPConnection -LocalPort $ApiPort -State Listen -ErrorAction SilentlyContinue
-if ($inUse) { throw "Port $ApiPort is already in use (PID $($inUse.OwningProcess)). Use -ApiPort 8010." }
+if ($inUse) {
+  $owners = Get-CimInstance Win32_Process | Where-Object { $_.CommandLine -like "*--port $ApiPort*" } |
+    ForEach-Object { "    PID $($_.ProcessId): $($_.CommandLine)" }
+  Write-Host "Port $ApiPort is already in use - another server is running:" -ForegroundColor Red
+  $owners | Select-Object -First 4 | ForEach-Object { Write-Host $_ }
+  Write-Host "Close that window (or run 'Stop AapdaSaathi'), make sure nothing restarts it, then start again."
+  Write-Host "Press Enter to close."; [void][Console]::ReadLine(); exit 1
+}
 
 $db = Join-Path $root "worker\data\demo.db"
 if ($Fresh -and (Test-Path $db)) { Remove-Item "$db*" -Force; Write-Host "Fresh demo database." }
@@ -85,17 +92,17 @@ Write-Host "  Command centre  http://localhost:$DashboardPort"
 Write-Host "  Resident app    http://localhost:$AppPort"
 Write-Host "  Scripted demo   $py scripts\demo_smoke.py $api --pace 3"
 
-for ($i = 0; $i -lt 30; $i++) {
-  try { Invoke-WebRequest "$api/api/v1/health" -UseBasicParsing -TimeoutSec 2 | Out-Null; break } catch { Start-Sleep -Seconds 1 }
+# From here on any failure still stops every process this script started (no orphaned servers).
+try {
+$publicFile = Join-Path $root "worker\data\public_url.txt"
+if (Test-Path $publicFile) { Remove-Item $publicFile -Force }
+$healthy = $false
+for ($i = 0; $i -lt 60 -and -not $healthy; $i++) {
+  # 127.0.0.1, not localhost: Windows PowerShell resolves localhost to IPv6 ::1 first, where uvicorn isn't listening.
+  try { Invoke-WebRequest "http://127.0.0.1:$ApiPort/api/v1/health" -UseBasicParsing -TimeoutSec 2 | Out-Null; $healthy = $true }
+  catch { Start-Sleep -Seconds 1 }
 }
-if ($Phone) {
-  $adb = "C:\dev\android-sdk\platform-tools\adb.exe"
-  if (-not (Test-Path $adb)) { $adb = "adb" }
-  # The installed app calls http://127.0.0.1:8000 on the phone; forward that to this laptop's API.
-  & $adb reverse tcp:8000 tcp:$ApiPort | Out-Null
-  & $adb shell monkey -p in.primeera.aapda_saathi -c android.intent.category.LAUNCHER 1 2>&1 | Out-Null
-  Write-Host "  Phone           USB tunnel phone:8000 -> laptop:$ApiPort, app launched"
-}
+if (-not $healthy) { throw "The API did not start on port $ApiPort (is another server using it?)" }
 $publicUrl = $null
 if ($Public) {
   $cf = "C:\dev\cloudflared\cloudflared.exe"
@@ -103,7 +110,7 @@ if ($Public) {
   $cfLog = Join-Path $root "worker\data\cloudflared.log"
   if (Test-Path $cfLog) { Remove-Item $cfLog -Force }
   $jobs += Start-Process -PassThru -WindowStyle Minimized $cf `
-    -ArgumentList "tunnel", "--no-autoupdate", "--url", "http://localhost:$ApiPort", "--logfile", "`"$cfLog`""
+    -ArgumentList "tunnel", "--no-autoupdate", "--url", "http://127.0.0.1:$ApiPort", "--logfile", "`"$cfLog`""
   for ($i = 0; $i -lt 60 -and -not $publicUrl; $i++) {
     Start-Sleep -Seconds 1
     if (Test-Path $cfLog) {
@@ -112,7 +119,7 @@ if ($Public) {
     }
   }
   if ($publicUrl) {
-    Set-Content -Path (Join-Path $root "worker\data\public_url.txt") -Value $publicUrl -Encoding ascii
+    Set-Content -Path $publicFile -Value $publicUrl -Encoding ascii
     Write-Host ""
     Write-Host "  PUBLIC LINK     $publicUrl            (command centre)"
     Write-Host "                  $publicUrl/app/       (resident app)"
@@ -121,9 +128,32 @@ if ($Public) {
     Write-Host "  PUBLIC LINK     tunnel did not start - see $cfLog" -ForegroundColor Yellow
   }
 }
+if ($Phone) {
+  # Optional and never fatal: adb writes to stderr (e.g. "no devices"), which Windows PowerShell 5.1
+  # would otherwise turn into a terminating error under $ErrorActionPreference = "Stop".
+  $adb = "C:\dev\android-sdk\platform-tools\adb.exe"
+  if (-not (Test-Path $adb)) { $adb = "adb" }
+  $prev = $ErrorActionPreference; $ErrorActionPreference = "Continue"
+  $state = (& $adb get-state 2>$null | Out-String).Trim()
+  if ($state -eq "device") {
+    # The installed app calls http://127.0.0.1:8000 on the phone; forward that to this laptop's API.
+    & $adb reverse tcp:8000 tcp:$ApiPort 2>$null | Out-Null
+    & $adb shell monkey -p in.primeera.aapda_saathi -c android.intent.category.LAUNCHER 1 2>$null | Out-Null
+    Write-Host "  Phone           USB tunnel phone:8000 -> laptop:$ApiPort, app launched"
+  } else {
+    Write-Host "  Phone           not connected (plug in USB with debugging on, then restart)" -ForegroundColor Yellow
+  }
+  $ErrorActionPreference = $prev
+}
 if ($Open) {
   if ($publicUrl) { Start-Process $publicUrl } else { Start-Process "http://localhost:$DashboardPort" }
   Start-Process "http://localhost:$AppPort"
 }
-try { while ($true) { Start-Sleep -Seconds 2 } }
+while ($true) { Start-Sleep -Seconds 2 }
+}
+catch {
+  Write-Host ""
+  Write-Host "FAILED: $($_.Exception.Message)" -ForegroundColor Red
+  Write-Host "Press Enter to close."; [void][Console]::ReadLine()
+}
 finally { $jobs | ForEach-Object { Stop-Process -Id $_.Id -ErrorAction SilentlyContinue } }
