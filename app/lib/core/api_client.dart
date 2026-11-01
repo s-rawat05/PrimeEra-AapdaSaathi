@@ -36,7 +36,9 @@ abstract class AapdaApi {
   Future<List<AlertOut>> activeAlerts();
   Future<PageOut<AlertOut>> alertHistory({int limit = 50, int offset = 0});
   Future<AlertOut> alert(String deliveryId);
-  Future<RespondOut> respond(String deliveryId, String status, {required String idempotencyKey});
+
+  /// [note] is shown to operators in the timeline (e.g. "Confirmed by voice").
+  Future<RespondOut> respond(String deliveryId, String status, {required String idempotencyKey, String? note});
 
   // caregiver
   Future<List<CaregiverResidentOut>> caregiverResidents();
@@ -59,7 +61,7 @@ abstract class AapdaApi {
 /// Real HTTP implementation.
 class HttpAapdaApi implements AapdaApi {
   HttpAapdaApi(this.config, {http.Client? client, this.timeout = const Duration(seconds: 15)})
-      : _client = client ?? http.Client();
+    : _client = client ?? http.Client();
 
   final AppConfig config;
   final http.Client _client;
@@ -158,9 +160,12 @@ class HttpAapdaApi implements AapdaApi {
 
   @override
   Future<TokenOut> verifyOtp(String phone, String code, {String? fullName}) async {
-    final j = await _send('POST', '/auth/otp/verify',
-        body: {'phone': phone, 'code': code, if (fullName != null && fullName.isNotEmpty) 'full_name': fullName},
-        auth: false);
+    final j = await _send(
+      'POST',
+      '/auth/otp/verify',
+      body: {'phone': phone, 'code': code, if (fullName != null && fullName.isNotEmpty) 'full_name': fullName},
+      auth: false,
+    );
     return _parse(() => TokenOut.fromJson(_obj(j)));
   }
 
@@ -184,10 +189,7 @@ class HttpAapdaApi implements AapdaApi {
 
   @override
   Future<UserOut> patchMe({String? language, String? fullName}) async {
-    final j = await _send('PATCH', '/me', body: {
-      'language': ?language,
-      'full_name': ?fullName,
-    });
+    final j = await _send('PATCH', '/me', body: {'language': ?language, 'full_name': ?fullName});
     return _parse(() => UserOut.fromJson(_obj(j)));
   }
 
@@ -259,10 +261,13 @@ class HttpAapdaApi implements AapdaApi {
   }
 
   @override
-  Future<RespondOut> respond(String deliveryId, String status, {required String idempotencyKey}) async {
-    final j = await _send('POST', '/alerts/${Uri.encodeComponent(deliveryId)}/respond',
-        body: {'status': status, 'client_request_id': idempotencyKey},
-        headers: {'Idempotency-Key': idempotencyKey});
+  Future<RespondOut> respond(String deliveryId, String status, {required String idempotencyKey, String? note}) async {
+    final j = await _send(
+      'POST',
+      '/alerts/${Uri.encodeComponent(deliveryId)}/respond',
+      body: {'status': status, 'client_request_id': idempotencyKey, 'note': ?note},
+      headers: {'Idempotency-Key': idempotencyKey},
+    );
     return _parse(() => RespondOut.fromJson(_obj(j)));
   }
 
@@ -275,8 +280,11 @@ class HttpAapdaApi implements AapdaApi {
 
   @override
   Future<RespondOut> caregiverRespond(String deliveryId, String status, {String? note}) async {
-    final j = await _send('POST', '/caregiver/alerts/${Uri.encodeComponent(deliveryId)}/respond',
-        body: {'status': status, if (note != null && note.isNotEmpty) 'note': note});
+    final j = await _send(
+      'POST',
+      '/caregiver/alerts/${Uri.encodeComponent(deliveryId)}/respond',
+      body: {'status': status, if (note != null && note.isNotEmpty) 'note': note},
+    );
     return _parse(() => RespondOut.fromJson(_obj(j)));
   }
 
@@ -289,8 +297,11 @@ class HttpAapdaApi implements AapdaApi {
 
   @override
   Future<TaskOut> neighbourRespond(String taskId, String outcome, {String? note}) async {
-    final j = await _send('POST', '/neighbour/checks/${Uri.encodeComponent(taskId)}/respond',
-        body: {'outcome': outcome, if (note != null && note.isNotEmpty) 'note': note});
+    final j = await _send(
+      'POST',
+      '/neighbour/checks/${Uri.encodeComponent(taskId)}/respond',
+      body: {'outcome': outcome, if (note != null && note.isNotEmpty) 'note': note},
+    );
     return _parse(() => TaskOut.fromJson(_obj(j)));
   }
 
@@ -327,15 +338,21 @@ class HttpAapdaApi implements AapdaApi {
 
   @override
   Future<TaskOut> cantGo(String taskId, String reason, {String? note}) async {
-    final j = await _send('POST', '/volunteer/tasks/${Uri.encodeComponent(taskId)}/cant-go',
-        body: {'reason': reason, if (note != null && note.isNotEmpty) 'note': note});
+    final j = await _send(
+      'POST',
+      '/volunteer/tasks/${Uri.encodeComponent(taskId)}/cant-go',
+      body: {'reason': reason, if (note != null && note.isNotEmpty) 'note': note},
+    );
     return _parse(() => TaskOut.fromJson(_obj(j)));
   }
 
   @override
   Future<TaskOut> reached(String taskId, String outcome, {String? note}) async {
-    final j = await _send('POST', '/volunteer/tasks/${Uri.encodeComponent(taskId)}/reached',
-        body: {'outcome': outcome, if (note != null && note.isNotEmpty) 'note': note});
+    final j = await _send(
+      'POST',
+      '/volunteer/tasks/${Uri.encodeComponent(taskId)}/reached',
+      body: {'outcome': outcome, if (note != null && note.isNotEmpty) 'note': note},
+    );
     return _parse(() => TaskOut.fromJson(_obj(j)));
   }
 }

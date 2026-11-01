@@ -225,6 +225,41 @@ class Strings {
   String get smsOnlyNote => _p('Your profile says you mostly use SMS. Reply 1 = SAFE or 2 = HELP by SMS.',
       'आपकी प्रोफ़ाइल के अनुसार आप ज़्यादातर SMS इस्तेमाल करते हैं। SMS से 1 = सुरक्षित या 2 = मदद भेजें।');
 
+  // ---------------------------------------------------------------- voice reply (vision profile)
+  // Spoken prompts: short, one question at a time. They describe only what the system does.
+  String get voiceAsk => _p('Are you safe? Say SAFE. Or say HELP.',
+      'क्या आप सुरक्षित हैं? सुरक्षित बोलिए। या मदद बोलिए।');
+  String get voiceConfirmSafe => _p('You said safe. To confirm, say YES. Otherwise say NO.',
+      'आपने सुरक्षित कहा। पुष्टि के लिए हाँ बोलिए। नहीं तो नहीं बोलिए।');
+  String get voiceSafeSent => _p('Thank you. You are marked safe.', 'धन्यवाद। आप सुरक्षित दर्ज हैं।');
+  String get voiceHelpSent => _p('Your help request has been sent to the control room.',
+      'आपका मदद अनुरोध नियंत्रण कक्ष को भेज दिया गया है।');
+  String get voiceQueued => _p(
+      'There is no network. Your reply is saved on this phone and will be sent when the network returns.',
+      'नेटवर्क नहीं है। आपका जवाब फ़ोन में सहेजा गया है और नेटवर्क आने पर भेजा जाएगा।');
+  String get voiceGaveUp => _p(
+      'Sorry, I could not understand. Use the big buttons on the screen, or send 1 for safe or 2 for help by SMS. '
+          'If you do not reply, a neighbour or volunteer will be asked to check on you.',
+      'माफ़ कीजिए, मैं समझ नहीं पाया। स्क्रीन के बड़े बटन दबाइए, या SMS से सुरक्षित के लिए 1 या मदद के लिए 2 भेजिए। '
+          'जवाब न मिलने पर किसी पड़ोसी या स्वयंसेवक को आपको देखने के लिए कहा जाएगा।');
+  // On-screen status of the voice reply.
+  String get voiceAnswerButton => _p('Answer by voice', 'आवाज़ से जवाब दें');
+  String get voiceStop => _p('Stop voice reply', 'आवाज़ से जवाब बंद करें');
+  String get voiceRinging => _p('Voice reply will start in a few seconds…', 'कुछ सेकंड में आवाज़ से जवाब शुरू होगा…');
+  String get voiceSpeaking => _p('Speaking…', 'बोला जा रहा है…');
+  String get voiceListening => _p('Listening — say SAFE or HELP', 'सुन रहे हैं — सुरक्षित या मदद बोलिए');
+  String get voiceConfirming => _p('Say YES to confirm safe', 'सुरक्षित की पुष्टि के लिए हाँ बोलिए');
+  String get voiceSendingStatus => _p('Sending your reply…', 'आपका जवाब भेजा जा रहा है…');
+  String get voiceDoneSafe => _p('Marked safe by voice', 'आवाज़ से सुरक्षित दर्ज');
+  String get voiceDoneHelp => _p('Help requested by voice', 'आवाज़ से मदद माँगी गई');
+  String get voiceQueuedStatus => _p('Saved on phone — will send when online', 'फ़ोन में सहेजा — नेटवर्क आने पर भेजेगा');
+  String get voiceGaveUpStatus => _p('Not understood — please use the buttons or SMS',
+      'समझ नहीं आया — कृपया बटन या SMS इस्तेमाल करें');
+  String get voiceUnavailable => _p('Voice reply is not available on this phone. Please use the buttons.',
+      'इस फ़ोन पर आवाज़ से जवाब उपलब्ध नहीं है। कृपया बटन इस्तेमाल करें।');
+  String voiceHeard(String words) => _p('Heard: "$words"', 'सुना: "$words"');
+  String get micPermission => _p('Microphone (answer alerts by voice)', 'माइक्रोफ़ोन (आवाज़ से जवाब)');
+
   // ---------------------------------------------------------------- emergency response
   String get areYouSafe => _p('Are you safe?', 'क्या आप सुरक्षित हैं?');
   String get iAmSafe => _p('I AM SAFE', 'मैं सुरक्षित हूँ');

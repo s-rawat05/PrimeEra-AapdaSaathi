@@ -68,6 +68,6 @@ class AlertRepository {
       _api.alertHistory(limit: limit, offset: offset);
 
   /// SAFE/HELP with a fresh idempotency key; queued on this device if the network is down.
-  Future<SendResult> respond(String deliveryId, String status) =>
-      queue.send(_api, deliveryId, status, _uuid.v4());
+  Future<SendResult> respond(String deliveryId, String status, {String? note}) =>
+      queue.send(_api, deliveryId, status, _uuid.v4(), note: note);
 }

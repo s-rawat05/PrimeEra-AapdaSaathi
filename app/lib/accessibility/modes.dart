@@ -17,8 +17,7 @@ class AlertModes {
     'feature_phone': ['sms_only'],
   };
 
-  factory AlertModes.fromNeeds(Iterable<String> needs) =>
-      AlertModes([for (final n in needs) ...?needModes[n]]);
+  factory AlertModes.fromNeeds(Iterable<String> needs) => AlertModes([for (final n in needs) ...?needModes[n]]);
 
   final Set<String> raw;
 

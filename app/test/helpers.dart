@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:aapda_saathi/accessibility/alert_effects.dart';
+import 'package:aapda_saathi/accessibility/voice_input.dart';
 import 'package:aapda_saathi/app.dart';
 import 'package:aapda_saathi/core/api_client.dart';
 import 'package:aapda_saathi/core/api_exception.dart';
@@ -25,8 +26,7 @@ dynamic fixture(String name) => jsonDecode(File('test/fixtures/$name.json').read
 
 Json fixtureObj(String name) => Map<String, dynamic>.from(fixture(name) as Map);
 
-List<Json> fixtureList(String name) =>
-    (fixture(name) as List).map((e) => Map<String, dynamic>.from(e as Map)).toList();
+List<Json> fixtureList(String name) => (fixture(name) as List).map((e) => Map<String, dynamic>.from(e as Map)).toList();
 
 Json meFor(String role) {
   switch (role) {
@@ -75,6 +75,7 @@ class FakeApi implements AapdaApi {
   bool volunteerAvailable = true;
   final List<String> calls = [];
   final List<(String, String, String)> responds = []; // (deliveryId, status, key)
+  final List<String?> respondNotes = [];
 
   Never _offline() => throw const ApiException.network();
 
@@ -86,7 +87,12 @@ class FakeApi implements AapdaApi {
   @override
   Future<OtpRequestOut> requestOtp(String phone) async {
     _guard('requestOtp');
-    return OtpRequestOut(sent: true, expiresIn: 300, channel: 'simulator', note: 'Code delivered to the SMS simulator inbox (demo).');
+    return OtpRequestOut(
+      sent: true,
+      expiresIn: 300,
+      channel: 'simulator',
+      note: 'Code delivered to the SMS simulator inbox (demo).',
+    );
   }
 
   @override
@@ -184,9 +190,10 @@ class FakeApi implements AapdaApi {
   }
 
   @override
-  Future<RespondOut> respond(String deliveryId, String status, {required String idempotencyKey}) async {
+  Future<RespondOut> respond(String deliveryId, String status, {required String idempotencyKey, String? note}) async {
     _guard('respond:$status');
     responds.add((deliveryId, status, idempotencyKey));
+    respondNotes.add(note);
     for (final a in alerts) {
       if (a['delivery_id'] == deliveryId) a['status'] = status;
     }
@@ -245,7 +252,13 @@ class FakeApi implements AapdaApi {
       ..._task(taskId),
       'resident_full_name': 'Kamla Devi Bisht',
       'resident_phone': '+919000000001',
-      'exact_location': {'lat': 29.35, 'lng': 79.55, 'address_text': 'House 3', 'landmark': null, 'source': 'registration'},
+      'exact_location': {
+        'lat': 29.35,
+        'lng': 79.55,
+        'address_text': 'House 3',
+        'landmark': null,
+        'source': 'registration',
+      },
       'location_note': 'Exact location shown because this task is active.',
       'official_instruction': 'Move to Demo Relief Post A.',
       'shelters': <dynamic>[],
@@ -295,6 +308,7 @@ Future<Harness> pumpApp(
   Set<String> announced = const {},
   bool introSeen = true,
   bool settleAfter = true,
+  VoiceInput? voice,
 }) async {
   SharedPreferences.setMockInitialValues({
     'ui.language': lang,
@@ -321,6 +335,7 @@ Future<Harness> pumpApp(
     location: const NoLocation(),
     permissions: FakePermissionGateway(),
     launcher: launcher,
+    voice: voice,
     enableLiveUpdates: false,
     enableMapTiles: false,
   );

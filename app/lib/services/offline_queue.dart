@@ -19,16 +19,18 @@ class QueuedReply {
     required this.createdAt,
     this.attempts = 0,
     this.lastError,
+    this.note,
   });
 
   factory QueuedReply.fromJson(Map<String, dynamic> j) => QueuedReply(
-        idempotencyKey: j['key'] as String,
-        deliveryId: j['delivery_id'] as String,
-        status: j['status'] as String,
-        createdAt: DateTime.parse(j['created_at'] as String),
-        attempts: (j['attempts'] as num?)?.toInt() ?? 0,
-        lastError: j['last_error'] as String?,
-      );
+    idempotencyKey: j['key'] as String,
+    deliveryId: j['delivery_id'] as String,
+    status: j['status'] as String,
+    createdAt: DateTime.parse(j['created_at'] as String),
+    attempts: (j['attempts'] as num?)?.toInt() ?? 0,
+    lastError: j['last_error'] as String?,
+    note: j['note'] as String?,
+  );
 
   final String idempotencyKey;
   final String deliveryId;
@@ -37,14 +39,18 @@ class QueuedReply {
   int attempts;
   String? lastError;
 
+  /// Optional note for operators (e.g. "Confirmed by voice").
+  final String? note;
+
   Map<String, dynamic> toJson() => {
-        'key': idempotencyKey,
-        'delivery_id': deliveryId,
-        'status': status,
-        'created_at': createdAt.toUtc().toIso8601String(),
-        'attempts': attempts,
-        'last_error': lastError,
-      };
+    'key': idempotencyKey,
+    'delivery_id': deliveryId,
+    'status': status,
+    'created_at': createdAt.toUtc().toIso8601String(),
+    'attempts': attempts,
+    'last_error': lastError,
+    if (note != null) 'note': note,
+  };
 }
 
 /// Outcome of sending a reply: delivered (with the server's answer) or queued on this device.
@@ -109,9 +115,9 @@ class OfflineQueue extends ChangeNotifier {
   }
 
   /// Try to send immediately; on a retryable failure, queue it. Other errors are rethrown.
-  Future<SendResult> send(AapdaApi api, String deliveryId, String status, String idempotencyKey) async {
+  Future<SendResult> send(AapdaApi api, String deliveryId, String status, String idempotencyKey, {String? note}) async {
     try {
-      final out = await api.respond(deliveryId, status, idempotencyKey: idempotencyKey);
+      final out = await api.respond(deliveryId, status, idempotencyKey: idempotencyKey, note: note);
       // A delivered reply supersedes anything still queued for this alert.
       for (final q in items.where((q) => q.deliveryId == deliveryId)) {
         await _box.delete(q.idempotencyKey);
@@ -127,6 +133,7 @@ class OfflineQueue extends ChangeNotifier {
         createdAt: DateTime.now().toUtc(),
         attempts: 1,
         lastError: e.message,
+        note: note,
       );
       await add(q);
       return SendResult.queued(q);
@@ -141,7 +148,7 @@ class OfflineQueue extends ChangeNotifier {
     try {
       for (final q in items) {
         try {
-          final out = await api.respond(q.deliveryId, q.status, idempotencyKey: q.idempotencyKey);
+          final out = await api.respond(q.deliveryId, q.status, idempotencyKey: q.idempotencyKey, note: q.note);
           await _box.delete(q.idempotencyKey);
           sent++;
           onDelivered?.call(q, out);

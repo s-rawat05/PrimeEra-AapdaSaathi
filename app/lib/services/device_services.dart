@@ -47,7 +47,7 @@ class GeolocatorLocation implements LocationProvider {
 
 enum PermState { granted, denied, permanentlyDenied, unsupported }
 
-enum AppPermission { notifications, location, camera }
+enum AppPermission { notifications, location, camera, microphone }
 
 /// Permission status/requests through permission_handler. Browsers report [PermState.unsupported].
 abstract class PermissionGateway {
@@ -78,6 +78,7 @@ class HandlerPermissionGateway implements PermissionGateway {
         AppPermission.notifications => Permission.notification,
         AppPermission.location => Permission.locationWhenInUse,
         AppPermission.camera => Permission.camera,
+        AppPermission.microphone => Permission.microphone,
       };
 
   PermState _conv(PermissionStatus s) {

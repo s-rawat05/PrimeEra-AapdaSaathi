@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'accessibility/alert_effects.dart';
+import 'accessibility/voice_input.dart';
 import 'app.dart';
 import 'core/api_client.dart';
 import 'core/config.dart';
@@ -53,6 +54,7 @@ Future<void> main() async {
     launcher: UrlExternalLauncher(),
     push: PushService(config),
     supabase: SupabaseAuth(config),
+    voice: DeviceVoiceInput(),
   );
 
   runApp(AapdaSaathiApp(controller: controller));

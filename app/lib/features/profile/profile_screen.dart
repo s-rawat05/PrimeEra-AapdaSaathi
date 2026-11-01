@@ -286,6 +286,7 @@ class _PermissionsCardState extends State<_PermissionsCard> {
           AppPermission.notifications => s.permNotifications,
           AppPermission.location => s.permLocation,
           AppPermission.camera => s.permCamera,
+          AppPermission.microphone => s.micPermission,
         };
     String stateText(PermState? st) => switch (st) {
           PermState.granted => s.permGranted,

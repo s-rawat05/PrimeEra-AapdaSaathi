@@ -21,6 +21,9 @@ abstract class AlertEffects {
 
   Future<void> start(AlertModes modes, {required List<String> speech, required String ttsLocale});
   Future<void> speak(List<String> lines, String ttsLocale);
+
+  /// Speaks and completes only when speech has finished (used before listening for a voice reply).
+  Future<void> speakAndWait(String text, String ttsLocale);
   Future<void> stop();
 
   /// Stops only the flashing overlay (the user asked to stop it); other effects continue.
@@ -40,6 +43,9 @@ class RecordingAlertEffects extends AlertEffects {
 
   @override
   Future<void> speak(List<String> lines, String ttsLocale) async => log.add('speak:${lines.length}');
+
+  @override
+  Future<void> speakAndWait(String text, String ttsLocale) async => log.add('say:$text');
 
   @override
   Future<void> stop() async {
@@ -161,6 +167,25 @@ class DeviceAlertEffects extends AlertEffects {
       await tts.speak(text);
     } catch (e) {
       debugPrint('Text-to-speech unavailable: $e');
+    }
+  }
+
+  @override
+  Future<void> speakAndWait(String text, String ttsLocale) async {
+    if (text.trim().isEmpty) return;
+    try {
+      final tts = _tts ??= FlutterTts();
+      await tts.setLanguage(ttsLocale);
+      await tts.setSpeechRate(kIsWeb ? 0.9 : 0.45);
+      await tts.awaitSpeakCompletion(true);
+      await tts.stop();
+      await tts.speak(text);
+    } catch (e) {
+      debugPrint('Text-to-speech unavailable: $e');
+    } finally {
+      try {
+        await _tts?.awaitSpeakCompletion(false);
+      } catch (_) {}
     }
   }
 

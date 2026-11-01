@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 
 import '../accessibility/alert_effects.dart';
+import '../accessibility/voice_input.dart';
 import '../accessibility/modes.dart';
 import '../core/api_client.dart';
 import '../core/api_exception.dart';
@@ -63,10 +64,11 @@ class AppController extends ChangeNotifier {
     required this.launcher,
     this.push,
     this.supabase,
+    this.voice,
     this.enableLiveUpdates = true,
     this.enableMapTiles = true,
-  })  : responders = ResponderRepository(api),
-        _lang = session.language {
+  }) : responders = ResponderRepository(api),
+       _lang = session.language {
     connectivity.onBackOnline = _onBackOnline;
     queue.onDelivered = (_, _) => _scheduleRefresh();
     connectivity.addListener(notifyListeners);
@@ -87,6 +89,9 @@ class AppController extends ChangeNotifier {
   final ExternalLauncher launcher;
   final PushService? push;
   final SupabaseAuth? supabase;
+
+  /// Speech recognition for hands-free SAFE/HELP (vision profile). Null where unavailable.
+  final VoiceInput? voice;
   final bool enableLiveUpdates;
 
   /// OSM tiles on the evacuation map (disabled in widget tests, which have no network).
@@ -403,11 +408,11 @@ class AppController extends ChangeNotifier {
 
   /// What text-to-speech reads for an alert: framing title/body, then the official instruction.
   List<String> speechFor(AlertOut a) => [
-        a.presentation.title,
-        a.presentation.body,
-        if (a.presentation.easyReadSteps.isNotEmpty) ...a.presentation.easyReadSteps,
-        if (modesFor(a).voicePrompts) '${s.areYouSafe} ${s.iAmSafe} / ${s.iNeedHelp}',
-      ];
+    a.presentation.title,
+    a.presentation.body,
+    if (a.presentation.easyReadSteps.isNotEmpty) ...a.presentation.easyReadSteps,
+    if (modesFor(a).voicePrompts) '${s.areYouSafe} ${s.iAmSafe} / ${s.iNeedHelp}',
+  ];
 
   Future<void> _refreshVolunteer() async {
     try {
@@ -501,8 +506,8 @@ class AppController extends ChangeNotifier {
 
   // ------------------------------------------------------------------ resident actions
   /// SAFE or HELP. Delivered immediately when online; otherwise queued (never shown as delivered).
-  Future<SendResult> respond(AlertOut a, String status) async {
-    final result = await alerts.respond(a.deliveryId, status);
+  Future<SendResult> respond(AlertOut a, String status, {String? note}) async {
+    final result = await alerts.respond(a.deliveryId, status, note: note);
     connectivity.reportRequest(result.isDelivered);
     if (result.isDelivered) {
       await effects.stop();

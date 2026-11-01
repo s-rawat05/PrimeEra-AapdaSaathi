@@ -138,13 +138,14 @@ async def apply_status(
 
 
 async def respond_as_resident(
-    session: AsyncSession, ctx: AppContext, delivery_id: str, status: str, actor: Actor
+    session: AsyncSession, ctx: AppContext, delivery_id: str, status: str, actor: Actor, note: str | None = None
 ) -> tuple[Delivery, bool]:
-    """Returns (delivery, changed). `changed` is decided under the row lock."""
+    """Returns (delivery, changed). `changed` is decided under the row lock.
+    `note` (e.g. "confirmed by voice") is shown to operators in the timeline."""
     dc = await get_delivery_ctx(session, delivery_id)
     if dc.resident.user_id != actor.user_id:
         raise Forbidden("This alert does not belong to you")
-    changed = await apply_status(session, ctx, dc, status, channel="app", actor=actor)
+    changed = await apply_status(session, ctx, dc, status, channel="app", actor=actor, note=note)
     return dc.delivery, changed
 
 
