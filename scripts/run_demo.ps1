@@ -17,7 +17,9 @@ param(
   [int]$EscalationSeconds = 45,
   [switch]$Fresh,     # delete the demo database first
   [switch]$Rebuild,   # rebuild both Flutter web apps for this API port
-  [switch]$LiveFeed   # poll SACHET in the background (needs internet)
+  [switch]$LiveFeed,  # poll SACHET in the background (needs internet)
+  [switch]$Open,      # open the command centre and resident app in the default browser
+  [switch]$Phone      # USB phone: tunnel phone:8000 -> laptop API (adb reverse) and launch the app
 )
 $ErrorActionPreference = "Stop"
 $root = Split-Path -Parent $PSScriptRoot
@@ -34,11 +36,17 @@ if ($Fresh -and (Test-Path $db)) { Remove-Item "$db*" -Force; Write-Host "Fresh 
 $api = "http://localhost:$ApiPort"
 foreach ($proj in @("dashboard", "app")) {
   $web = Join-Path $root "$proj\build\web\index.html"
-  if ($Rebuild -or -not (Test-Path $web)) {
+  # Each web build records the API address it was compiled for; a mismatch forces a rebuild.
+  $marker = Join-Path $root "$proj\build\web\.api_base"
+  $builtFor = if (Test-Path $marker) { (Get-Content $marker -Raw).Trim() } else { "" }
+  if ($Rebuild -or -not (Test-Path $web) -or $builtFor -ne $api) {
     Write-Host "Building $proj for $api ..."
     Push-Location (Join-Path $root $proj)
-    flutter build web --release --dart-define=API_BASE_URL=$api | Out-Host
+    flutter build web --release --no-wasm-dry-run --dart-define=API_BASE_URL=$api | Out-Host
+    $ok = $LASTEXITCODE -eq 0
     Pop-Location
+    if (-not $ok) { throw "Flutter web build failed for $proj" }
+    Set-Content -Path $marker -Value $api -Encoding ascii
   }
 }
 
@@ -62,5 +70,21 @@ Write-Host "  API + docs      $api/docs"
 Write-Host "  Command centre  http://localhost:$DashboardPort"
 Write-Host "  Resident app    http://localhost:$AppPort"
 Write-Host "  Scripted demo   $py scripts\demo_smoke.py $api --pace 3"
+
+for ($i = 0; $i -lt 30; $i++) {
+  try { Invoke-WebRequest "$api/api/v1/health" -UseBasicParsing -TimeoutSec 2 | Out-Null; break } catch { Start-Sleep -Seconds 1 }
+}
+if ($Phone) {
+  $adb = "C:\dev\android-sdk\platform-tools\adb.exe"
+  if (-not (Test-Path $adb)) { $adb = "adb" }
+  # The installed app calls http://127.0.0.1:8000 on the phone; forward that to this laptop's API.
+  & $adb reverse tcp:8000 tcp:$ApiPort | Out-Null
+  & $adb shell monkey -p in.primeera.aapda_saathi -c android.intent.category.LAUNCHER 1 2>&1 | Out-Null
+  Write-Host "  Phone           USB tunnel phone:8000 -> laptop:$ApiPort, app launched"
+}
+if ($Open) {
+  Start-Process "http://localhost:$DashboardPort"
+  Start-Process "http://localhost:$AppPort"
+}
 try { while ($true) { Start-Sleep -Seconds 2 } }
 finally { $jobs | ForEach-Object { Stop-Process -Id $_.Id -ErrorAction SilentlyContinue } }
