@@ -1,6 +1,6 @@
 import 'package:latlong2/latlong.dart';
 
-/// A polygon ring set: outer ring + holes, in map coordinates.
+/// A polygon ring set: outer boundary and optional inner holes.
 class PolygonRings {
   const PolygonRings(this.outer, this.holes);
 
@@ -8,40 +8,80 @@ class PolygonRings {
   final List<List<LatLng>> holes;
 }
 
+/// Converts a GeoJSON linear ring into Flutter Map coordinates.
+///
+/// GeoJSON uses [longitude, latitude], while LatLng uses
+/// (latitude, longitude).
 List<LatLng> _ring(Object? ring) {
-  if (ring is! List) return const [];
-  final out = <LatLng>[];
-  for (final p in ring) {
-    // GeoJSON positions are [longitude, latitude].
-    if (p is List && p.length >= 2 && p[0] is num && p[1] is num) {
-      out.add(LatLng((p[1] as num).toDouble(), (p[0] as num).toDouble()));
+  if (ring is! List) return const <LatLng>[];
+
+  final points = <LatLng>[];
+  for (final position in ring) {
+    if (position is List &&
+        position.length >= 2 &&
+        position[0] is num &&
+        position[1] is num) {
+      final longitude = (position[0] as num).toDouble();
+      final latitude = (position[1] as num).toDouble();
+
+      if (latitude >= -90 &&
+          latitude <= 90 &&
+          longitude >= -180 &&
+          longitude <= 180) {
+        points.add(LatLng(latitude, longitude));
+      }
     }
   }
-  return out;
+
+  return points;
 }
 
-PolygonRings? _polygon(Object? coords) {
-  if (coords is! List || coords.isEmpty) return null;
-  final outer = _ring(coords.first);
+PolygonRings? _polygon(Object? coordinates) {
+  if (coordinates is! List || coordinates.isEmpty) return null;
+
+  final outer = _ring(coordinates.first);
   if (outer.length < 3) return null;
-  return PolygonRings(outer, [for (final h in coords.skip(1)) _ring(h)].where((r) => r.length >= 3).toList());
+
+  final holes = <List<LatLng>>[];
+  for (final rawHole in coordinates.skip(1)) {
+    final hole = _ring(rawHole);
+    if (hole.length >= 3) holes.add(hole);
+  }
+
+  return PolygonRings(outer, holes);
 }
 
-/// Parses a GeoJSON Polygon / MultiPolygon geometry (or a Feature wrapping one).
+/// Parses GeoJSON Polygon, MultiPolygon, or a Feature containing either.
+///
+/// Unsupported or malformed geometries return an empty list instead of
+/// throwing, so a bad ward boundary does not break the complete map.
 List<PolygonRings> parseGeoJsonPolygons(Map<String, dynamic>? geometry) {
-  if (geometry == null) return const [];
+  if (geometry == null) return const <PolygonRings>[];
+
   final type = geometry['type'];
   if (type == 'Feature') {
-    final g = geometry['geometry'];
-    return g is Map<String, dynamic> ? parseGeoJsonPolygons(g) : const [];
+    final rawGeometry = geometry['geometry'];
+    if (rawGeometry is Map) {
+      return parseGeoJsonPolygons(Map<String, dynamic>.from(rawGeometry));
+    }
+    return const <PolygonRings>[];
   }
-  final coords = geometry['coordinates'];
+
+  final coordinates = geometry['coordinates'];
+
   if (type == 'Polygon') {
-    final p = _polygon(coords);
-    return p == null ? const [] : [p];
+    final polygon = _polygon(coordinates);
+    return polygon == null ? const <PolygonRings>[] : <PolygonRings>[polygon];
   }
-  if (type == 'MultiPolygon' && coords is List) {
-    return [for (final c in coords) _polygon(c)].whereType<PolygonRings>().toList();
+
+  if (type == 'MultiPolygon' && coordinates is List) {
+    final polygons = <PolygonRings>[];
+    for (final rawPolygon in coordinates) {
+      final polygon = _polygon(rawPolygon);
+      if (polygon != null) polygons.add(polygon);
+    }
+    return polygons;
   }
-  return const [];
+
+  return const <PolygonRings>[];
 }
