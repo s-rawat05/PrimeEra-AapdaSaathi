@@ -172,8 +172,13 @@ def create_app(settings: Settings | None = None, ctx: AppContext | None = None, 
             q.append(now)
         response = await call_next(request)
         response.headers["X-Content-Type-Options"] = "nosniff"
-        response.headers["Referrer-Policy"] = "no-referrer"
-        response.headers["Cache-Control"] = "no-store"
+        if path.startswith("/api/"):
+            # API data must not be cached or leak URLs. Not applied to the served web apps: their map
+            # tile requests need a Referer, without which OpenStreetMap returns "Access blocked" tiles.
+            response.headers["Referrer-Policy"] = "no-referrer"
+            response.headers["Cache-Control"] = "no-store"
+        else:
+            response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
         return response
 
     @app.exception_handler(DomainError)

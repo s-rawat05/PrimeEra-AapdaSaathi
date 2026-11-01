@@ -26,3 +26,12 @@ def test_audience_filtering_and_multiple_connections_per_user():
     assert "audience" not in me1.queue.get_nowait()  # recipients list is never leaked
     bus.unsubscribe(me1)
     assert bus.subscriber_count == 3
+
+
+async def test_strict_headers_on_api_only(env):
+    """API responses forbid referrers and caching; served web pages keep a Referer so OSM map tiles load."""
+    api = await env.client.get("/api/v1/health")
+    assert api.headers["referrer-policy"] == "no-referrer" and api.headers["cache-control"] == "no-store"
+    page = await env.client.get("/does-not-exist")
+    assert page.headers["referrer-policy"] == "strict-origin-when-cross-origin"
+    assert "cache-control" not in page.headers
