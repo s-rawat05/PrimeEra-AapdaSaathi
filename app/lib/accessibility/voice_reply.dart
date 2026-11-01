@@ -22,9 +22,24 @@ const _helpWords = {
   'bacha',
   'unsafe',
   'danger',
+  'rescue',
 };
 const _helpDevanagari = ['मदद', 'बचाओ', 'बचा', 'हेल्प', 'खतरा'];
-const _safeWords = {'safe', 'fine', 'surakshit', 'surakshith', 'theek', 'thik', 'thick', 'okay'};
+// 'save'/'saved': Indian-English speech recognition often hears "safe" as "save" (seen on a real
+// device). Safe to accept because SAFE is only sent after a spoken YES; "save me" is HELP (below).
+const _safeWords = {
+  'safe',
+  'safely',
+  'save',
+  'saved',
+  'fine',
+  'surakshit',
+  'surakshith',
+  'theek',
+  'thik',
+  'thick',
+  'okay',
+};
 const _safeDevanagari = ['सुरक्षित', 'ठीक', 'सेफ'];
 const _negations = {'not', 'no', 'nahi', 'nahin', 'nai', 'isnt', 'arent', 'dont'};
 const _negationsDevanagari = ['नहीं', 'नही', 'ना'];
@@ -38,6 +53,14 @@ final _word = RegExp(r'[a-zऀ-ॣ०-ॿ]+');
 
 List<String> _words(String t) => _word.allMatches(t.toLowerCase()).map((m) => m.group(0)!).toList();
 
+/// "save me" / "save us" is a cry for help, not "safe".
+bool _saveMe(List<String> w) {
+  for (var i = 0; i + 1 < w.length; i++) {
+    if (w[i] == 'save' && (w[i + 1] == 'me' || w[i + 1] == 'us')) return true;
+  }
+  return false;
+}
+
 bool _any(List<String> words, Set<String> latin, List<String> deva) =>
     words.any((w) => latin.contains(w) || deva.contains(w));
 
@@ -46,7 +69,7 @@ VoiceIntent interpretAnswer(String? transcript) {
   final t = (transcript ?? '').trim();
   if (t.isEmpty) return VoiceIntent.unknown;
   final words = _words(t);
-  if (_any(words, _helpWords, _helpDevanagari)) return VoiceIntent.help;
+  if (_any(words, _helpWords, _helpDevanagari) || _saveMe(words)) return VoiceIntent.help;
   final saysSafe = _any(words, _safeWords, _safeDevanagari);
   final negated = _any(words, _negations, _negationsDevanagari);
   if (saysSafe && negated) return VoiceIntent.help; // "not safe", "surakshit nahi", "ठीक नहीं"
@@ -59,7 +82,7 @@ VoiceIntent interpretConfirmation(String? transcript) {
   final t = (transcript ?? '').trim();
   if (t.isEmpty) return VoiceIntent.unknown;
   final words = _words(t);
-  if (_any(words, _helpWords, _helpDevanagari)) return VoiceIntent.help;
+  if (_any(words, _helpWords, _helpDevanagari) || _saveMe(words)) return VoiceIntent.help;
   final yes = _any(words, _yesWords, _yesDevanagari);
   final no = _any(words, _noWords, _noDevanagari);
   if (yes && !no) return VoiceIntent.yes;

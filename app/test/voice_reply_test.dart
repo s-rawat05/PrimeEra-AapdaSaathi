@@ -22,6 +22,19 @@ void main() {
       }
     });
 
+    test('real device mishearing: "safe" heard as "save" is a SAFE candidate', () {
+      for (final t in ['save', 'save save', 'I am save', 'saved', 'I am safely home']) {
+        expect(interpretAnswer(t), VoiceIntent.safe, reason: t);
+      }
+    });
+
+    test('"save me" and "rescue" are cries for help', () {
+      for (final t in ['save me', 'please save us', 'rescue', 'not saved']) {
+        expect(interpretAnswer(t), VoiceIntent.help, reason: t);
+      }
+      expect(interpretConfirmation('save me'), VoiceIntent.help);
+    });
+
     test('help wins, including negated safe', () {
       for (final t in [
         'help',
