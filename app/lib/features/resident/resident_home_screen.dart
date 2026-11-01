@@ -401,7 +401,7 @@ class AlertStatusCard extends StatelessWidget {
             children: [
               Expanded(
                 child: Text(
-                  'Potensi Bencana • ${s.officialAlertStatus}',
+                  s.officialAlertStatus,
                   style: const TextStyle(color: AppColors.gray, fontSize: 13, fontWeight: FontWeight.w600),
                 ),
               ),
