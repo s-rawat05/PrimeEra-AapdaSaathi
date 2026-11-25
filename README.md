@@ -3,8 +3,7 @@
 **From "alert delivered" to "person confirmed safe or helped."**
 App where possible. SMS everywhere. A human for those who don't reply.
 
-Team **PRIME ERA** · Graphic Era Hill University, Bhimtal · SAARTHI'26 (Smart Cities, Mobility & Public Safety)
-Sahil Rawat (lead) · Udit Joshi · Ayush Mahara · Saksham Pantola
+Team **PRIME ERA** · Graphic Era Hill University, Bhimtal 
 
 ---
 
